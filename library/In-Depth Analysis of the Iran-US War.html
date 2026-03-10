@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fifth Middle East War & Iran Crisis — In-Depth Strategic Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #ffffff;
+            color: #1f2937;
+            scroll-behavior: smooth;
+        }
+        .chart-container { position: relative; margin: auto; height: 350px; width: 100%; }
+        .kpi-card {
+            background-color: white; border-radius: 0.75rem; padding: 1.5rem;
+            border: 1px solid #fee2e2;
+            box-shadow: 0 4px 6px -1px rgb(255 77 79 / 0.1), 0 2px 4px -2px rgb(255 77 79 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(255 77 79 / 0.15), 0 4px 6px -4px rgb(255 77 79 / 0.1); }
+        .nav-link { transition: all 0.3s ease; color: #4b5563; }
+        .nav-link.active, .nav-link:hover { background-color: #ff4d4f; color: white; }
+        .content-section { scroll-margin-top: 80px; }
+        .theme-text-primary { color: #ff4d4f; }
+        .timeline-container { position: relative; padding-left: 2rem; }
+        .timeline-container::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background-color: #fca5a5; }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
+        .timeline-dot { position: absolute; left: -2.1rem; top: 0.25rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: #ff4d4f; border: 3px solid white; box-shadow: 0 0 0 2px #fca5a5; }
+        .expert-quote { border-left: 4px solid #ff4d4f; background: linear-gradient(to right, #fef2f2, transparent); }
+        .insight-box { background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%); border: 1px solid #fecaca; border-radius: 0.75rem; padding: 1.5rem; }
+        .strategy-card { background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; transition: all 0.3s ease; }
+        .strategy-card:hover { border-color: #fca5a5; box-shadow: 0 8px 25px -5px rgba(255,77,79,0.1); }
+        .phase-card { position: relative; overflow: hidden; }
+        .phase-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .phase-1::before { background: #1e40af; }
+        .phase-2::before { background: #d97706; }
+        .phase-3::before { background: #dc2626; }
+        .risk-meter { height: 8px; border-radius: 4px; background: #e5e7eb; overflow: hidden; }
+        .risk-meter-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .scenario-card { border: 1px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden; transition: all 0.3s ease; }
+        .scenario-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -8px rgba(0,0,0,0.12); }
+        .geopolitics-table th { background: #1f2937; color: white; padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .geopolitics-table td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .geopolitics-table tr:hover td { background: #fef2f2; }
+        .cta-slide-link { background: linear-gradient(135deg, #1f2937 0%, #374151 100%); border: 1px solid #4b5563; transition: all 0.3s ease; }
+        .cta-slide-link:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.3); border-color: #ff4d4f; }
+        .section-bridge { background: #f9fafb; border-left: 3px solid #ff4d4f; padding: 1rem 1.25rem; margin-bottom: 2rem; border-radius: 0 0.5rem 0.5rem 0; }
+        .section-number { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: #ff4d4f; color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 800; margin-right: 0.5rem; flex-shrink: 0; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen flex">
+        
+        <!-- Mobile top bar -->
+        <div class="md:hidden fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/95 backdrop-blur-sm z-50 border-b border-red-100 shadow-sm">
+            <h1 class="text-xl font-bold theme-text-primary">Crisis Analysis Dashboard</h1>
+            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Fixed sidebar -->
+        <aside id="sidebar" class="bg-gray-50 border-r border-gray-200 text-gray-800 w-64 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 shadow-sm overflow-y-auto pt-20 md:pt-8 pb-8 px-4 flex flex-col h-screen">
+            <div class="mb-8 px-2">
+                <span class="text-xs font-bold text-red-500 tracking-wider uppercase">Strategic Report</span>
+                <h2 class="text-2xl font-bold text-gray-900 leading-tight mt-1">The Fifth<br>Middle East War</h2>
+            </div>
+            <nav id="main-nav" class="flex flex-col space-y-1.5">
+                <a href="#overview" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">1</span>Crisis Overview</a>
+                <a href="#geopolitics" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">2</span>Why It Erupted</a>
+                <a href="#history" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">3</span>War Timeline</a>
+                <a href="#experts" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">4</span>Expert Analysis</a>
+                <a href="#military" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">5</span>Battlefield Dynamics</a>
+                <a href="#regime" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">6</span>Why It Won't End</a>
+                <a href="#economy" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">7</span>Economic Shockwave</a>
+                <a href="#scenarios" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">8</span>Scenarios & Recommendations</a>
+            </nav>
+            <div class="mt-auto pt-8 px-2 text-xs text-gray-400">
+                <p>Source: Zakaria, Park, Sung, In</p>
+                <p>Date: March 2026</p>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="flex-1 min-w-0 md:ml-64 pt-20 md:pt-8 px-4 sm:px-8 lg:px-12 pb-24 bg-white">
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: CRISIS OVERVIEW (WHAT HAPPENED) -->
+            <!-- ============================================================ -->
+            <section id="overview" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 1 — CRISIS OVERVIEW</div>
+                <h2 class="text-4xl md:text-5xl font-black mb-6 text-gray-900 tracking-tight">Trump's 'Regime Change' vs.<br>Iran's Fight to the Death</h2>
+                <p class="text-lg md:text-xl leading-relaxed text-gray-700 mb-6 max-w-4xl">
+                    On February 28, 2026, a massive U.S.–Israeli airstrike codenamed <strong>'Operation Epic Fury'</strong> killed Supreme Leader Ayatollah Ali Khamenei, catapulting the Fifth Middle East War into an entirely new phase.
+                    Deploying roughly 45% of the U.S. Air Force and two carrier strike groups, this unprecedented operation precision-struck Iran's strategic depth. Yet the 47-year-old theocratic regime refuses to crumble. Iran has declared a blockade of the Strait of Hormuz, global oil prices are surging, and the specter of a ground invasion — the worst-case scenario — looms ever larger.
+                </p>
+
+                <!-- Source references -->
+                <div class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p class="text-sm font-bold text-gray-600 mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Source References
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://www.youtube.com/watch?v=JlOai763iOw" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Zakaria Interview (3/3)</a>
+                        <a href="https://www.youtube.com/watch?v=EpOyzzNuwVk" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Zakaria CNN GPS (3/2)</a>
+                        <a href="https://www.youtube.com/watch?v=MneeAAldEJg" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Prof. Park Hyun-do (3/3)</a>
+                        <a href="https://www.youtube.com/watch?v=UrMpNu_81_A" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Park & Sung Panel (3/3)</a>
+                        <a href="https://www.facebook.com/share/p/175xV3r1s8/" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Prof. In Nam-sik (3/1)
+                        </a>
+                        <a href="https://www.facebook.com/share/p/1P7wkPXPP5/" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Prof. In Nam-sik (3/2)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Visual slides CTA -->
+                <div class="mb-10">
+                    <a href="https://drive.google.com/file/d/1OQy2gUU9Ieczye7FPE1ygHoSKUV2M2mk/view?usp=sharing" target="_blank" class="cta-slide-link block rounded-xl p-5 text-white no-underline">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Visual Briefing Slides</p>
+                                <h3 class="text-lg md:text-xl font-black text-white mb-0.5">📊 When Fantasy Meets Reality: The Hidden Dynamics & Global Geopolitical Risks of the Fifth Middle East War</h3>
+                                <p class="text-sm text-gray-400">Full presentation deck (15 slides) — View on Google Drive →</p>
+                            </div>
+                            <svg class="w-8 h-8 text-gray-400 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- KPI -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="kpi-card border-t-4 border-t-red-500">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">Population at Stake</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">92 Million</p>
+                        <p class="text-xs text-gray-500 mt-2">Iran's total population. The latent scale of internal resistance forces that will determine the outcome of any regime change effort.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-gray-800">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">Theocratic Regime Duration</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">47 Years</p>
+                        <p class="text-xs text-gray-500 mt-2">Fortified by the IRGC and a deep bureaucracy, this power structure is too entrenched to collapse from airstrikes alone.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-red-500">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">U.S. Casualties</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">Confirmed</p>
+                        <p class="text-xs text-gray-500 mt-2">Pentagon-confirmed casualties from Iranian retaliatory strikes on U.S. bases in Iraq and the Gulf region.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-gray-800">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">Force Deployment</p>
+                        <p class="text-xl font-black text-gray-900 mt-2">45% USAF + 2 Carrier Groups</p>
+                        <p class="text-xs text-gray-500 mt-2">An unprecedented force projection. Natanz, Fordow, and Isfahan nuclear facilities and missile bases destroyed.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: WHY IT ERUPTED — GEOPOLITICAL DRIVERS -->
+            <!-- ============================================================ -->
+            <section id="geopolitics" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 2 — GEOPOLITICAL DRIVERS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">Why It Erupted: Four Decades<br>of Grudges & Clashing Interests</h2>
+                <p class="text-gray-600 mb-8 max-w-3xl">This crisis is not a simple religious or sectarian conflict. It is a calculated collision of interests — rooted in over 40 years of structural hostility since the 1979 Iranian Revolution — with each party seizing Iran's moment of weakness to reshape the Middle Eastern power order.</p>
+
+                <!-- Strange Bedfellows table -->
+                <div class="mb-10">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Strange Bedfellows: The Hidden Calculus of Each Attacker</h3>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                        <table class="geopolitics-table w-full">
+                            <thead><tr><th class="rounded-tl-xl">State / Leader</th><th>Core Objective</th><th class="rounded-tr-xl">Underlying Motivation (So What?)</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇺🇸 U.S. (Trump)</td>
+                                    <td><strong>Regime change</strong> & proving "peace through strength"</td>
+                                    <td>A fatalistic pursuit of "the deal as victory." Rallying the midterm base, surpassing Obama's foreign policy legacy. A unilateral decision made at the expense of congressional approval.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇮🇱 Israel (Netanyahu)</td>
+                                    <td><strong>Complete elimination of Iran's missile threat</strong> & existential risk</td>
+                                    <td>Described as "the realization of a 40-year dream." An ideological war to erase the Iranian regime from the map. An escape from the political fatigue of the Gaza war.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇸🇦 Saudi Arabia (MBS)</td>
+                                    <td><strong>Fundamental removal of the Iranian threat</strong> & protecting economic transformation</td>
+                                    <td><strong class="text-red-600">The single most driving force behind this attack.</strong> Seizing this window to eliminate Iran as a security liability threatening NEOM and Vision 2030. MBS aggressively lobbied Trump to launch the strike.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Iran's strategic miscalculation -->
+                <div class="insight-box mb-10">
+                    <h4 class="font-bold text-gray-900 mb-3">🔴 Iran's Fatal Strategic Miscalculation: Misreading the Gulf States</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed mb-4">Iran assumed Saudi Arabia and other Gulf states would remain neutral. Instead, exhausted by years of Iranian provocations, MBS proactively lobbied Trump and drove the attack forward. A sense of <strong>"If we don't cooperate, we end up on the menu"</strong> pervaded the GCC, and Iran's strikes on Aramco and LNG facilities boomeranged — they cemented a tactical alliance binding the Gulf states to the U.S. and Israel rather than fracturing it.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">Air Defense Depletion</p>
+                            <p class="text-xl font-black text-red-600">3:1</p>
+                            <p class="text-xs text-gray-500">3 interceptors per incoming</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">Anti-Iran Coalition</p>
+                            <p class="text-xl font-black text-red-600">9 Nations</p>
+                            <p class="text-xs text-gray-500">Incl. Oman & Qatar</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">Bahrain Shia Pop.</p>
+                            <p class="text-xl font-black text-amber-600">75-80%</p>
+                            <p class="text-xs text-gray-500">Internal sectarian risk</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">Kuwait Shia Pop.</p>
+                            <p class="text-xl font-black text-amber-600">~50%</p>
+                            <p class="text-xs text-gray-500">Instability variable</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Russia vs China -->
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Great Power Calculus: The One Who Thrives on Chaos vs. The One Who Needs Stability</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="strategy-card border-l-4 border-l-amber-500">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">🇷🇺</span>
+                            <div><h4 class="font-bold text-gray-900">Russia: Beneficiary of Instability</h4><p class="text-xs text-amber-600 font-semibold">Commodity Superpower — Wants Chaos</p></div>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-3">As an energy exporter, high oil prices triggered by a Middle Eastern war are a windfall for Russia. The more the U.S. and the West are bogged down in the region, the wider <strong>Russia's room to maneuver on the Ukraine front</strong> becomes.</p>
+                        <div class="risk-meter"><div class="risk-meter-fill bg-amber-500" style="width: 85%;"></div></div>
+                        <p class="text-xs text-gray-400 mt-1">Chaos Benefit Index: 85/100</p>
+                    </div>
+                    <div class="strategy-card border-l-4 border-l-blue-500">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">🇨🇳</span>
+                            <div><h4 class="font-bold text-gray-900">China: Master of the Double Game</h4><p class="text-xs text-blue-600 font-semibold">Trade Superpower — Wants Stability, But...</p></div>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-3">As the "world's factory," the safety of the Strait of Hormuz is existential for China. Yet behind the scenes, it supplies Iran with its <strong>Beidou satellite navigation system</strong>, playing a parallel role as part of an "axis of instability" designed to check Western dominance.</p>
+                        <div class="risk-meter"><div class="risk-meter-fill bg-blue-500" style="width: 65%;"></div></div>
+                        <p class="text-xs text-gray-400 mt-1">Double Game Risk: 65/100</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: WAR TIMELINE (WHEN) -->
+            <!-- ============================================================ -->
+            <section id="history" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 3 — TIMELINE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">War Timeline: From Proxy Collapse<br>to All-Out Conflict</h2>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> Tracing how the geopolitical interests outlined above translated into military action across three escalating phases. The crisis built gradually before exploding.</p>
+                </div>
+
+                <!-- Phase 1 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md">P1</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">Collapse of Iran's "Ring of Fire" (Proxy Network)</h3>
+                            <p class="text-sm text-amber-600 font-semibold">2023 – 2024</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-amber-400 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">October 2023</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Hamas Surprise Attack & Gaza War Erupts</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">The opening act of the Middle Eastern power struggle. Iran's "Axis of Resistance" proxy network — built over 40 years — was thrust into live combat, turning the shadow war with Israel into an overt confrontation.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">April 2024</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">First-Ever Direct Territorial Strikes Between Iran & Israel</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">The end of the decades-long "shadow war." Both nations struck each other's sovereign territory for the first time, shattering the taboo and decisively lowering the threshold for all-out conflict.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">Late 2024</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Hezbollah Leadership Decimated & Assad Regime Falls in Syria</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">Israeli targeted operations neutralized Hezbollah's senior leadership — Iran's most critical regional proxy. Simultaneously, the Assad regime collapsed in Syria, severing Iran's overland supply corridor linking Lebanon and Syria. Iran's "Ring of Fire" strategy was effectively dismantled.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md">P2</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">Crossing the Red Line & The Nuclear Crisis</h3>
+                            <p class="text-sm text-orange-600 font-semibold">2025 – February 2026</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-orange-500 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-orange-500 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-orange-700">June 2025 — First Strike: The 12-Day War</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Concentrated Bombing of Iran's Core Nuclear Facilities</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">With Trump's backing, Israel launched the offensive. U.S. B-2 bombers were deployed to strike three key nuclear sites: Natanz, Fordow, and Isfahan. The physical foundation of Iran's nuclear program was destroyed, making a second war virtually inevitable.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-orange-500 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-orange-700">Early February 2026 — Negotiations Collapse</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Final Collapse of the Geneva Nuclear Agreement</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">The last window for a diplomatic resolution slammed shut as the Geneva nuclear talks collapsed definitively. The political justification for a full-scale U.S.–Israeli military campaign was secured, and the diplomatic brakes were destroyed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md animate-pulse">P3</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">Regime Change & Total War</h3>
+                            <p class="text-sm text-red-600 font-semibold">February 28, 2026 – Present</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-red-600 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-red-600 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-red-700">February 28, 2026 — Operation Epic Fury</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Massive U.S.–Israeli Surprise Strike</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">Exploiting Vienna diplomatic talks as a deception screen, the coalition achieved tactical surprise. Deploying ~45% of the U.S. Air Force and two carrier strike groups, they precision-struck hundreds of military, missile, and command targets across Iran. Supreme Leader Khamenei and senior IRGC leadership were eliminated. Trump declared "regime change" the official objective.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-red-600 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow animate-pulse"></span>
+                                <span class="text-sm font-bold text-red-700">Early March 2026 — Ongoing</span>
+                            </div>
+                            <h4 class="font-bold text-red-700 mb-1">Iran's Immediate Retaliation & Escalation to Total War</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">Iran launched counterstrikes within 2 hours, following pre-established decentralized protocols. Declaring a blockade of the Strait of Hormuz, Iran unleashed ballistic missiles and drones against U.S. bases across 9 Gulf states and major energy infrastructure (Aramco, Qatar LNG facilities). Strikes hit Israeli government buildings with assassination attempts on Netanyahu. Remnant Hezbollah forces joined the fight, opening a multi-front war.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: EXPERT ANALYSIS (WHO SAYS WHAT) -->
+            <!-- ============================================================ -->
+            <section id="experts" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 4 — EXPERT INSIGHTS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">How the Experts<br>Read This War</h2>
+                
+                <div class="section-bridge mb-8">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> Three experts dissect the strategic implications revealed at each stage of the timeline, each from a distinct analytical vantage point.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">FZ</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">Fareed Zakaria</h3><p class="text-xs text-gray-500">Foreign Affairs Commentator, CNN</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "The death of an 86-year-old tyrant could mean liberation for 92 million Iranians, but America's 'regime change' strategy is profoundly naive. An oppressive dictatorship armed with guns and 47 years of entrenched power does not collapse overnight. Unmanned AI precision strikes have become the new standard of warfare, and the next targets will be Iran's naval forces threatening the Strait of Hormuz — submarines, small craft — and mid-level IRGC commanders."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#RegimeChangeIllusion</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#AIPrecisionStrikes</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">PH</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">Prof. Park Hyun-do</h3><p class="text-xs text-gray-500">Sogang Univ., EuroMENA Institute</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "This war will not end quickly. Trump wants the trophy of 'regime change,' but he cannot paralyze the Iranian government without deploying ground forces — the slowest and worst option available. The U.S. has suffered casualties with nothing to show for it, and neither the surrounding Middle Eastern states nor Russia or China have the will or capability to mediate. The greatest danger is a stalemate with no exit strategy."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#GroundForceRisk</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#NoMediator</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">SI</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">Prof. Sung Il-kwang</h3><p class="text-xs text-gray-500">Sogang Univ., EuroMENA Institute</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "Last year's 12-day air campaign in June 2025, using B-2 bombers to strike Iran's nuclear facilities at Natanz and Fordow, was only the prologue. The key inflection point to watch is Iran's retaliation target. Ali Larijani declared they would 'strike the heart,' and Iran has targeted Israeli government buildings while actively seeking to assassinate Netanyahu. Whether or not they succeed in killing Netanyahu will be the single largest inflection point determining escalation or de-escalation."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#NetanyahuTarget</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#RetaliationCycle</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: BATTLEFIELD DYNAMICS (HOW THEY FIGHT) -->
+            <!-- ============================================================ -->
+            <section id="military" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 5 — MILITARY DYNAMICS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">Battlefield Dynamics: How<br>Each Side Is Fighting</h2>
+                <p class="text-gray-600 mb-4 max-w-3xl">Modern warfare is not decided by technological superiority alone. Iran is waging a war of "Capability vs. Capacity" — attacking the adversary's economic limits through asymmetric strategy.</p>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> A concrete analysis of the military foundations behind the experts' assertion that a protracted war is inevitable — through a comparative breakdown of both sides' strategies.</p>
+                </div>
+
+                <!-- U.S.–Israel strategy -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-black text-gray-900 mb-5 flex items-center">
+                        <span class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm mr-3">US</span>
+                        U.S.–Israel Coalition: Unmanned AI Precision Decapitation
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">🎯 Senior Leadership Decapitation</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">Khamenei and senior leadership eliminated. Drone and AI precision-strike technology applied at every level of military operations — the new standard of modern warfare. Israel's intelligence capability in pinpointing Khamenei's location provided GCC nations with "proven operational trust."</p>
+                        </div>
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">🚢 Next Target: Neutralizing Iran's Navy</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">To prevent a Hormuz Strait blockade, pre-emptive strikes are planned against Iran's minelayers, fast attack craft, and diesel submarines. This naval campaign will be the critical watershed for global energy supply chain security.</p>
+                        </div>
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">👤 Eliminating Mid-Level Commanders</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">Targeting mid-tier IRGC commanders to create conditions for internal uprising and collaboration with protest movements. However, the IRGC's decentralized manual system allows each unit to operate independently, limiting effectiveness.</p>
+                        </div>
+                        <div class="strategy-card border-red-200 bg-red-50/30">
+                            <h4 class="font-bold text-red-700 mb-2">⚠️ The Core Dilemma: A Historical Blind Spot</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong>No regime in history has ever been toppled by airstrikes alone.</strong> Afghanistan (2001), Iraq (2003), and Libya (2011) all required ground forces. Trump's hope for a 4–6 week short war stands in complete contradiction to every historical precedent.</p>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <p class="text-blue-800 font-bold mb-3 text-center">Estimated U.S.–Israeli Coalition Target Priorities</p>
+                        <div class="chart-container" style="height: 280px;"><canvas id="usTargetChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Iran's 3-phase counter-strategy -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-black text-gray-900 mb-5 flex items-center">
+                        <span class="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm mr-3">IR</span>
+                        Iran's 3-Phase Asymmetric Playbook: Blind → Drain → Overwhelm
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="phase-card phase-1 strategy-card pl-8">
+                            <div class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Phase 1</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">Blind</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">Neutralize the adversary's early warning systems. Primary target: the CAOC radar network at Al Udeid Air Base in Qatar. Cheap swarm drones are deployed to jam or directly strike radar installations, stripping the enemy of response time for subsequent missile attacks.</p>
+                        </div>
+                        <div class="phase-card phase-2 strategy-card pl-8">
+                            <div class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Phase 2</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">Drain</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">Mass-deploy <strong>$20,000</strong> "Shahed" (Martyr) drones and older missiles. The enemy is forced to expend <strong>$1,000,000+</strong> interceptor missiles per engagement. A <strong>50x+ cost asymmetry</strong> that attacks the adversary's wallet rather than its hardware.</p>
+                        </div>
+                        <div class="phase-card phase-3 strategy-card pl-8">
+                            <div class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Phase 3</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">Overwhelm</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">Once air defense stocks are depleted and C2 is disrupted, Iran unleashes its reserved high-end weapons — <strong>Fattah hypersonic missiles</strong> — in a saturation attack on critical targets. An estimated <strong>1,000+ remaining ballistic missiles</strong> stand ready for this phase.</p>
+                        </div>
+                    </div>
+
+                    <!-- War economics -->
+                    <div class="insight-box mb-8">
+                        <h4 class="font-bold text-gray-900 mb-3">💡 The Economics of War: A Structural Capability vs. Capacity Asymmetry</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-700 leading-relaxed mb-3">The U.S. and Israel excel at threading-the-needle precision strikes (Capability), but Iran fights with sheer volume (Capacity). Iran's drone "Shahed" literally means "Martyr" — a culture where 12 operatives die establishing a single launch pad, yet missile fire continues uninterrupted. This martyrdom ethos is the core engine powering Iran's war machine.</p>
+                                <p class="text-sm text-gray-700 leading-relaxed">Furthermore, Iran uses <strong>China's Beidou satellite navigation system</strong> instead of U.S. GPS to enhance missile accuracy, amplifying the real-world threat of its asymmetric arsenal.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-red-100">
+                                <p class="text-red-800 font-bold mb-3 text-center text-sm">Offense-Defense Cost Asymmetry</p>
+                                <div class="chart-container" style="height: 220px;"><canvas id="costAsymmetryChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-5 rounded-xl border border-red-100">
+                        <p class="text-red-800 font-bold mb-3 text-center">Iran's Retaliatory Asset Composition & Estimated Remaining Forces</p>
+                        <div class="chart-container" style="height: 280px;"><canvas id="iranAssetChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: WHY IT WON'T END — REGIME RESILIENCE -->
+            <!-- ============================================================ -->
+            <section id="regime" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 6 — REGIME RESILIENCE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">Why It Won't End: The Institutional<br>Durability of the Iranian Regime</h2>
+                <p class="text-gray-600 mb-4 max-w-3xl">Why the optimistic assumption that "removing the leader ends the war" is a dangerous miscalculation. Unlike Saddam Hussein's Iraq or Gaddafi's Libya, Iran is a state that survives on institutions, not individuals.</p>
+
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> Building on the battlefield analysis, this section explains the structural reasons why the U.S.–Israeli decapitation strategy fails to trigger regime collapse.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                    <div class="strategy-card">
+                        <h4 class="font-bold text-gray-900 mb-3 text-lg">🔗 Soviet-Style Hybrid Power Complex</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">The Iranian regime operates as a highly institutionalized hybrid complex mirroring the Soviet relationship between the Communist Party (the clerical establishment) and the military (the IRGC). The <strong>Assembly of Experts</strong> — an 88-member clerical body that confers ideological legitimacy — is designed to activate an immediate succession process upon the Supreme Leader's incapacitation, free from emotional disruption.</p>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Constitutional Article 111 Succession System</p>
+                            <p class="text-sm text-gray-700">Upon the Supreme Leader's death → an interim leadership council comprising the Head of the Judiciary, the Speaker of Parliament, and the Guardian Council is immediately activated → a legitimate, structural power succession unfolds. <strong class="text-red-600">This system is currently operating in real time</strong> — proof that the regime remains intact.</p>
+                        </div>
+                    </div>
+
+                    <div class="strategy-card">
+                        <h4 class="font-bold text-gray-900 mb-3 text-lg">⚙️ IRGC's Decentralized Resistance Mechanism</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">The IRGC was engineered so that "the body keeps fighting even when the head is severed." Pre-established operational manuals allow each regional unit to independently launch counterattacks through a fully decentralized command structure.</p>
+                        <div class="space-y-3">
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">①</span>
+                                <div><p class="text-sm font-bold text-gray-900">Sacrifice-Ready Resolve</p><p class="text-xs text-gray-600">12 operatives killed establishing a single missile launcher — yet immediate launch proceeded without hesitation</p></div>
+                            </div>
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">②</span>
+                                <div><p class="text-sm font-bold text-gray-900">Manual-Based Command Chain</p><p class="text-xs text-gray-600">Despite commander decapitation, pre-built manuals enabled counterstrikes within 2 hours</p></div>
+                            </div>
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">③</span>
+                                <div><p class="text-sm font-bold text-gray-900">Hardened Underground Assets</p><p class="text-xs text-gray-600">Vast ballistic missile base networks built deep in mountainous terrain — impossible to fully destroy by air alone</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collateral damage & legitimacy -->
+                <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg">
+                    <h4 class="font-bold text-red-400 mb-3 text-lg">🚨 The Legitimacy Crisis: Collateral Damage & Public Opinion</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">When military blitzkrieg combines with the erosion of moral authority, short-term victory hopes become a fatal political boomerang.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-red-400 font-bold text-sm mb-1">Civilian Casualties</p>
+                            <p class="text-xs text-gray-400">An estimated ~80 children killed in the bombing of a girls' school in Bandar Abbas. Galvanized domestic rallying behind the regime.</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-amber-400 font-bold text-sm mb-1">Deepening International Isolation</p>
+                            <p class="text-xs text-gray-400">No UN authorization. Growing Global South criticism. India maintaining pragmatic (Realpolitik) silence.</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-yellow-400 font-bold text-sm mb-1">U.S. Domestic Political Risk</p>
+                            <p class="text-xs text-gray-400">Congressional backlash over being bypassed. Risk of a "Forever War" frame taking hold ahead of November elections.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: ECONOMIC SHOCKWAVE (SO WHAT — IMPACT) -->
+            <!-- ============================================================ -->
+            <section id="economy" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 7 — ECONOMIC SHOCKWAVE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">Economic Shockwave: Hormuz<br>Blockade & South Korea's Achilles' Heel</h2>
+                <p class="text-lg leading-relaxed text-gray-700 mb-4 max-w-4xl">
+                    <strong>Over 70% of South Korea's energy comes from the Middle East, and 99% of it passes through the Strait of Hormuz.</strong> Korea's oil dependency per GDP is 2x Japan's and 4x Germany's — making it among the world's most structurally vulnerable nations.
+                </p>
+
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> If the Iranian regime won't collapse easily, the war will be protracted — and a prolonged conflict directly translates into a frozen Hormuz blockade. This section analyzes the downstream economic consequences.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg md:col-span-1 flex flex-col justify-center">
+                        <h3 class="text-xl font-bold text-red-400 mb-4">Economic Domino Chain</h3>
+                        <ol class="space-y-4 text-sm text-gray-300">
+                            <li><strong class="text-white">Stage 1:</strong> Hormuz commercial shipping halt declared</li>
+                            <li><strong class="text-white">Stage 2:</strong> Global oil prices spike vertically; energy grid disruption</li>
+                            <li><strong class="text-white">Stage 3:</strong> Maritime & aviation logistics paralysis; freight rates surge</li>
+                            <li><strong class="text-white">Stage 4:</strong> Energy-importing nations (Korea, etc.) hit by trade deficits & direct inflationary shock</li>
+                        </ol>
+                    </div>
+                    <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm md:col-span-2">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">Estimated Global Energy Crisis Severity</h3>
+                        <div class="chart-container"><canvas id="economyChart"></canvas></div>
+                        <p class="text-xs text-gray-400 text-center mt-2">* Illustrative threat index based on expert analysis</p>
+                    </div>
+                </div>
+
+                <!-- South Korea's structural vulnerability -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="strategy-card border-t-4 border-t-red-500">
+                        <h4 class="font-bold text-gray-900 mb-3">🇰🇷 South Korea's Structural Energy Vulnerability</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Middle East Crude Dependency</span><span class="font-bold text-red-600">70%</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-500" style="width: 70%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Hormuz Strait Transit Rate</span><span class="font-bold text-red-600">99%</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-600" style="width: 99%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Strategic Petroleum Reserve</span><span class="font-bold text-amber-600">~210 Days</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-amber-500" style="width: 58%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Oil Dependency per GDP (vs. Japan)</span><span class="font-bold text-red-600">2x</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-400" style="width: 80%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="strategy-card border-t-4 border-t-gray-800">
+                        <h4 class="font-bold text-gray-900 mb-3">🌐 Strait of Hormuz Dependency: Global Ranking</h4>
+                        <div class="chart-container" style="height: 280px;"><canvas id="hormuzDependencyChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Iran's asymmetric strike targets -->
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                    <table class="geopolitics-table w-full">
+                        <thead><tr><th class="rounded-tl-xl">Target</th><th>Strategic Purpose</th><th class="rounded-tr-xl">Expected Impact & Characteristics</th></tr></thead>
+                        <tbody>
+                            <tr><td class="font-bold">Saudi Aramco / Qatar LNG</td><td>Paralyze global energy markets</td><td>Trigger global inflation; pressure neighboring states to abandon neutrality</td></tr>
+                            <tr><td class="font-bold">Strait of Hormuz</td><td>Sever the global supply chain</td><td>99% of South Korea's oil supply at risk of total cutoff (blockade declared)</td></tr>
+                            <tr><td class="font-bold">Bahrain / Kuwait</td><td>Exploit internal sectarian fault lines</td><td>Disseminate "martyrdom narratives" in Shia-majority regions to destabilize monarchies</td></tr>
+                            <tr><td class="font-bold">Oman</td><td>An unexpected "jab" strike</td><td>Striking even the traditional mediator to signal intent for no-retreat total war</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 8: SCENARIOS & RECOMMENDATIONS (WHAT'S NEXT) -->
+            <!-- ============================================================ -->
+            <section id="scenarios" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 8 — SCENARIOS & RECOMMENDATIONS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">Final Scenario Assessment &<br>Strategic Recommendations</h2>
+                <p class="mb-4 text-md leading-relaxed text-gray-700 max-w-3xl">As the war slides into the quagmire of protraction, it is imperative to guard against optimism bias about a quick resolution and coldly assess the probability of each scenario.</p>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>Context:</strong> Synthesizing geopolitical drivers (§2), military stalemate (§5), regime durability (§6), and economic fallout (§7) to derive the plausible future pathways.</p>
+                </div>
+
+                <!-- Scenario cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- A -->
+                    <div class="scenario-card">
+                        <div class="bg-gray-100 p-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Scenario A</span>
+                                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">Probability &lt; 5%</span>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-lg">Diplomatic Resolution / Democratization</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-4">A scenario where Iran transforms into a Western-cooperating normal state, or third-party mediation (Oman, EU) succeeds in brokering a deal. However, the gulf between Trump's demands (total surrender) and Iran's survival instinct is unbridgeable, and the deep rift between urban liberals and rural conservatives makes short-term realization a pipe dream.</p>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-xs font-bold text-red-600">⚠️ Optimism Bias Warning</p>
+                                <p class="text-xs text-red-700">Do not bet your corporate strategy on this scenario.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B (Most Likely) -->
+                    <div class="scenario-card border-2 border-red-300">
+                        <div class="bg-red-500 text-white text-center py-1.5 text-sm font-black tracking-wide">🔥 MOST LIKELY SCENARIO</div>
+                        <div class="bg-red-50 p-4 border-b border-red-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">Scenario B</span>
+                                <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-full">Probability: High</span>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-lg">Protracted War of Attrition / Pragmatic Military Dictatorship</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3"><strong>Short-term (1–3 months):</strong> No off-ramp available; airstrikes drag on. Iran's decentralized IRGC sustains continuous counterattacks.</p>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3"><strong>Mid-to-long term (6 months–1 year+):</strong> Iran's national resilience kicks in. Pressure mounts for ground troop deployment to save face for Trump. The theocratic shell remains but hollows out, as an IRGC-led pragmatic military dictatorship emerges, opting for "managed tension."</p>
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong>Economic impact:</strong> Hormuz logistics paralysis → Energy price super-spike sustained → 1970s-style global energy crisis environment.</p>
+                        </div>
+                    </div>
+
+                    <!-- C -->
+                    <div class="scenario-card">
+                        <div class="bg-gray-800 text-white p-4 border-b border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Scenario C</span>
+                                <span class="px-2 py-0.5 bg-gray-600 text-gray-200 text-xs font-bold rounded-full">Worst-Case Risk</span>
+                            </div>
+                            <h4 class="font-black text-white text-lg">Balkanization & Civil War</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-4">Central control completely collapses, unleashing separatist movements among Kurds, Balochis, Azeris, and other ethnic minorities. Iran becomes "a second Syria" — a geopolitical catastrophe generating uncontrollable refugee crises and regional chaos.</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">Uncontrollable refugee flows and civil war spill over into neighboring states, while Russia exploits the chaos as a tool to prop up energy prices.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game changers -->
+                <h3 class="text-xl font-bold text-gray-900 mb-6">⚡ Critical Inflection Points (Game Changers)</h3>
+                <div class="space-y-4 mb-12">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-1">
+                            <span class="font-bold text-lg text-gray-900">Inflection Point 1: Netanyahu's Survival 🔥</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-1" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            In retaliation for Khamenei's assassination, Iran is concentrating strikes on Israeli government buildings with the assassination of Prime Minister Netanyahu as its top priority. Ali Larijani declared they would "pierce the heart." If this attack succeeds, it would be <strong>the single largest geopolitical inflection point</strong> — completely reversing the trajectory and scale of the war.
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-2">
+                            <span class="font-bold text-lg text-gray-900">Inflection Point 2: Emergence of a Mediator & the "Graceful Exit" 🕊️</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-2" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            Russia and China are unwilling to intervene, and neighboring states fear retaliation too much to step forward. A third party — Oman or the EU — could potentially mediate, but the key challenge is crafting a face-saving narrative for Trump (<strong>"We achieved something tantamount to regime change — a great victory"</strong>) while simultaneously giving Iran a path to stop fighting without humiliation. However, Iran's strike on Oman — the traditional mediator — has made this pathway even less viable.
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-3">
+                            <span class="font-bold text-lg text-gray-900">Inflection Point 3: The Grandson Factor — Hassan Khomeini ♟️</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-3" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            On the brink of regime collapse, the system elevates <strong>Hassan Khomeini</strong> — Ayatollah Khomeini's reform-leaning grandson — to attempt a radical deal with the West. This represents a "strategic retreat" — swapping the regime's branding to survive. If driven by the IRGC's pragmatist faction, it could yield limited but meaningful change.
+                        </div>
+                    </div>
+                    <div class="border border-red-200 rounded-lg overflow-hidden bg-red-50/30">
+                        <button class="w-full px-6 py-4 bg-red-50 flex justify-between items-center text-left focus:outline-none hover:bg-red-100 transition-colors accordion-btn" data-target="acc-4">
+                            <span class="font-bold text-lg text-red-700">Worst Case: The Ground Invasion Quagmire ⚠️</span>
+                            <svg class="w-5 h-5 text-red-400 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-4" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-red-200">
+                            If airstrikes alone fail to paralyze the Iranian government and Iran refuses to surrender, Trump faces an impossible dilemma: he cannot end the war with nothing to show for it. Unlike Afghanistan's Northern Alliance or Libya's rebel forces, Iran lacks a meaningful armed opposition. The path of last resort leads to a U.S. ground invasion — and the quagmire. Like Iraq and Afghanistan before it, this would mean years of an exit-less "Forever War."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic recommendations -->
+                <div class="bg-gray-900 text-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-black text-white mb-2">📋 Strategic Recommendations for Executives & Policymakers</h3>
+                    <p class="text-gray-400 text-sm mb-6">Do not bet on a swift regime collapse. Prepare immediately for a protracted war and the structural vulnerability it exposes in energy-dependent economies.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                            <div class="text-blue-400 font-bold text-sm mb-2">Action 1</div>
+                            <h4 class="font-bold text-white mb-2">Activate SPR & Energy Contingency Plans Immediately</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Move beyond relying on 210-day strategic reserves. Execute immediate demand management and emergency supply plans at both national and corporate levels.</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                            <div class="text-green-400 font-bold text-sm mb-2">Action 2</div>
+                            <h4 class="font-bold text-white mb-2">Force-Diversify Away from Middle East Supply Chains</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Immediately diversify crude and LNG sourcing to non-Middle Eastern channels (Americas, etc.). Reassess logistics routes and freight cost assumptions.</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-5 border border-red-500/50">
+                            <div class="text-red-400 font-bold text-sm mb-2">Action 3 (Critical)</div>
+                            <h4 class="font-bold text-white mb-2">Stress-Test All Plans Against a Full Hormuz Blockade</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Immediately incorporate a "prolonged total Strait of Hormuz blockade" as a mandatory risk scenario in every medium- to long-term business and investment plan.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="h-8"></div>
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Accordion
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const t = document.getElementById(btn.getAttribute('data-target'));
+            const icon = btn.querySelector('svg');
+            if (t) { t.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); }
+        });
+    });
+
+    // Mobile Menu
+    const mb = document.getElementById('mobile-menu-button'), sb = document.getElementById('sidebar');
+    if (mb && sb) mb.addEventListener('click', () => sb.classList.toggle('-translate-x-full'));
+
+    // ScrollSpy
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.content-section');
+    function updateNav() {
+        let i = sections.length;
+        while(--i && window.scrollY + 120 < sections[i].offsetTop) {}
+        navLinks.forEach(l => { l.classList.remove('bg-red-500','text-white'); l.classList.add('text-gray-600'); });
+        if(i >= 0 && navLinks[i]) { navLinks[i].classList.remove('text-gray-600'); navLinks[i].classList.add('bg-red-500','text-white'); }
+    }
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const s = document.querySelector(this.getAttribute('href'));
+            if(s) window.scrollTo({ top: s.offsetTop - 80, behavior: 'smooth' });
+            if(window.innerWidth < 768 && sb) sb.classList.add('-translate-x-full');
+        });
+    });
+    window.addEventListener('scroll', updateNav);
+    updateNav();
+
+    // Charts
+    Chart.defaults.font.family = '"Paperlogy", sans-serif';
+    Chart.defaults.color = '#4b5563';
+
+    const c1 = document.getElementById('usTargetChart');
+    if(c1) new Chart(c1, { type:'doughnut', data:{ labels:['Nuclear/Missile Infrastructure','Senior Leadership (Decapitation)','Naval Forces (Hormuz Defense)','Mid-Level Commanders (IRGC)'], datasets:[{data:[35,25,25,15],backgroundColor:['#1e3a8a','#3b82f6','#93c5fd','#dbeafe'],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12}}}}});
+
+    const c2 = document.getElementById('iranAssetChart');
+    if(c2) new Chart(c2, { type:'doughnut', data:{ labels:['Remaining Ballistic Missiles (~1,000+)','Low-Cost Drones (Shahed, etc.)','Proxy Forces (Hezbollah, etc.)','Strait Blockade (Mines/Subs)','Hypersonics (Fattah, etc.)'], datasets:[{data:[30,25,15,15,15],backgroundColor:['#7f1d1d','#dc2626','#f87171','#fecaca','#991b1b'],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+
+    const c3 = document.getElementById('economyChart');
+    if(c3) new Chart(c3, { type:'bar', data:{ labels:['Global Oil Price Surge','S. Korea Trade Balance Deterioration','Air/Sea Logistics Paralysis','U.S. Inflation Pressure','S. Korea Inflation Direct Hit'], datasets:[{label:'Economic Threat Index',data:[95,92,85,70,90],backgroundColor:['#ef4444','#dc2626','#f87171','#fca5a5','#b91c1c'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true,max:100}},plugins:{legend:{display:false}}}});
+
+    const c4 = document.getElementById('costAsymmetryChart');
+    if(c4) new Chart(c4, { type:'bar', data:{ labels:['Iran Attack Drone\n(Shahed)','U.S. Interceptor\n(Patriot, etc.)'], datasets:[{label:'Cost per Unit ($10K)',data:[2,100],backgroundColor:['#dc2626','#3b82f6'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'$10K USD',font:{size:10}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.parsed.y*10+'K USD'}}}}}});
+
+    const c5 = document.getElementById('hormuzDependencyChart');
+    if(c5) new Chart(c5, { type:'bar', data:{ labels:['China','S. Korea','India','Japan','EU'], datasets:[{label:'Hormuz Strait Dependency (%)',data:[38,12,12,8,5],backgroundColor:['#1e40af','#dc2626','#6b7280','#3b82f6','#93c5fd'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true,max:45}},plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:function(c){if(c.label==='S. Korea')return'Among the highest risk levels of any oil-consuming nation';return''}}}}}});
+});
+</script>
+</body>
+</html>

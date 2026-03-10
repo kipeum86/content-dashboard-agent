@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미 연방대법원 IEEPA 관세 권한 부재 판결 및 기업 대응 전략 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #f0f2f5;
+            color: #172b4d;
+        }
+        .text-primary { color: #0052cc; }
+        .bg-primary { background-color: #0052cc; }
+        .border-primary { border-color: #0052cc; }
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #ffffff;
+            font-weight: bold;
+        }
+        .content-section {
+            scroll-margin-top: 5rem;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <div class="md:hidden fixed top-4 left-4 z-50">
+        <button id="mobile-menu-button" class="p-2 bg-primary text-white rounded-md shadow-md focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+
+    <nav id="sidebar" class="bg-primary text-white w-72 flex-shrink-0 h-full overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:relative z-40 shadow-xl">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold mb-8 leading-tight">IEEPA 관세 무효<br><span class="text-sm font-normal opacity-80">법률 및 무역 심층 분석</span></h1>
+            <ul id="main-nav" class="space-y-2">
+                <li><a href="#overview" class="sidebar-link block py-3 px-4 rounded transition-colors duration-200 active">판결 개요 (Overview)</a></li>
+                <li><a href="#legal" class="sidebar-link block py-3 px-4 rounded transition-colors duration-200">법적 쟁점 (Legal Issues)</a></li>
+                <li><a href="#admin-response" class="sidebar-link block py-3 px-4 rounded transition-colors duration-200">행정부 대응 (Admin Response)</a></li>
+                <li><a href="#impact" class="sidebar-link block py-3 px-4 rounded transition-colors duration-200">경제적 영향 (Economic Impact)</a></li>
+                <li><a href="#strategy" class="sidebar-link block py-3 px-4 rounded transition-colors duration-200">실무 대응 전략 (Strategy)</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto relative scroll-smooth">
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+            <div class="px-6 py-4 flex justify-between items-center ml-12 md:ml-0">
+                <h2 class="text-xl font-bold text-[#172b4d] pr-4">미 연방대법원 IEEPA 관세 무효 판결 분석</h2>
+                <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-sm text-gray-500 font-medium hidden lg:inline">로펌 Client Alert 및 1차 자료(대법원·백악관·연방관보) 대조</span>
+                    <a href="https://codepen.io/Kipeum-Lee/full/LERYxBp" target="_blank" rel="noopener noreferrer" class="flex items-center bg-[#172b4d] hover:bg-primary text-white text-sm font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                        English Version
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-10 max-w-7xl mx-auto pb-12">
+            
+            <div class="bg-[#e6f0ff] border-l-4 border-primary p-5 md:p-6 rounded-lg flex flex-col lg:flex-row justify-between items-start lg:items-center shadow-sm gap-4">
+                <div class="lg:w-2/3">
+                    <h3 class="font-bold text-[#172b4d] text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        미국 주요 로펌 법률 분석 및 1차 자료 대조 기반 대시보드
+                    </h3>
+                    <p class="text-sm text-gray-700 mt-2 leading-relaxed">
+                        이 대시보드는 Quinn Emanuel, Sidley Austin, Gibson Dunn 등 <strong>미국 주요 로펌들의 Client Alert 원문</strong>을 중심으로, <strong>연방대법원 판결문·백악관 대통령문서·연방관보(Federal Register)</strong> 등 1차 자료를 함께 대조하여, 판결의 핵심 법리와 실무 대응 포인트를 재구성한 자료입니다.
+                    </p>
+                    <p class="text-xs text-gray-600 mt-3 leading-relaxed">
+                        <strong class="text-primary">1차 자료 바로가기:</strong>
+                        <a href="https://www.supremecourt.gov/opinions/25pdf/24-1287_4gcj.pdf" target="_blank" rel="noopener noreferrer" class="underline">대법원 판결문(PDF)</a> ·
+                        <a href="https://www.whitehouse.gov/presidential-actions/2026/02/ending-certain-tariff-actions/" target="_blank" rel="noopener noreferrer" class="underline">IEEPA 관세 종료 EO</a> ·
+                        <a href="https://www.whitehouse.gov/presidential-actions/2026/02/imposing-a-temporary-import-surcharge-to-address-fundamental-international-payments-problems/" target="_blank" rel="noopener noreferrer" class="underline">Trade Act §122 10% Surcharge Proclamation</a> ·
+                        <a href="https://www.federalregister.gov/documents/2025/12/04/2025-23210/implementation-of-the-united-states-korea-strategic-trade-and-investment-deal" target="_blank" rel="noopener noreferrer" class="underline">U.S.-Korea Deal 이행(연방관보)</a>
+                        <span class="block mt-1">최종 업데이트: 2026-02-24</span>
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2 lg:w-1/3 lg:justify-end mt-2 lg:mt-0">
+                    <a href="https://www.quinnemanuel.com/the-firm/publications/client-alert-supreme-court-strikes-down-ieepa-tariffs-what-importers-need-to-know-about-recovering-refunds/" target="_blank" rel="noopener noreferrer" class="bg-white text-primary border border-primary hover:bg-primary hover:text-white text-xs font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">Quinn Emanuel</a>
+                    <a href="https://www.sidley.com/en/insights/newsupdates/2026/02/us-supreme-court-issues-international-emergency-economic-powers-act-tariff-decision" target="_blank" rel="noopener noreferrer" class="bg-white text-primary border border-primary hover:bg-primary hover:text-white text-xs font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">Sidley Austin</a>
+                    <a href="https://www.gibsondunn.com/supreme-court-invalidates-president-trumps-tariffs/" target="_blank" rel="noopener noreferrer" class="bg-white text-primary border border-primary hover:bg-primary hover:text-white text-xs font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">Gibson Dunn</a>
+                    <a href="https://www.wilmerhale.com/en/insights/client-alerts/20260220-supreme-court-strikes-down-ieepa-tariffs-what-now" target="_blank" rel="noopener noreferrer" class="bg-white text-primary border border-primary hover:bg-primary hover:text-white text-xs font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">WilmerHale</a>
+                    <a href="https://www.hklaw.com/en/insights/publications/2026/02/supreme-court-strikes-down-ieepa-tariffs" target="_blank" rel="noopener noreferrer" class="bg-white text-primary border border-primary hover:bg-primary hover:text-white text-xs font-bold py-1.5 px-3 rounded shadow-sm transition-colors duration-200 whitespace-nowrap">Holland & Knight</a>
+                </div>
+            </div>
+
+            <section id="overview" class="content-section bg-white p-6 md:p-8 rounded-xl shadow-sm border-t-4 border-primary">
+                <h3 class="text-2xl font-bold mb-6 text-primary flex items-center border-b pb-4">
+                    <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                    사건 개요 (Executive Summary)
+                </h3>
+                <div class="prose max-w-none text-gray-700 leading-relaxed mb-8">
+                    <p class="mb-4">
+                        2026년 2월 20일, 미 연방대법원(U.S. Supreme Court)은 <strong><em>Learning Resources, Inc. v. Trump</em></strong> 사건(‘<em>Trump v. V.O.S. Selections, Inc.</em>’ 사건과 병합 심리)에서 6대 3으로, <strong>국제긴급경제권한법(IEEPA, 50 U.S.C. § 1701 et seq.)이 대통령에게 관세 부과 권한을 부여하지 않는다</strong>고 판시했습니다(<strong>“IEEPA does not authorize the President to impose tariffs.”</strong>). 
+                        법원은 관세를 ‘세금(tax)’으로 전제하고 과세권이 의회에 귀속된다는 헌법 구조(Article I, §8)를 강하게 강조했지만, <strong>결론(holding)은 IEEPA 문언·구조에 대한 법률해석(수권 부재)</strong>에 근거했습니다. 따라서 IEEPA 자체를 위헌으로 선언하거나, 비위임(nondelegation) 위반 여부를 직접 판단한 판결은 아닙니다(관련 논점은 일부 의견에서만 언급됩니다).
+                    </p>
+                    <p class="mb-4">
+                        이번 판결은 2025년 2월 이후 IEEPA를 근거로 부과된 관세 체계 전반(① 마약·국경 비상사태 관련 추가관세(일명 ‘펜타닐 관세’) ② 2025년 4월 2일 상호(‘reciprocal’) 관세 체계(일명 ‘Liberation Day’) ③ 브라질·러시아·이란·쿠바 등 특정 국가 관련 IEEPA 관세 조치 등)을 <strong>원칙적으로 무효화</strong>했습니다. 다만 <strong>무역확장법 §232, 무역법 §301 등 다른 법률 근거 관세</strong>는 이번 판결의 직접 대상이 아니며, 별도 요건·절차에 따라 존속 또는 신규 부과될 수 있습니다.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                        <li><strong>핵심 쟁점:</strong> IEEPA의 “regulate … importation” 문언이 관세(=tax) 권한까지 포함하는지 여부</li>
+                        <li><strong>의견 구도:</strong> 문언해석(수권 부재)에는 6인 다수, 주요쟁점 독트린(명확한 수권 요구)은 3인 복수의견(plurality)</li>
+                        <li><strong>관할:</strong> IEEPA 관세 다툼은 원칙적으로 <strong>CIT(국제무역법원) 전속 관할</strong>로 정리되어, D.D.C. 사건은 관할 부재로 파기·각하 지시</li>
+                        <li><strong>환급:</strong> 대법원은 환급 명령·절차를 정하지 않았고, CBP/CIT 절차에서 후속 진행</li>
+                        <li><strong>행정부 대응:</strong> IEEPA 관세 종료 EO 발령과 동시에, Trade Act §122에 따른 <strong>10% 한시 Surcharge</strong>가 2026-02-24부터 발효</li>
+                    </ul>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <h4 class="font-bold mb-6 text-center text-[#172b4d] text-lg">주요국 IEEPA 관세율 (대표/상한, 판결 직전 기준)</h4>
+                        <div class="relative h-72">
+                            <canvas id="tariffBarChart"></canvas>
+                        </div>
+                        <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded text-sm text-gray-700">
+                            <strong class="text-primary">📌 한국(상호관세) 정리:</strong> 2025년 4월 2일 상호관세 행정명령(EO 14257) Annex I에서 한국은 <strong>25%</strong>로 지정되었으나, 2025년 7월 31일 후속 행정명령(EO 14326) Annex I에서 <strong>15%</strong>로 조정되어 <strong>2025년 8월 7일부터</strong>(운송 중 예외 등 포함) 적용되었습니다. 
+                            이후 2025년 12월 4일 연방관보 고시로 U.S.-Korea Strategic Trade and Investment Deal의 관세 요소가 시행되면서, 다수 품목은 <strong>“기본세율+추가세율의 합이 15%”</strong>가 되도록(또는 기본세율이 15% 이상이면 추가세율 0) 구조가 정교화되었습니다(자동차·부품은 2025년 11월 1일 소급, 기타 품목은 2025년 11월 14일부터). 
+                            이번 판결로 한국산 제품에 적용되던 <strong>IEEPA 기반 상호관세(및 그 이행 고시)</strong>가 무효화 범주에 포함됩니다.
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 flex flex-col justify-center">
+                        <h4 class="font-bold mb-6 text-center text-[#172b4d] text-lg">연방대법원 표결 구조 (Vote & Opinions)</h4>
+                        <div class="relative h-56 w-full flex justify-center mb-4">
+                            <canvas id="voteDoughnutChart"></canvas>
+                        </div>
+                        <div class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-100 shadow-sm space-y-2">
+                            <p><strong>결론(관세 무효) 동의 6인:</strong> Roberts 대법원장(집필, 다만 주요쟁점 독트린 파트는 plurality), Sotomayor, Kagan(별도 동의의견), Gorsuch, Barrett, Jackson(별도 의견). 핵심 쟁점 — IEEPA의 “regulate … importation” 문언이 관세 권한을 포함하는지 여부.</p>
+                            <p><strong>반대 3인:</strong> Kavanaugh(집필) + Alito + Thomas(별도 반대의견). 외교·통상 영역에서의 재량 및 역사적 관행을 중시하며 IEEPA가 관세를 허용한다고 봄.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="legal" class="content-section bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                <h3 class="text-2xl font-bold mb-6 text-primary flex items-center border-b pb-4">
+                    <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                    심층 법적 쟁점 분석 (In-Depth Legal Analysis)
+                </h3>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-sm text-gray-700">
+                    <strong class="text-amber-800">⚠️ 의견 구조 참고:</strong> 
+                    대법원은 <strong>‘IEEPA에 관세 수권이 없다’는 결론</strong>에는 6인이 동의했지만, 그 이유에 관해 다수의견 내부에서 갈렸습니다. 
+                    <strong>문언·체계에 따른 수권 부재(=핵심 holding)는 6인 공통</strong>인 반면, <strong>주요쟁점 독트린(명확한 수권 요구)을 전면에 둔 부분은 3인(Roberts·Gorsuch·Barrett) 복수의견(plurality)</strong>으로 선례적 구속력이 제한될 수 있습니다. 
+                    또한 법원은 <strong>CIT 전속 관할</strong>을 명확히 하여, D.D.C. 사건은 관할 부재로 파기·각하 지시가 내려졌습니다.
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div class="bg-blue-50 py-3 px-5 border-b border-gray-200">
+                            <h4 class="font-bold text-[#172b4d] text-lg">다수의견(결론 동의 6인) — IEEPA는 관세를 허용하지 않음</h4>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-2">
+                                    <h5 class="font-bold text-primary">1. 문언·체계 해석(수권 부재) — 6인 공통</h5>
+                                    <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">핵심 판시</span>
+                                </div>
+                                <p class="text-sm text-gray-700">
+                                    IEEPA §1702(a)(1)(B)의 “regulate … importation” 문언은 관세(=tax) 부과 권한을 포함하지 않는다고 보았습니다. 
+                                    법원은 (i) IEEPA 권한조항에 관세·duty를 직접 언급하는 표현이 없고, (ii) “regulate”라는 일반적 표현만으로 과세권 위임을 인정하기 어렵고, (iii) 의회가 행정부에 관세 권한을 위임할 때는 통상 <strong>명시적 언어와 절차·기간·범위 제한</strong>을 함께 둔다는 점을 중시했습니다.
+                                </p>
+                            </div>
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <h5 class="font-bold text-primary mb-2">2. 헌법적 배경 설명(‘세금은 의회’)과 결론의 관계 — 6인 공통</h5>
+                                <p class="text-sm text-gray-700">
+                                    다수의견은 Article I, §8의 과세권 구조를 출발점으로 삼아 관세가 ‘세금’임을 분명히 했습니다. 
+                                    다만 이는 <strong>결론을 위한 전제(헌법 구조 설명)</strong>로 기능한 것이며, 최종 결론은 <strong>IEEPA의 수권이 없다는 법률해석</strong>에 기초했습니다. 
+                                    따라서 “IEEPA가 위헌이라서 관세가 무효”라기보다, “IEEPA가 관세까지 위임하지 않았기 때문에(수권 부재) 관세가 무효”라는 구조로 이해하는 것이 정확합니다.
+                                </p>
+                            </div>
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <h5 class="font-bold text-primary mb-2">3. 주요쟁점 독트린(Major Questions) — 3인 복수의견(plurality)</h5>
+                                <p class="text-sm text-gray-700">
+                                    Roberts·Gorsuch·Barrett 3인은 추가적으로, 광범위한 관세 권한 주장처럼 경제·정치적으로 중대한 권한 행사에는 의회의 <strong>명확한 수권(clear congressional authorization)</strong>이 필요하다는 틀(주요쟁점 독트린)을 강조했습니다. 
+                                    반면 Kagan(동의의견)·Sotomayor·Jackson은 <strong>통상적 법률해석만으로도 충분</strong>하다는 입장이어서, 이 부분은 법원의 단일한 ‘공식 다수이유’로 고정되었다고 단정하기 어렵습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div class="bg-gray-100 py-3 px-5 border-b border-gray-200">
+                            <h4 class="font-bold text-[#172b4d] text-lg">반대의견(3인) — IEEPA는 관세를 허용함</h4>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm">
+                                <h5 class="font-bold text-gray-800 mb-2">1. “관세는 수입규제의 전통적 수단” + Youngstown 프레임워크</h5>
+                                <p class="text-sm text-gray-700">
+                                    Kavanaugh 대법관은 “수입을 규제(regulate importation)”하는 방법에는 금수·쿼터뿐 아니라 관세도 포함된다는 직관을 전면에 두고, IEEPA에 따른 권한행사는 의회의 수권 하에서 이뤄진 것으로 보아 <em>Youngstown</em>의 ‘Category One’에 가깝다고 평가했습니다.
+                                </p>
+                            </div>
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm">
+                                <h5 class="font-bold text-gray-800 mb-2">2. 역사·선례(TWEA/전시 선례, Algonquin 등) 원용</h5>
+                                <p class="text-sm text-gray-700">
+                                    반대의견은 전시·비상사태 하에서 관세가 활용된 역사적 관행, TWEA 계열 논리, 그리고 <em>Algonquin</em> 등 선례를 근거로 IEEPA의 “regulate … importation”도 관세를 포괄한다고 주장했습니다. 
+                                    이에 대해 다수의견은 전시 선례의 ‘연역 고리’가 약하고, 다른 통상법 조항(예: §232)의 문언 구조와 IEEPA가 다르다는 점을 들어 구별했습니다.
+                                </p>
+                            </div>
+                            <div class="bg-white p-4 rounded border border-gray-100 shadow-sm">
+                                <h5 class="font-bold text-gray-800 mb-2">3. “외교·통상에서는 Major Questions 부적합” + 환급 혼란 경고</h5>
+                                <p class="text-sm text-gray-700">
+                                    Kavanaugh는 외교·통상 맥락에서 주요쟁점 독트린을 ‘가중치’로 적용하는 것은 부적절하다고 보았고, 환급 절차가 현실적으로 복잡해질 수 있다고 경고했습니다. 
+                                    또한 Thomas는 별도 반대의견에서 비위임(nondelegation)과 관련한 시각을 제시했습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="admin-response" class="content-section bg-white p-6 md:p-8 rounded-xl shadow-sm border-l-4 border-red-500">
+                <h3 class="text-2xl font-bold mb-6 text-[#172b4d] flex items-center border-b pb-4">
+                    <svg class="w-7 h-7 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    행정부의 즉각적 대응 및 대체 조치 (Administration's Response)
+                </h3>
+                <p class="text-gray-700 mb-6 font-medium">
+                    대법원 판결 직후, 대통령은 <strong>IEEPA 기반 추가관세를 종료</strong>하는 행정명령(<em>Ending Certain Tariff Actions</em>)을 발령하여 “가능한 한 조속히 더 이상 징수하지 않도록” 관련 기관에 지시했습니다. 
+                    다만 해당 EO는 <strong>환급(refunds)을 직접 규율하지 않았고</strong>, 행정부는 동시에 다른 통상법을 근거로 ‘대체 관세’ 체계를 가동했습니다. 
+                    수입업체들은 아래의 새로운 법적 근거에 따른 관세 리스크와, IEEPA 관세 환급을 둘러싼 절차적 불확실성에 동시에 직면해 있습니다.
+                </p>
+
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row gap-4 items-start bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="md:w-1/4">
+                            <span class="inline-block bg-[#172b4d] text-white px-3 py-1 rounded text-sm font-bold w-full text-center">1974년 무역법 제122조<br>(Section 122)</span>
+                        </div>
+                        <div class="md:w-3/4">
+                            <h4 class="font-bold text-lg text-primary mb-2">국제수지(International Payments) 명분의 한시적 보편 Surcharge</h4>
+                            <p class="text-sm text-gray-700 mb-2">
+                                행정부는 ‘fundamental international payments problems(국제수지상의 근본적 문제)’를 명분으로 무역법 122조를 발동했습니다. 이 조항은 대통령에게 <strong>최대 150일</strong> 동안 모든 수입품에 대해 <strong>최대 15%</strong>의 추가 관세(surcharge)를 부과할 수 있는 명시적 권한을 부여합니다.
+                            </p>
+                            <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                                <li><strong>2026-02-20 Proclamation:</strong> <strong>10%</strong> 보편 Surcharge 부과, <strong>2026-02-24 00:01(ET)</strong>부터 <strong>150일</strong> 시행(~<strong>2026-07-24 00:01(EDT)</strong>)</li>
+                                <li><strong>운송 중(in-transit) 예외:</strong> 2026-02-24 00:01(ET) 이전 선적·운송 중이던 물품에 대해 제한적 예외가 설정됨(세부 요건은 Proclamation/Annex 참조)</li>
+                                <li><strong>15% 인상 “언급”:</strong> 대통령이 소셜미디어에서 <strong>15% 인상</strong>을 언급했으나, <strong>공식 Proclamation/HTSUS 개정으로의 시행 여부는 별도 확인이 필요</strong>합니다</li>
+                                <li><strong>한계/쟁점:</strong> 150일 한시·의회 연장 필요, ‘국제수지 적자’ 요건 충족 및 예외 설계의 적법성에 대한 다툼 가능</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 items-start bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="md:w-1/4">
+                            <span class="inline-block bg-gray-700 text-white px-3 py-1 rounded text-sm font-bold w-full text-center">무역법 제301조<br>(Section 301)</span>
+                        </div>
+                        <div class="md:w-3/4">
+                            <h4 class="font-bold text-lg text-gray-800 mb-2">불공정 무역 관행에 대한 조사·보복관세 확대 가능</h4>
+                            <p class="text-sm text-gray-700">
+                                IEEPA 무효화 이후 행정부는 USTR을 통한 <strong>301조 조사(조치) 확대</strong>를 예고했습니다. 301조 관세는 기간 상한이 없고 상한선도 없을 수 있으나, <strong>공식 조사 절차·공청회·기록 형성 등 절차 요건</strong>을 거쳐야 합니다. 기존 301조 관세(중국 대상 등)는 이번 판결의 직접 대상이 아닙니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 items-start bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="md:w-1/4">
+                            <span class="inline-block bg-gray-700 text-white px-3 py-1 rounded text-sm font-bold w-full text-center">무역확장법 제232조<br>(Section 232)</span>
+                        </div>
+                        <div class="md:w-3/4">
+                            <h4 class="font-bold text-lg text-gray-800 mb-2">국가안보 기반 관세(및 조사) 지속</h4>
+                            <p class="text-sm text-gray-700">
+                                철강·알루미늄, 자동차·부품, 구리, 반도체, 목재·임산물 등과 관련된 <strong>232조 기반 관세/조사</strong>는 IEEPA가 아닌 별도 법적 근거에 기반하므로, 이번 IEEPA 판결로 자동 소멸하지 않습니다. 
+                                다만 특정 품목에 대한 신규 조사 개시, 예외(쿼터·면제) 구조, 협상 결과에 따른 조정 가능성은 상시 모니터링이 필요합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 items-start bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="md:w-1/4">
+                            <span class="inline-block bg-gray-700 text-white px-3 py-1 rounded text-sm font-bold w-full text-center">1930년 관세법 제338조<br>(Section 338)</span>
+                        </div>
+                        <div class="md:w-3/4">
+                            <h4 class="font-bold text-lg text-gray-800 mb-2">차별적 무역 관행 대응 수단(실무상 불확실성 큼)</h4>
+                            <p class="text-sm text-gray-700">
+                                행정부는 1930년 관세법 338조를 통한 관세 부과 가능성도 언급했습니다. 이 조항은 “미국 상거래를 차별”하는 국가에 대해 추가 관세를 부과할 수 있도록 하나, <strong>현대적 발동·검증 사례가 드물어</strong> 절차적·헌법적·국제통상적 쟁점이 동시다발적으로 제기될 가능성이 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="impact" class="content-section bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                <h3 class="text-2xl font-bold mb-6 text-primary flex items-center border-b pb-4">
+                    <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    경제적 파급력 및 환급 절차 (Economic Impact & Refunds)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-blue-50">
+                        <div class="text-4xl mb-4">💰</div>
+                        <h4 class="font-bold text-xl mb-2 text-[#172b4d]">최대 1,750억 달러</h4>
+                        <div class="text-xs font-bold text-primary mb-2 uppercase tracking-wide">Estimated Total IEEPA Tariffs Collected</div>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            IEEPA 체제 하에서 징수된 관세(추가관세)의 총 규모에 대한 추정치입니다(Penn Wharton Budget Model 등). 
+                            CBP 기준으로는 <strong>2025년 12월 중순(12/14)까지 약 1,335억 달러</strong>가 누적된 것으로 보도되어 왔고, 이후에도 징수가 이어졌습니다. 
+                            환급이 본격화될 경우 미 관세 행정상 유례없는 규모의 환급·소송이 예상됩니다.
+                        </p>
+                    </div>
+                    <div class="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-blue-50">
+                        <div class="text-4xl mb-4">⚖️</div>
+                        <h4 class="font-bold text-xl mb-2 text-[#172b4d]">환급 “기회”는 열렸으나 절차는 불확실</h4>
+                        <div class="text-xs font-bold text-primary mb-2 uppercase tracking-wide">Refund Process Uncertain</div>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            대법원은 환급을 명령하거나 구체적 절차를 설계하지 않았습니다. 
+                            다만 대법원은 IEEPA 관세 다툼의 관할을 <strong>CIT 중심</strong>으로 정리했고, 로펌들은 일반적으로 <strong>CBP의 PSC/Protest 등 행정절차 + 필요 시 CIT 소송</strong>의 병행을 권고합니다. 
+                            또한 2026년 1월 CIT 진행에서 정부가 “최종·불가역 판결 이후 환급”에 관한 약정(stipulation)을 한 전례가 있어, 향후 환급이 단일 트랙으로 정리되기 전까지는 <strong>권리보전 조치(기한 관리)</strong>가 핵심입니다.
+                        </p>
+                    </div>
+                    <div class="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-blue-50">
+                        <div class="text-4xl mb-4">⏱️</div>
+                        <h4 class="font-bold text-xl mb-2 text-[#172b4d]">핵심 기한 준수</h4>
+                        <div class="text-xs font-bold text-primary mb-2 uppercase tracking-wide">Key Deadlines</div>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            <strong>청산(Liquidation) 완료 건</strong>에 대한 CBP 이의제기(Protest)는 통상 <strong>청산일로부터 180일 이내</strong> 제출이 필요합니다(기한 경과 시 권리 소멸 위험). 
+                            <strong>미청산 건</strong>은 <strong>입항일로부터 300일</strong>(또는 청산 15일 전) 이내 사후수정(PSC)이 가능할 수 있습니다. 
+                            실무적으로는 <strong>청산 연장 요청</strong>, 수입신고·납부 데이터의 즉시 확보, “IEEPA vs 비IEEPA(232/301 등)” 구분이 동시에 요구됩니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="strategy" class="content-section bg-[#172b4d] text-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold mb-6 text-white flex items-center border-b border-gray-600 pb-4">
+                    <svg class="w-7 h-7 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    수입업체 및 글로벌 기업을 위한 핵심 행동 지침 (Action Plan)
+                </h3>
+                
+                <div class="space-y-6">
+                    <div class="bg-white/10 p-5 rounded-lg backdrop-blur-sm border border-white/20">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 shrink-0">1</span>
+                            <h4 class="text-lg font-bold text-blue-300">데이터 추출 및 IEEPA 노출액 정밀 산정 (Audit & Assess Exposure)</h4>
+                        </div>
+                        <p class="text-gray-300 ml-11 text-sm leading-relaxed">
+                            기업 내 무역 컴플라이언스 팀은 관세사(Customs Broker)와 협력하여 <strong>ACE(Automated Commercial Environment)</strong>에서 IEEPA 관련 HTS(예: 99장 추가 세번) 적용 내역을 식별하고, 
+                            <strong>IEEPA 관세(환급 후보)와 232/301 등 비IEEPA 관세(환급 대상 아님)</strong>를 명확히 분리해야 합니다. 
+                            미청산(unliquidated)·청산 완료(180일 내)·기한 경과를 구분하여 “가장 긴급한 건”부터 우선순위를 설정하는 것이 필요합니다.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/10 p-5 rounded-lg backdrop-blur-sm border border-white/20">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 shrink-0">2</span>
+                            <h4 class="text-lg font-bold text-blue-300">권리 보전 조치 즉각 시행 (Preserve Refund Rights)</h4>
+                        </div>
+                        <p class="text-gray-300 ml-11 text-sm leading-relaxed">
+                            <strong>미청산 건:</strong> PSC(Post-Summary Correction)로 IEEPA 관세 조정을 시도하고, 기한(일반적으로 300일/청산 전 15일)을 엄수해야 합니다. 
+                            <strong>청산 완료 건:</strong> 청산일 기준 180일 이내인 건에 대해 Protest를 통해 환급 권리를 보전하십시오. 
+                            <strong>CBP 기각 시:</strong> 통상 <strong>28 U.S.C. § 1581(a)</strong>에 따른 CIT 소송이 기본 경로가 됩니다. 
+                            <strong>잔여 관할(§ 1581(i))</strong>은 행정구제의 이용 가능성·효과가 쟁점화될 때 예비적으로 검토하는 것이 일반적입니다.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/10 p-5 rounded-lg backdrop-blur-sm border border-white/20">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 shrink-0">3</span>
+                            <h4 class="text-lg font-bold text-blue-300">CIT 소송 재개 대비 + 대체 관세 모니터링 (Litigation & Monitoring)</h4>
+                        </div>
+                        <p class="text-gray-300 ml-11 text-sm leading-relaxed">
+                            로펌 분석에 따르면, 대법원 심리 대기 기간 동안 <strong>약 2,000건에 근접한 수입업체 사건</strong>이 CIT에 제기되었고 상당수는 대법원 판단을 기다리며 중지(stay)되었습니다. 
+                            향후 CIT 절차가 재개되면서 “환급의 범위·요건·증빙”이 본격 쟁점화될 수 있습니다. 
+                            동시에, 새로 부과된 <strong>Section 122(10% 한시)</strong> 및 향후 <strong>Section 301/232/338</strong> 등 ‘대체 관세’의 적용 범위·예외·발효 시점을 모니터링하고, 계약·가격·원산지/분류 전략을 선제적으로 업데이트해야 합니다.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/10 p-5 rounded-lg backdrop-blur-sm border border-white/20">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 shrink-0">4</span>
+                            <h4 class="text-lg font-bold text-blue-300">거래처 관계 및 비용 전가분 관리 (Commercial Considerations)</h4>
+                        </div>
+                        <p class="text-gray-300 ml-11 text-sm leading-relaxed">
+                            IEEPA 관세 비용을 하위 고객에게 서차지(surcharge)나 가격 인상으로 전가한 경우, 환급이 발생하면 고객 측의 정산·환급금 귀속 주장과 분쟁이 발생할 수 있습니다. 
+                            반대로, 관세를 직접 부담했으나 “수입자(importer of record)”가 아닌 기업(non-importers)도 계약상 조항(관세조정·가격조정·환급귀속)과 실질 부담 구조를 점검하여 가능한 환수 경로를 검토해야 합니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="mt-12 border-t border-gray-200 pt-8 pb-4 text-center text-sm text-gray-500">
+                <p>
+                    본 대시보드는 공개된 1차 자료(연방대법원 판결문, 백악관 대통령문서, 연방관보) 및 상단에 링크된 로펌 Client Alert를 기반으로 한 정보 제공 자료입니다.<br class="md:hidden">
+                    개별 사안에 대한 법률 자문이 아니며, 실제 의사결정 전 사실관계·적용 법령·절차 요건을 전제로 한 전문 자문이 필요합니다.
+                </p>
+            </footer>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Bar Chart (Representative / cap rates of key IEEPA tariff tracks, just before the ruling)
+            const barCtx = document.getElementById('tariffBarChart');
+            if (barCtx) {
+                new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['캐나다 (Canada)', '멕시코 (Mexico)', '중국 (China)', '한국 (South Korea)'],
+                        datasets: [{
+                            label: 'IEEPA 기반 관세율 (대표/상한, %)',
+                            data: [35, 25, 20, 15],
+                            backgroundColor: ['#0052cc', '#0052cc', '#1e3a8a', '#3b82f6'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                max: 40, 
+                                title: { display: true, text: '관세율 (Representative / Cap %)', font: { family: "'Paperlogy', sans-serif" } } 
+                            },
+                            x: {
+                                ticks: { font: { family: "'Paperlogy', sans-serif" } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                titleFont: { family: "'Paperlogy', sans-serif" },
+                                bodyFont: { family: "'Paperlogy', sans-serif" },
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const notes = {
+                                            '캐나다 (Canada)': '국경/마약 비상사태 IEEPA 추가관세: 25% → 35%(2025-08-01), 단 USMCA 적격·에너지(10%) 등 예외 존재',
+                                            '멕시코 (Mexico)': '국경 비상사태 IEEPA 추가관세: 25%(일부 품목/요건 예외 가능)',
+                                            '중국 (China)': 'IEEPA 추가관세(누적): 펜타닐 10% + 상호관세 10% = 총 20% (판결 직전 기준)',
+                                            '한국 (South Korea)': '상호(Reciprocal) 관세: 총 부담 15% 상한(기본세율≥15%면 추가 0; 2025-11-14 시행, 일부 품목 2025-11-01 소급)'
+                                        };
+                                        return notes[context.label] || '';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Doughnut Chart (Supreme Court Vote)
+            const doughnutCtx = document.getElementById('voteDoughnutChart');
+            if (doughnutCtx) {
+                new Chart(doughnutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['IEEPA 관세 무효 — 6인', 'IEEPA 관세 적법 — 3인'],
+                        datasets: [{
+                            data: [6, 3],
+                            backgroundColor: ['#0052cc', '#e2e8f0'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { 
+                                position: 'bottom',
+                                labels: { font: { family: "'Paperlogy', sans-serif" } }
+                            },
+                            tooltip: {
+                                titleFont: { family: "'Paperlogy', sans-serif" },
+                                bodyFont: { family: "'Paperlogy', sans-serif" }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Navigation
+            const navLinks = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('main');
+
+            function changeNav() {
+                if(!sections || sections.length === 0) return;
+                let index = sections.length;
+                while(--index >= 0 && mainContent.scrollTop + 120 < sections[index].offsetTop) {}
+                
+                navLinks.forEach((link) => link.classList.remove('active'));
+                if(index >= 0 && navLinks[index]) {
+                    navLinks[index].classList.add('active');
+                }
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if(targetSection && mainContent){
+                         mainContent.scrollTo({
+                            top: targetSection.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                    
+                     if(window.innerWidth < 768 && sidebar) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
+
+            mainContent.addEventListener('scroll', changeNav);
+            changeNav();
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            if(mobileMenuButton && sidebar){
+                mobileMenuButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

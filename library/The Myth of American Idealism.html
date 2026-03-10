@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Myth of American Idealism - Interactive Dashboard</title>
+    <style>
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            /* Palette: Serious, Critical, Academic, "Redacted Document" Vibe */
+            --bg-body: #f4f4f4;
+            --bg-sidebar: #1a1a1a;
+            --bg-card: #ffffff;
+            --bg-header: #ffffff;
+            
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-sidebar: #e0e0e0;
+            --text-sidebar-hover: #ffffff;
+            --text-accent: #b71c1c; /* Deep Red for emphasis/danger */
+            
+            --border-color: #ddd;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-header: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            
+            /* Typography */
+            --font-heading: 'Georgia', 'Times New Roman', serif;
+            --font-body: 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
+            
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+
+        /* --- RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            overflow: hidden; /* Prevent body scroll, handle in containers */
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            display: block;
+            height: 100vh;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            background-color: #000;
+        }
+
+        .book-cover {
+            width: 100%;
+            max-width: 140px;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sidebar-title-display {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        #chapter-navigation {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        #chapter-navigation li {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            color: #bbb;
+        }
+
+        #chapter-navigation li:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-sidebar-hover);
+        }
+
+        #chapter-navigation li.active {
+            background-color: rgba(183, 28, 28, 0.15); /* Tint of red */
+            border-left-color: var(--text-accent);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #333;
+            background-color: #111;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        #dashboard-container {
+            flex-grow: 1;
+            display: block;
+            height: 100vh;
+            overflow-y: auto; /* Enable independent scrolling for main area */
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* --- HEADER --- */
+        #mobile-header {
+            display: none; /* Hidden on desktop */
+            height: 60px;
+            background-color: var(--bg-sidebar);
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #hamburger-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        #content-header {
+            background-color: var(--bg-header);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-header);
+            z-index: 10;
+        }
+
+        #book-title-main {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        #book-meta-main {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #current-section-title {
+            margin-top: 15px;
+            font-size: 1.4rem;
+            color: var(--text-accent);
+            font-weight: 700;
+            border-left: 5px solid var(--text-accent);
+            padding-left: 15px;
+        }
+
+        /* --- CONTENT DISPLAY --- */
+        #content-display {
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            align-content: start;
+        }
+
+        /* --- CARDS & WIDGETS --- */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow-card);
+            padding: 25px;
+            border: 1px solid #eee;
+            transition: transform 0.2s ease;
+            height: 100%; /* Fill grid cell */
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-accent);
+            border-radius: 50%;
+        }
+
+        /* Layout Specifics for Cards */
+        .card-full { grid-column: span 12; }
+        .card-half { grid-column: span 6; }
+        .card-third { grid-column: span 4; }
+        .card-two-thirds { grid-column: span 8; }
+
+        /* Typography inside cards */
+        .card-text {
+            color: #444;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Arguments List */
+        .argument-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .argument-item {
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            border-left: 3px solid #ccc;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+        .argument-item strong {
+            color: var(--text-accent);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Keywords Tag Cloud */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background-color: #eceff1;
+            color: #455a64;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Quote Block */
+        .quote-block {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: var(--text-accent);
+            font-style: italic;
+            position: relative;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .quote-block::before {
+            content: '“';
+            font-size: 3rem;
+            position: absolute;
+            top: -10px;
+            left: 0;
+            opacity: 0.2;
+        }
+
+        /* Insight Chips */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .insight-chip {
+            background-color: #e3f2fd; /* Light blue tint */
+            border: 1px solid #bbdefb;
+            color: #0d47a1;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* Visual: Limits/Future List */
+        .list-visual {
+            list-style: none;
+        }
+        .list-visual li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .list-visual li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--text-accent);
+            font-weight: bold;
+        }
+
+        /* Overlay for Mobile */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 900;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- RESPONSIVE DESIGN IMPROVEMENTS --- */
+        
+        /* Tablet & Large Mobile (Landscape) - Keep grid, simplify columns */
+        @media (max-width: 992px) {
+            #sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100%;
+            }
+            #sidebar.open {
+                transform: translateX(280px);
+            }
+            #mobile-header { display: flex; }
+            #content-header { padding: 15px 20px; }
+            #book-title-main { font-size: 1.4rem; }
+            #current-section-title { font-size: 1.1rem; }
+            
+            #content-display {
+                padding: 20px;
+                /* Switch to 2 columns for tablet feel, not just 1 */
+                grid-template-columns: repeat(2, 1fr); 
+            }
+            
+            /* Text heavy cards span full width */
+            .card-full, .card-two-thirds, .card-half { grid-column: span 2; }
+            /* Smaller cards can sit side-by-side */
+            .card-third { grid-column: span 1; }
+            
+            #overlay.show { display: block; opacity: 1; }
+        }
+
+        /* Mobile Phones (Portrait) */
+        @media (max-width: 600px) {
+            #content-display {
+                padding: 15px;
+                grid-template-columns: 1fr; /* Single column */
+                gap: 15px;
+            }
+
+            .card-third { grid-column: span 1; }
+            
+            /* Compact Card Styles */
+            .card {
+                padding: 15px; /* Reduce padding to save space */
+            }
+            .card-header {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            .card-text {
+                font-size: 0.95rem;
+            }
+
+            /* --- HORIZONTAL SCROLLING WIDGETS --- 
+               Note: Insight Grid reverted to vertical stacking per user request
+            */
+            
+            /* Make Insight Grid Stack Vertically to prevent cutting off */
+            .insight-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin: 0;
+                padding: 0;
+                overflow-x: visible;
+            }
+            
+            .insight-chip {
+                min-width: 0;
+                width: 100%;
+                margin-bottom: 0;
+                scroll-snap-align: none;
+            }
+
+            /* Make Argument List Compact */
+            .argument-list {
+                gap: 8px;
+            }
+            .argument-item {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            /* Tag Cloud Compact */
+            .tag-cloud {
+                gap: 6px;
+            }
+            .tag {
+                font-size: 0.8rem;
+                padding: 4px 10px;
+            }
+            
+            /* Quote adjustments */
+            .quote-block {
+                font-size: 1.1rem;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY FOR MOBILE -->
+    <div id="overlay"></div>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <!-- Book Cover Image from Instructions -->
+            <img src="https://imgur.com/AGYJmPZ.jpg" alt="Book Cover" class="book-cover">
+            <div class="sidebar-title-display">THE MYTH OF<br>AMERICAN IDEALISM</div>
+        </div>
+        <ul id="chapter-navigation">
+            <!-- Populated by JS -->
+        </ul>
+        <div class="sidebar-footer">
+            Dashboard by Kipeum
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div id="dashboard-container">
+        
+        <!-- MOBILE HEADER -->
+        <header id="mobile-header">
+            <span style="font-weight: bold;">Book Dashboard</span>
+            <button id="hamburger-btn">☰</button>
+        </header>
+
+        <!-- MAIN HEADER -->
+        <header id="content-header">
+            <h1 id="book-title-main">Loading...</h1>
+            <p id="book-meta-main">...</p>
+            <h2 id="current-section-title">Overview</h2>
+        </header>
+
+        <!-- DYNAMIC CONTENT AREA -->
+        <main id="content-display">
+            <!-- Populated by JS -->
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- DATA SOURCE ---
+        const jsonData = {
+          "book_meta": {
+            "title": "The Myth of American Idealism: How U.S. Foreign Policy Endangers the World",
+            "author": "Noam Chomsky & Nathan J. Robinson",
+            "publication_year": "2024",
+            "main_theme": "U.S. foreign policy is driven by a 'Mafia Doctrine' of global hegemony and elite economic interest rather than the professed values of democracy and human rights."
+          },
+          "overall_summary": {
+            "abstract": "The Myth of American Idealism argues that United States foreign policy is not driven by the \"idealism\" of spreading democracy and human rights it publicly professes, but by a \"Mafia Doctrine\" designed to maintain global hegemony and protect elite domestic economic interests. Through an extensive review of historical records and declassified documents, the authors contend that the U.S. routinely suppresses independent nationalism in the Global South, violates international law with impunity, and prioritizes the security of \"the masters of mankind\" over the safety of the global population. The book emphasizes that these policies have led to catastrophic humanitarian consequences, from the devastation of Southeast Asia to the ongoing existential threats of nuclear proliferation and the climate crisis. Ultimately, the authors conclude that the survival of the species depends on the American public's ability to dismantle these national myths, hold their leaders accountable to universal moral standards, and demand a foreign policy based on genuine cooperation and international law.",
+            "keywords": [
+              "American Exceptionalism",
+              "Mafia Doctrine",
+              "Global Hegemony",
+              "Foreign Intervention",
+              "International Law",
+              "Climate Crisis",
+              "Nuclear Proliferation"
+            ]
+          },
+          "chapters": [
+            {
+              "chapter_number": 0,
+              "chapter_title": "Introduction: Noble Goals and Mafia Logic",
+              "summary": "The authors introduce the \"Mafia Doctrine\" as the operative principle of U.S. foreign policy, where the \"Godfather\" (the U.S.) brooks no defiance and punishes any country that attempts an independent course. They argue that while every empire uses noble rhetoric to justify conquest, the U.S. specifically uses the myth of \"American Exceptionalism\" to exempt itself from the moral and legal standards it imposes on others.",
+              "key_arguments": [
+                "The \"Fifth Freedom\": Beyond FDR’s four freedoms, the U.S. asserts a \"freedom to dominate\" and protect existing privileges at any cost.",
+                "Rationalized Aggression: Crime requires malicious intent; since the U.S. defines its intentions as benevolent, it cannot, by its own logic, commit crimes—only \"mistakes\" or \"errors\".",
+                "Universal Standards: The authors propose a \"Principle of Universality,\" insisting that the U.S. must be judged by the same criteria it applies to its enemies."
+              ],
+              "key_takeaways_or_insights": [
+                "Recognize that political rhetoric often masks the operational logic of dominance.",
+                "Apply the 'Principle of Universality' to evaluate current events objectively."
+              ],
+              "notable_quote": "The 'Godfather' brooks no defiance and punishes any country that attempts an independent course.",
+              "keywords": [
+                "Mafia Doctrine",
+                "American Exceptionalism",
+                "Fifth Freedom",
+                "Principle of Universality"
+              ]
+            },
+            {
+              "chapter_number": 1,
+              "chapter_title": "Taming the Global South",
+              "summary": "This chapter examines U.S. efforts to suppress \"radical nationalism\" and social reform in Latin America, Indonesia, and Africa to ensure these regions remain sources of raw materials and markets for U.S. investors. It details how the U.S. frequently preferred stable, pro-business dictatorships over democracies that might prioritize their own citizens' welfare.",
+              "key_arguments": [
+                "The Threat of a \"Good Example\": Leaders like Salvador Allende (Chile) and Jacobo Arbenz (Guatemala) were targeted not for being military threats, but because their success might inspire other nations to seek independence from U.S. control.",
+                "\"Constructive\" Massacres: The 1965-66 Indonesian genocide was welcomed by U.S. officials and media as a \"light of hope\" because it eliminated the P.K.I. (Communist Party) and opened the country to Western investment.",
+                "Collectively Punishing Cuba: Decades of illegal embargoes and terrorism against Cuba are explained as punishment for \"successful defiance\" of the Monroe Doctrine."
+              ],
+              "key_takeaways_or_insights": [
+                "Understanding the economic motivations behind regime change operations.",
+                "Recognizing how 'stability' is often a euphemism for compliance with foreign investment."
+              ],
+              "notable_quote": "The Indonesian genocide was welcomed by U.S. officials as a 'light of hope' because it opened the country to Western investment.",
+              "keywords": [
+                "Salvador Allende",
+                "Jacobo Arbenz",
+                "Indonesian Genocide",
+                "Monroe Doctrine",
+                "Successful Defiance"
+              ]
+            },
+            {
+              "chapter_number": 2,
+              "chapter_title": "The Southeast Asian War",
+              "summary": "The authors deconstruct the Vietnam War, arguing it was a criminal act of aggression aimed at preventing a \"virus\" of independent development from \"infecting\" neighboring states. They contrast the sanitized \"noble mistake\" narrative in U.S. media with the reality of widespread civilian massacres and environmental destruction.",
+              "key_arguments": [
+                "Subverting Diplomacy: The U.S. actively blocked the 1956 national elections mandated by the Geneva Accords because it was certain Ho Chi Minh would win.",
+                "\"Firepower\" over Strategy: To minimize U.S. casualties, commanders used massive, indiscriminate firepower (Napalm, Agent Orange, B-52s) that intentionally destroyed rural society.",
+                "Expansion to Laos and Cambodia: The \"secret\" bombing of neighboring countries demonstrated a total disregard for international law and sovereignty, directly leading to the rise of the Khmer Rouge."
+              ],
+              "key_takeaways_or_insights": [
+                "Historical awareness of how military strategy can generate long-term blowback (e.g., the Khmer Rouge).",
+                "Critical analysis of sanitized media narratives regarding past wars."
+              ],
+              "notable_quote": "The 'secret' bombing of neighboring countries demonstrated a total disregard for international law and sovereignty.",
+              "keywords": [
+                "Ho Chi Minh",
+                "Geneva Accords",
+                "Agent Orange",
+                "B-52",
+                "Khmer Rouge"
+              ]
+            },
+            {
+              "chapter_number": 3,
+              "chapter_title": "9/11 and the Destruction of Afghanistan",
+              "summary": "This chapter critiques the U.S. response to the 9/11 attacks, arguing that the invasion of Afghanistan was an act of vengeance that ignored diplomatic offers to negotiate bin Laden's surrender. It highlights how the subsequent 20-year occupation prioritized \"killing bad guys\" over building a stable society, eventually handing the country back to a strengthened Taliban.",
+              "key_arguments": [
+                "Refusing Diplomacy: The Bush administration rejected Taliban offers to try bin Laden in a neutral third country, preferring a demonstration of military \"might\".",
+                "Funding Warlords: By relying on brutal local warlords and a \"VICE\" (vertically integrated criminal enterprise) government, the U.S. alienated the population and drove them toward the Taliban.",
+                "Financial Warfare: The post-withdrawal freezing of Afghan central bank assets is described as a cruel theft that has driven millions toward starvation."
+              ],
+              "key_takeaways_or_insights": [
+                "Military vengeance often fails to achieve long-term security goals.",
+                "Economic warfare (asset freezing) can be as devastating to civilians as physical warfare."
+              ],
+              "notable_quote": "The invasion was an act of vengeance that prioritized 'killing bad guys' over building a stable society.",
+              "keywords": [
+                "Osama bin Laden",
+                "Taliban",
+                "Warlords",
+                "Central Bank Assets",
+                "Vengeance"
+              ]
+            },
+            {
+              "chapter_number": 4,
+              "chapter_title": "Iraq: Crime of the Century",
+              "summary": "The authors describe the 2003 invasion of Iraq as a \"textbook case\" of criminal aggression based on conscious deceptions regarding WMDs and Al-Qaeda links. They argue the war's primary goals were to ensure regional control, secure energy resources, and demonstrate that \"what we say goes\".",
+              "key_arguments": [
+                "Support for the Dictator: The U.S. armed and supported Saddam Hussein during his worst atrocities in the 1980s, only turning against him when he disobeyed the \"Godfather\" by invading Kuwait.",
+                "Institutional Lies: High-level officials (Bush, Cheney, Powell) made hundreds of false statements to panic the public into supporting an unnecessary war.",
+                "Impunity for Planners: The architects of the war, which killed at least 500,000 Iraqis, have suffered no legal or social consequences, while the victims continue to suffer from the war's toxic legacy."
+              ],
+              "key_takeaways_or_insights": [
+                "Skepticism toward intelligence claims used to justify preemptive war.",
+                "The importance of accountability for political leaders who launch aggressive wars."
+              ],
+              "notable_quote": "The invasion was a 'textbook case' of criminal aggression based on conscious deceptions regarding WMDs.",
+              "keywords": [
+                "Saddam Hussein",
+                "WMDs",
+                "Shock and Terror",
+                "Energy Resources",
+                "Impunity"
+              ]
+            },
+            {
+              "chapter_number": 5,
+              "chapter_title": "The U.S., Israel, and Palestine",
+              "summary": "Examining the Israel-Palestine conflict, the chapter argues that the U.S. provides the \"Iron Wall\" of military and diplomatic support that allows Israel to maintain an illegal occupation and an apartheid system. It details how the U.S. consistently blocks the international consensus for a two-state solution.",
+              "key_arguments": [
+                "Strategic Asset: The U.S. supports Israel primarily because it serves as a \"pro-Western force\" that helps control regional energy resources and suppress Arab nationalism.",
+                "Expansion over Security: The authors argue Israel has chosen expansion (settlements) over security, a choice facilitated by unconditional U.S. aid.",
+                "Post-10/7 Crisis: A postscript discusses the devastating toll of the 2023-24 Gaza war, characterizing U.S. support for the \"annihilation\" of Gaza as the ultimate failure of its \"human rights\" rhetoric."
+              ],
+              "key_takeaways_or_insights": [
+                "Understanding the diplomatic shield the U.S. provides in international forums (UN vetoes).",
+                "Reframing the conflict through the lens of settlement expansion rather than pure security."
+              ],
+              "notable_quote": "The U.S. provides the 'Iron Wall' of military and diplomatic support that allows Israel to maintain an illegal occupation.",
+              "keywords": [
+                "Apartheid",
+                "Two-State Solution",
+                "Iron Wall",
+                "Gaza",
+                "Strategic Asset"
+              ]
+            },
+            {
+              "chapter_number": 6,
+              "chapter_title": "The Great Chinese Threat",
+              "summary": "The authors contend that the \"China threat\" is largely an ideological construct used to justify U.S. military buildup and economic warfare aimed at maintaining \"international primacy\". They argue that China’s real \"crime\" is simply existing as a rival that cannot be bullied into submission.",
+              "key_arguments": [
+                "Bipartisan Hawkishness: Both Trump and Biden have pursued policies (semiconductor bans, military encirclement) designed to \"kick away the ladder\" of Chinese development.",
+                "Provocation over Taiwan: The U.S. is criticized for abandoning the \"One China\" policy in favor of provocative military gestures that increase the risk of a catastrophic war.",
+                "Security Dilemma: U.S. \"defensive\" actions—like placing 750 bases worldwide—are perceived as aggressive encirclement by China, leading to a dangerous arms race."
+              ],
+              "key_takeaways_or_insights": [
+                "Distinguishing between genuine security threats and rivalry for hegemony.",
+                "The dangers of the 'Thucydides Trap' in U.S.-China relations."
+              ],
+              "notable_quote": "China’s real 'crime' is simply existing as a rival that cannot be bullied into submission.",
+              "keywords": [
+                "China Encirclement",
+                "One China Policy",
+                "Primacy",
+                "Security Dilemma"
+              ]
+            },
+            {
+              "chapter_number": 7,
+              "chapter_title": "NATO and Russia After the Cold War",
+              "summary": "This chapter traces the roots of the Ukraine war to the decision to expand NATO to Russia's borders despite repeated warnings that it would be seen as a \"monumental provocation\". It argues the U.S. preferred a \"proxy war\" to weaken Russia over a diplomatic settlement.",
+              "key_arguments": [
+                "Broken Promises: Russian leaders view NATO expansion as a betrayal of promises made during the German reunification negotiations.",
+                "Ignoring \"Red Lines\": The U.S. dismissed Russia's stated security concerns regarding Ukraine's NATO membership as illegitimate, effectively choosing escalation over negotiation.",
+                "Strategic Win at Humanitarian Cost: U.S. planners describe the war as a \"cost-effective\" way to destroy the Russian military, regardless of the hundreds of thousands of lives lost."
+              ],
+              "key_takeaways_or_insights": [
+                "The importance of acknowledging the security concerns of adversaries to prevent conflict.",
+                "Analyzing the geopolitical utility of proxy wars for major powers."
+              ],
+              "notable_quote": "The U.S. preferred a 'proxy war' to weaken Russia over a diplomatic settlement.",
+              "keywords": [
+                "NATO Expansion",
+                "Proxy War",
+                "Vladimir Putin",
+                "Red Lines",
+                "Strategic Advantage"
+              ]
+            },
+            {
+              "chapter_number": 8,
+              "chapter_title": "Nuclear Threat and Climate Catastrophe",
+              "summary": "The authors identify the nuclear arms race and the climate crisis as the two primary existential threats facing humanity. They argue that the U.S. has actively undermined global efforts to address both, prioritizing dominance and short-term profit over species survival.",
+              "key_arguments": [
+                "Thermonuclear Monarchy: The U.S. president possesses the unchecked power to destroy the world in minutes, a situation fundamentally incompatible with democracy.",
+                "Carbon Colonialism: Wealthy nations (led by the U.S.) are responsible for the bulk of historical emissions, yet the poorest nations suffer the most from the resulting disasters.",
+                "Industrial Capture: The fossil fuel industry has successfully captured both political parties, ensuring that oil production reaches record highs even as the planet reaches its tipping point."
+              ],
+              "key_takeaways_or_insights": [
+                "The urgent need for democratization of nuclear policy.",
+                "Recognizing climate inaction as a form of structural violence against the Global South."
+              ],
+              "notable_quote": "The U.S. has actively undermined global efforts to address both threats, prioritizing dominance over species survival.",
+              "keywords": [
+                "Doomsday Clock",
+                "First-Use Policy",
+                "Carbon Colonialism",
+                "Fossil Fuel Industry",
+                "Existential Threat"
+              ]
+            },
+            {
+              "chapter_number": 9,
+              "chapter_title": "Domestic Roots of Foreign Policy",
+              "summary": "This chapter explains that foreign policy is determined by concentrated private power and a specialized class of \"internal insiders\" rather than the public. They argue that the \"unreliable masses\" are kept in the dark to prevent them from interfering with elite interests.",
+              "key_arguments": [
+                "The Policy-Public Disconnect: Polls show Americans often favor diplomacy and social spending, while the government pursues intervention and record military budgets.",
+                "Manufacturing Consent: In a free society, the public must be \"engineered\" into supporting elite policies through propaganda and the creation of imaginary enemies.",
+                "Corporate Shadow: Politics is defined as the \"shadow cast on society by big business,\" where both major parties serve the same investor class."
+              ],
+              "key_takeaways_or_insights": [
+                "The necessity of critical media literacy to bypass propaganda.",
+                "Understanding that foreign policy often reflects domestic corporate interests."
+              ],
+              "notable_quote": "Politics is defined as the 'shadow cast on society by big business.'",
+              "keywords": [
+                "Concentrated Wealth",
+                "Internal Insiders",
+                "Manufacturing Consent",
+                "Public Disconnect"
+              ]
+            },
+            {
+              "chapter_number": 10,
+              "chapter_title": "International Law and \"Rules-Based Order\"",
+              "summary": "The authors argue the U.S. has replaced the \"UN-based order\" with a \"rules-based order\" where the U.S. sets and breaks the rules as it sees fit. They document a long history of the U.S. rejecting treaties and ignoring international court rulings.",
+              "key_arguments": [
+                "Sovereign Immunity: The U.S. rejects the jurisdiction of the International Criminal Court (ICC) to ensure its officials can never be tried for war crimes.",
+                "Treaty Sabotage: From landmines to children's rights, the U.S. is often the lone holdout on major humanitarian treaties.",
+                "The \"Hague Invasion Act\": U.S. law allows the president to use force to rescue any American held by the ICC, a clear signal of contempt for international justice."
+              ],
+              "key_takeaways_or_insights": [
+                "Distinguishing between 'International Law' and the 'Rules-Based Order'.",
+                "The importance of universal jurisdiction for war crimes."
+              ],
+              "notable_quote": "The U.S. has replaced the 'UN-based order' with a 'rules-based order' where it sets and breaks the rules as it sees fit.",
+              "keywords": [
+                "UN Charter",
+                "ICC",
+                "Rules-Based Order",
+                "Sovereign Immunity",
+                "Treaty Holdout"
+              ]
+            },
+            {
+              "chapter_number": 11,
+              "chapter_title": "How the Myth Is Made",
+              "summary": "The final chapter analyzes how the U.S. media reinforces the myth of benevolence by filtering out the human cost of U.S. actions and framing all interventions as well-intentioned.",
+              "key_arguments": [
+                "Tactical Criticism Only: Media debate is restricted to whether a war is \"working,\" never whether it is legal or moral.",
+                "Orwellian Language: Brutal actions are sanitized with terms like \"population transfer,\" \"enhanced interrogation,\" and \"collateral damage\".",
+                "Victim Hierarchies: The media creates a hierarchy where victims of enemies (Ukrainians) receive immense empathy, while victims of the U.S. (Yemenis, Iraqis) are ignored."
+              ],
+              "key_takeaways_or_insights": [
+                "Recognizing 'worthy' vs. 'unworthy' victim frameworks in news coverage.",
+                "Decoding sanitized military language."
+              ],
+              "notable_quote": "The media creates a hierarchy where victims of enemies receive empathy, while victims of the U.S. are ignored.",
+              "keywords": [
+                "Intellectual Conformity",
+                "Orwellian Language",
+                "Victim Hierarchy",
+                "Tactical Critique"
+              ]
+            },
+            {
+              "chapter_number": 12,
+              "chapter_title": "Conclusion: Hegemony or Survival?",
+              "summary": "The authors summarize the choice facing humanity: continue the pursuit of global hegemony, which leads toward nuclear or environmental doomsday, or choose survival through collective action. They call for a \"Revolutionary Pacifism\" and the development of \"intellectual self-defense\".",
+              "key_arguments": [
+                "Individual Responsibility: Citizens in free societies have a unique moral obligation to restrain the violence of their own state.",
+                "Power of Movements: Significant progress (Civil Rights, Environmental Protection) has always come from \"the countless small actions of unknown people\" rather than enlightened leaders.",
+                "Urgency of Now: With the Doomsday Clock at 90 seconds to midnight, there is no time for cynicism or passivity."
+              ],
+              "key_takeaways_or_insights": [
+                "Engage in 'Intellectual Self-Defense' against state propaganda.",
+                "Participate in collective action movements for peace and environmental protection."
+              ],
+              "notable_quote": "Significant progress has always come from 'the countless small actions of unknown people.'",
+              "keywords": [
+                "Revolutionary Pacifism",
+                "Intellectual Self-Defense",
+                "Collective Action",
+                "Survival"
+              ]
+            }
+          ],
+          "limitations_and_future_directions": {
+            "acknowledged_constraints": [
+              "Hidden Records: Much of the historical record remains classified or suppressed under the guise of \"national security\" until it is no longer politically sensitive.",
+              "Psychological Barriers: Confronting the \"ugly and painful\" truth about one’s own society is difficult and often leads to social or professional marginalization.",
+              "Narrowing Timeframe: The authors warn that the window to prevent environmental collapse and nuclear war is closing rapidly.",
+              "Information Oversupply/Knowledge Deficit: Despite the internet, information remains siloed by corporate interests, leaving the public largely ignorant of the world’s most pressing issues."
+            ],
+            "future_research": [
+              "Development of 'Intellectual Self-Defense' strategies for the general public.",
+              "Study of 'Revolutionary Pacifism' as a viable foreign policy alternative.",
+              "Research into the mechanisms of 'Industrial Capture' of political parties.",
+              "Investigation of non-hegemonic frameworks for international cooperation."
+            ]
+          },
+          "field_context": {
+            "statement": "This book situates itself in the tradition of radical political economy and critical international relations, continuing Noam Chomsky's decades-long critique of American power exemplified in works like 'Manufacturing Consent' and 'Hegemony or Survival.' It challenges both the 'Liberal Internationalist' and 'Realist' schools by arguing that U.S. policy is structurally aggressive rather than reactive or benevolent. The work is particularly significant for applying these critical frameworks to the contemporary multipolar era, addressing the rise of China and the immediate existential threats of the climate crisis."
+          }
+        };
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            nav: document.getElementById('chapter-navigation'),
+            contentDisplay: document.getElementById('content-display'),
+            title: document.getElementById('book-title-main'),
+            meta: document.getElementById('book-meta-main'),
+            sectionTitle: document.getElementById('current-section-title'),
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('overlay'),
+            hamburger: document.getElementById('hamburger-btn'),
+            dashboardContainer: document.getElementById('dashboard-container')
+        };
+
+        // --- CORE FUNCTIONS ---
+
+        function initialize() {
+            // 1. Populate Header Meta
+            els.title.innerText = jsonData.book_meta.title;
+            els.meta.innerText = `By ${jsonData.book_meta.author} | ${jsonData.book_meta.publication_year}`;
+
+            // 2. Build Navigation
+            buildNavigation();
+
+            // 3. Set Default View
+            displayContent('overall_summary');
+        }
+
+        function buildNavigation() {
+            // Add "Book Overview" link
+            const overviewLi = document.createElement('li');
+            overviewLi.innerText = "Book Overview";
+            overviewLi.dataset.id = 'overall_summary';
+            overviewLi.addEventListener('click', (e) => handleNavClick('overall_summary', e.target));
+            els.nav.appendChild(overviewLi);
+
+            // Add "Field Context" link
+            const contextLi = document.createElement('li');
+            contextLi.innerText = "Field Context";
+            contextLi.dataset.id = 'field_context';
+            contextLi.addEventListener('click', (e) => handleNavClick('field_context', e.target));
+            els.nav.appendChild(contextLi);
+
+            // Add Chapters
+            jsonData.chapters.forEach((chapter, index) => {
+                const li = document.createElement('li');
+                // Format title nicely
+                const shortTitle = chapter.chapter_title.length > 35 
+                    ? chapter.chapter_title.substring(0, 32) + '...' 
+                    : chapter.chapter_title;
+                
+                li.innerText = chapter.chapter_number === 0 
+                    ? `Intro: ${shortTitle}` 
+                    : `Ch ${chapter.chapter_number}: ${shortTitle}`;
+                
+                li.dataset.id = `chapter_${index}`; // store array index
+                li.addEventListener('click', (e) => handleNavClick(`chapter_${index}`, e.target));
+                els.nav.appendChild(li);
+            });
+
+            // Add "Limitations & Future" link
+            const limitLi = document.createElement('li');
+            limitLi.innerText = "Limits & Future Directions";
+            limitLi.dataset.id = 'limitations';
+            limitLi.addEventListener('click', (e) => handleNavClick('limitations', e.target));
+            els.nav.appendChild(limitLi);
+        }
+
+        function handleNavClick(id, targetEl) {
+            // Update UI active state
+            document.querySelectorAll('#chapter-navigation li').forEach(li => li.classList.remove('active'));
+            targetEl.classList.add('active');
+            
+            // Display Content
+            displayContent(id);
+
+            // Close Mobile Menu if open
+            if(window.innerWidth <= 992) {
+                toggleMobileMenu(false);
+            }
+        }
+
+        function displayContent(id) {
+            // Clear container
+            els.contentDisplay.innerHTML = '';
+            
+            // Scroll to top of MAIN CONTAINER (since header scrolls with content now)
+            els.dashboardContainer.scrollTop = 0;
+
+            if (id === 'overall_summary') {
+                renderOverallSummary();
+            } else if (id === 'field_context') {
+                renderFieldContext();
+            } else if (id === 'limitations') {
+                renderLimitations();
+            } else if (id.startsWith('chapter_')) {
+                const index = parseInt(id.split('_')[1]);
+                renderChapter(jsonData.chapters[index]);
+            }
+        }
+
+        // --- RENDER HELPERS ---
+
+        function createCard(title, contentHTML, widthClass = 'card-full') {
+            const card = document.createElement('div');
+            card.className = `card ${widthClass}`;
+            card.innerHTML = `
+                <div class="card-header">${title}</div>
+                <div class="card-text">${contentHTML}</div>
+            `;
+            return card;
+        }
+
+        function renderOverallSummary() {
+            els.sectionTitle.innerText = "Book Overview";
+            const data = jsonData.overall_summary;
+
+            // 1. Abstract
+            els.contentDisplay.appendChild(createCard("Abstract", data.abstract, "card-two-thirds"));
+
+            // 2. Main Theme (From Book Meta)
+            els.contentDisplay.appendChild(createCard("Central Theme", jsonData.book_meta.main_theme, "card-third"));
+            
+            // 3. Infographic (New addition)
+            const infographicHTML = `<img src="https://imgur.com/B6TEFdb.jpg" alt="Book Summary Infographic" style="width: 100%; height: auto; display: block; border-radius: 4px;">`;
+            els.contentDisplay.appendChild(createCard("Visual Summary", infographicHTML, "card-full"));
+
+            // 4. Keywords
+            const keywordsHTML = `<div class="tag-cloud">
+                ${data.keywords.map(k => `<span class="tag">${k}</span>`).join('')}
+            </div>`;
+            els.contentDisplay.appendChild(createCard("Core Keywords", keywordsHTML, "card-full"));
+        }
+
+        function renderFieldContext() {
+            els.sectionTitle.innerText = "Field Context";
+            const data = jsonData.field_context;
+            
+            els.contentDisplay.appendChild(createCard("Academic Positioning", data.statement, "card-full"));
+        }
+
+        function renderChapter(chapter) {
+            els.sectionTitle.innerText = chapter.chapter_number === 0 
+                ? chapter.chapter_title 
+                : `Chapter ${chapter.chapter_number}: ${chapter.chapter_title}`;
+
+            // 1. Summary (Top Left, large)
+            els.contentDisplay.appendChild(createCard("Chapter Summary", chapter.summary, "card-two-thirds"));
+
+            // 2. Quote (Top Right, visual)
+            const quoteHTML = `<div class="quote-block">${chapter.notable_quote}</div>`;
+            els.contentDisplay.appendChild(createCard("Notable Quote", quoteHTML, "card-third"));
+
+            // 3. Key Arguments (Visualized as list)
+            // Split distinct points if possible, otherwise list them
+            const argsHTML = `<div class="argument-list">
+                ${chapter.key_arguments.map((arg, i) => {
+                    // Try to split on colon for bolding header of argument
+                    const parts = arg.split(':');
+                    const title = parts.length > 1 ? parts[0] + ':' : '';
+                    const body = parts.length > 1 ? parts.slice(1).join(':') : arg;
+                    
+                    return `<div class="argument-item">
+                        ${title ? `<strong>${title}</strong>` : ''}
+                        ${body}
+                    </div>`;
+                }).join('')}
+            </div>`;
+            els.contentDisplay.appendChild(createCard("Key Arguments", argsHTML, "card-half"));
+
+            // 4. Key Takeaways (Visualized as chips)
+            const takeawaysHTML = `<div class="insight-grid">
+                ${chapter.key_takeaways_or_insights.map(t => `
+                    <div class="insight-chip">
+                        <span class="insight-icon">💡</span>
+                        <span>${t}</span>
+                    </div>
+                `).join('')}
+            </div>`;
+            els.contentDisplay.appendChild(createCard("Key Takeaways & Insights", takeawaysHTML, "card-half"));
+
+            // 5. Keywords
+             const keywordsHTML = `<div class="tag-cloud">
+                ${chapter.keywords.map(k => `<span class="tag">${k}</span>`).join('')}
+            </div>`;
+            els.contentDisplay.appendChild(createCard("Chapter Keywords", keywordsHTML, "card-full"));
+        }
+
+        function renderLimitations() {
+            els.sectionTitle.innerText = "Limitations & Future Directions";
+            const data = jsonData.limitations_and_future_directions;
+
+            // 1. Constraints List
+            const constraintsHTML = `<ul class="list-visual">
+                ${data.acknowledged_constraints.map(c => `<li>${c}</li>`).join('')}
+            </ul>`;
+            els.contentDisplay.appendChild(createCard("Acknowledged Constraints", constraintsHTML, "card-half"));
+
+            // 2. Future Research List
+             const futureHTML = `<ul class="list-visual">
+                ${data.future_research.map(r => `<li>${r}</li>`).join('')}
+            </ul>`;
+            els.contentDisplay.appendChild(createCard("Avenues for Future Research", futureHTML, "card-half"));
+        }
+
+        // --- EVENT LISTENERS ---
+
+        els.hamburger.addEventListener('click', () => toggleMobileMenu(true));
+        els.overlay.addEventListener('click', () => toggleMobileMenu(false));
+
+        function toggleMobileMenu(show) {
+            if (show) {
+                els.sidebar.classList.add('open');
+                els.overlay.classList.add('show');
+            } else {
+                els.sidebar.classList.remove('open');
+                els.overlay.classList.remove('show');
+            }
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', initialize);
+
+    </script>
+</body>
+</html>

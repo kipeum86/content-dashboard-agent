@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK하이닉스 (000660) 투자분석 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        @keyframes pulse-price { 0%,100%{opacity:1} 50%{opacity:.85} }
+        @keyframes gradient-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+        .pulse-price { animation: pulse-price 2s ease-in-out infinite; }
+        .gradient-animate { background-size: 200% 200%; animation: gradient-shift 4s ease infinite; }
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); transition: transform .2s, box-shadow .2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+        .metric-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .accent-border { border-left: 4px solid; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 3px; }
+        @media (max-width: 768px) { .desktop-table { display: none; } .mobile-cards { display: block !important; } }
+        @media (min-width: 769px) { .mobile-cards { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- ===== 1. HEADER ===== -->
+<header class="gradient-animate text-white" style="background: linear-gradient(135deg, #c8102e 0%, #8b1a2b 30%, #2d1f3d 70%, #1a1a2e 100%);">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
+                        <i class="fas fa-microchip text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold tracking-tight">SK하이닉스</h1>
+                        <p class="text-white/70 text-sm font-medium">000660 · KOSPI · 반도체</p>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-3 mt-4">
+                    <span class="text-4xl font-black pulse-price">₩949,000</span>
+                    <span class="metric-pill bg-green-500/25 text-green-200">
+                        <i class="fas fa-caret-up"></i> +6.15%
+                    </span>
+                </div>
+                <p class="text-white/50 text-xs mt-1">2026년 2월 20일 종가 기준</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3">
+                    <p class="text-white/60 text-xs">시가총액</p>
+                    <p class="text-lg font-bold">~691조</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3">
+                    <p class="text-white/60 text-xs">52주 범위</p>
+                    <p class="text-lg font-bold text-xs">162,700~949,000</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3">
+                    <p class="text-white/60 text-xs">외국인 지분율</p>
+                    <p class="text-lg font-bold">~54%</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg px-4 py-3">
+                    <p class="text-white/60 text-xs">배당수익률</p>
+                    <p class="text-lg font-bold">0.32%</p>
+                </div>
+            </div>
+        </div>
+        <!-- Quick Links -->
+        <div class="flex flex-wrap gap-2 mt-5">
+            <a href="https://www.perplexity.ai/finance/000660.KS" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition"><i class="fas fa-chart-line mr-1"></i>Perplexity Finance</a>
+            <a href="https://finance.yahoo.com/quote/000660.KS/" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition"><i class="fas fa-globe mr-1"></i>Yahoo Finance</a>
+            <a href="https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&gicode=A000660" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition"><i class="fas fa-database mr-1"></i>FnGuide</a>
+            <a href="https://dart.fss.or.kr/dsab002/main.do?autoSearch=true&textCrpNm=SK%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4" target="_blank" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition"><i class="fas fa-file-alt mr-1"></i>DART 공시</a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+
+<!-- ===== 2. DCF / VALUATION TARGET ===== -->
+<section class="gradient-animate rounded-2xl text-white p-6 sm:p-8" style="background: linear-gradient(135deg, #1a1a2e, #3d1f5c, #c8102e);">
+    <h2 class="text-lg font-semibold mb-1 text-white/80"><i class="fas fa-bullseye mr-2"></i>시나리오별 목표주가</h2>
+    <p class="text-white/50 text-xs mb-6">2026E 실적 기반 밸류에이션 — 증권사 컨센서스 종합</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-center border border-green-400/30">
+            <p class="text-green-300 text-sm font-semibold mb-1">🟢 Bull Case</p>
+            <p class="text-3xl font-black">₩1,120,000</p>
+            <p class="text-green-300 text-sm mt-1">+18.0% 상승여력</p>
+            <p class="text-white/40 text-xs mt-2">2026E PER 6.5x · HBM4 풀가동</p>
+        </div>
+        <div class="bg-white/15 backdrop-blur rounded-xl p-5 text-center border border-yellow-400/40 ring-2 ring-yellow-400/20">
+            <p class="text-yellow-300 text-sm font-semibold mb-1">🟡 Base Case</p>
+            <p class="text-3xl font-black">₩950,000</p>
+            <p class="text-yellow-300 text-sm mt-1">+0.1% (현재가 근접)</p>
+            <p class="text-white/40 text-xs mt-2">2026E PER 5.5x · 컨센서스 수준</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-center border border-red-400/30">
+            <p class="text-red-300 text-sm font-semibold mb-1">🔴 Bear Case</p>
+            <p class="text-3xl font-black">₩700,000</p>
+            <p class="text-red-300 text-sm mt-1">−26.2% 하락위험</p>
+            <p class="text-white/40 text-xs mt-2">2026E PER 4.0x · 메모리 다운사이클</p>
+        </div>
+    </div>
+    <p class="text-center text-white/40 text-xs mt-4">⚡ Risk/Reward: 하방 −26% vs 상방 +18% (현재가 기준) — 컨센서스 평균 목표가 ₩895,000</p>
+</section>
+
+<!-- ===== 3. KPI HIGHLIGHT ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-bolt text-red-700 mr-2"></i>핵심 운영 KPI</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="card p-5 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500 mb-1">HBM 매출 비중</p>
+            <p class="text-2xl font-extrabold text-gray-900">~36%</p>
+            <p class="text-xs text-green-600 font-medium mt-1"><i class="fas fa-arrow-up"></i> DRAM 매출 내 점유율</p>
+        </div>
+        <div class="card p-5 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500 mb-1">엔비디아 HBM 점유율</p>
+            <p class="text-2xl font-extrabold text-gray-900">63%</p>
+            <p class="text-xs text-green-600 font-medium mt-1"><i class="fas fa-crown"></i> 압도적 1위</p>
+        </div>
+        <div class="card p-5 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500 mb-1">2025 영업이익률</p>
+            <p class="text-2xl font-extrabold text-gray-900">49%</p>
+            <p class="text-xs text-green-600 font-medium mt-1"><i class="fas fa-arrow-up"></i> Q4 58% 역대 최고</p>
+        </div>
+        <div class="card p-5 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500 mb-1">순현금 전환</p>
+            <p class="text-2xl font-extrabold text-gray-900">3.8조+</p>
+            <p class="text-xs text-green-600 font-medium mt-1"><i class="fas fa-check-circle"></i> 재무구조 개선</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 4. THESIS & VARIANT VIEW ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-balance-scale text-red-700 mr-2"></i>투자 포인트 & 리스크 분석</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+        <!-- Bull -->
+        <div class="card p-6 border-t-4 border-green-500">
+            <h3 class="text-green-700 font-bold text-lg mb-4"><i class="fas fa-chart-line mr-2"></i>강점 / Bull Case</h3>
+            <div class="space-y-4 text-sm text-gray-700">
+                <div>
+                    <p class="font-bold text-green-800">🔎 Variant View: 시장이 놓치고 있는 것</p>
+                    <p class="mt-1">시장 컨센서스는 2026년 영업이익을 80~100조 수준으로 보지만, 하나증권(112조)·대신증권(101조) 등은 범용 DRAM 가격 급등 효과를 반영하면 이익이 더 상향될 여지가 크다고 판단. HBM 프리미엄만이 아닌 <strong>범용 메모리 가격 상승의 레버리지</strong>가 과소 평가되고 있음.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-green-800">⚡ HBM4 세계 최초 양산 (2026.2)</p>
+                    <p class="mt-1">엔비디아 차세대 AI칩 '루빈'에 탑재될 HBM4를 2월부터 양산 시작. TSMC 12nm 베이스다이 연합으로 대역폭 2배, 전력효율 40% 개선. 2027년까지 수요 대비 공급 부족 전망.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-green-800">💰 대규모 주주환원</p>
+                    <p class="mt-1">2025 회계연도 총 2.1조 배당(주당 3,000원) + 자사주 1,530만주 전량 소각(약 12.2조원 규모, 지분율 2.1%). 순현금 전환으로 추가 환원 가능성.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-green-800">📈 이익의 질(Quality of Earnings)</p>
+                    <p class="mt-1">Q4 EBITDA 22.7조(마진 69%). 감가상각비 3.6조 대비 영업이익 19.2조로 FCF 전환율 우수. 2~3년 장기 공급 계약 체제로 실적 가시성 극대화.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Bear -->
+        <div class="card p-6 border-t-4 border-red-500">
+            <h3 class="text-red-700 font-bold text-lg mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>리스크 / Bear Case</h3>
+            <div class="space-y-4 text-sm text-gray-700">
+                <div>
+                    <p class="font-bold text-red-800">🔴 메모리 사이클 리스크</p>
+                    <p class="mt-1">DRAM 가격 급등이 PC·스마트폰 수요 둔화로 이어질 가능성. DDR5 가격 45% 추가 상승 전망 시 세트업체 출하 조정 → 역사적으로 급등 후 조정 패턴 반복. 범용 DRAM 가격 20% 하락 시 영업이익 ~15조 감소 추정.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-red-800">🔴 지정학적 불확실성</p>
+                    <p class="mt-1">미국 대중국 반도체 장비 수출 통제 VEU(검증된 최종 사용자) 유예 2026년 11월 만료 예정. SK하이닉스 우시(무석) D램 공장 운영에 직접 영향. 최신 공정 전환 제약 가능성.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-red-800">🔴 HBM4 품질·수율 이슈</p>
+                    <p class="mt-1">HBM4 12단 제품의 초기 품질 이슈 제기. 엔비디아의 납품 스펙 재상향 조정. 초기 수율 안정화 지연 시 공급 일정 차질 → 경쟁사 삼성전자에 물량 이동 가능성.</p>
+                </div>
+                <div>
+                    <p class="font-bold text-red-800">🔴 중국 레거시 메모리 공세</p>
+                    <p class="mt-1">창신메모리·양쯔메모리가 DDR4/LPDDR4X 공급 확대 시 레거시 가격 하락 압력. SK하이닉스의 선단공정 전환 가속 필요하나 Capex 부담 증가(M15X 20조+ 투자).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 5. VALUATION METRICS ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-calculator text-red-700 mr-2"></i>밸류에이션 지표</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">PER (2025E)</p>
+            <p class="text-xl font-bold">16.1x</p>
+            <p class="text-xs text-gray-400">Forward 2026E: 5.5x</p>
+        </div>
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">PBR (2025E)</p>
+            <p class="text-xl font-bold">3.6x</p>
+            <p class="text-xs text-gray-400">Forward 2026E: 2.5x</p>
+        </div>
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">EV/EBITDA (2025)</p>
+            <p class="text-xl font-bold">6.9x</p>
+            <p class="text-xs text-gray-400">Forward 2026E: 4.2x</p>
+        </div>
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">ROE (2025)</p>
+            <p class="text-xl font-bold">42.3%</p>
+            <p class="text-xs text-green-500">역대 최고 수준</p>
+        </div>
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">배당금 (2025)</p>
+            <p class="text-xl font-bold">₩3,000</p>
+            <p class="text-xs text-gray-400">총 2.1조원 환원</p>
+        </div>
+        <div class="card p-4 accent-border" style="border-color:#c8102e;">
+            <p class="text-xs text-gray-500">영업이익률</p>
+            <p class="text-xl font-bold">49%</p>
+            <p class="text-xs text-green-500">Q4: 58% 역대 최고</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 6. PEER COMPARISON ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-users text-red-700 mr-2"></i>경쟁사 비교</h2>
+    <div class="card overflow-hidden desktop-table">
+        <table class="w-full text-sm">
+            <thead class="text-white" style="background:#2d1f3d;">
+                <tr>
+                    <th class="py-3 px-4 text-left">기업</th>
+                    <th class="py-3 px-4 text-right">시가총액</th>
+                    <th class="py-3 px-4 text-right">2025 매출</th>
+                    <th class="py-3 px-4 text-right">영업이익률</th>
+                    <th class="py-3 px-4 text-right">PER(F)</th>
+                    <th class="py-3 px-4 text-right">PBR</th>
+                    <th class="py-3 px-4 text-right">HBM 점유율</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-red-50 font-semibold border-l-4 border-red-500">
+                    <td class="py-3 px-4"><i class="fas fa-star text-red-500 mr-1"></i>SK하이닉스</td>
+                    <td class="py-3 px-4 text-right">~691조원</td>
+                    <td class="py-3 px-4 text-right">97.1조원</td>
+                    <td class="py-3 px-4 text-right text-green-600 font-bold">49%</td>
+                    <td class="py-3 px-4 text-right">5.5x</td>
+                    <td class="py-3 px-4 text-right">2.5x</td>
+                    <td class="py-3 px-4 text-right text-green-600 font-bold">63%</td>
+                </tr>
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">삼성전자 (DS)</td>
+                    <td class="py-3 px-4 text-right">~440조원</td>
+                    <td class="py-3 px-4 text-right">~331조원*</td>
+                    <td class="py-3 px-4 text-right">12.6%</td>
+                    <td class="py-3 px-4 text-right">~9x</td>
+                    <td class="py-3 px-4 text-right">1.6x</td>
+                    <td class="py-3 px-4 text-right">24%</td>
+                </tr>
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">마이크론 (MU)</td>
+                    <td class="py-3 px-4 text-right">~$120B</td>
+                    <td class="py-3 px-4 text-right">~$34B</td>
+                    <td class="py-3 px-4 text-right">30%</td>
+                    <td class="py-3 px-4 text-right">~10x</td>
+                    <td class="py-3 px-4 text-right">2.8x</td>
+                    <td class="py-3 px-4 text-right">17%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="text-xs text-gray-400 p-3">* 삼성전자는 연결 기준 전사 매출. DS부문 별도 비교 필요. HBM 점유율은 엔비디아 물량 기준(대신증권 추정). Forward PER는 2026E 기준.</p>
+    </div>
+    <!-- Mobile cards -->
+    <div class="mobile-cards space-y-3">
+        <div class="card p-4 border-l-4 border-red-500 bg-red-50">
+            <p class="font-bold"><i class="fas fa-star text-red-500 mr-1"></i>SK하이닉스</p>
+            <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
+                <div><p class="text-gray-500">시총</p><p class="font-bold">~691조</p></div>
+                <div><p class="text-gray-500">OPM</p><p class="font-bold text-green-600">49%</p></div>
+                <div><p class="text-gray-500">HBM</p><p class="font-bold text-green-600">63%</p></div>
+            </div>
+        </div>
+        <div class="card p-4">
+            <p class="font-bold">삼성전자 (DS)</p>
+            <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
+                <div><p class="text-gray-500">시총</p><p class="font-bold">~440조</p></div>
+                <div><p class="text-gray-500">OPM</p><p class="font-bold">12.6%</p></div>
+                <div><p class="text-gray-500">HBM</p><p class="font-bold">24%</p></div>
+            </div>
+        </div>
+        <div class="card p-4">
+            <p class="font-bold">마이크론 (MU)</p>
+            <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
+                <div><p class="text-gray-500">시총</p><p class="font-bold">$120B</p></div>
+                <div><p class="text-gray-500">OPM</p><p class="font-bold">30%</p></div>
+                <div><p class="text-gray-500">HBM</p><p class="font-bold">17%</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 7. ANALYST TARGETS ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-bullhorn text-red-700 mr-2"></i>증권사 목표주가 & 투자의견</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-xs text-gray-500">컨센서스 평균</p>
+                    <p class="text-3xl font-black text-gray-900">₩895,000</p>
+                </div>
+                <div class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold text-sm">
+                    <i class="fas fa-thumbs-up mr-1"></i>Strong Buy
+                </div>
+            </div>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">하나증권</span><span class="font-bold">₩1,120,000 <span class="text-green-500 text-xs">BUY</span></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">SK증권</span><span class="font-bold">₩1,000,000 <span class="text-green-500 text-xs">BUY</span></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">키움증권</span><span class="font-bold">₩880,000 <span class="text-green-500 text-xs">BUY</span></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">대신증권</span><span class="font-bold">₩840,000 <span class="text-green-500 text-xs">BUY</span></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">모건스탠리</span><span class="font-bold">₩840,000 <span class="text-green-500 text-xs">OW</span></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">NH투자증권</span><span class="font-bold">₩880,000 <span class="text-green-500 text-xs">BUY</span></span></div>
+            </div>
+        </div>
+        <div class="card p-6">
+            <p class="text-sm font-semibold mb-3">투자의견 분포 (최근 3개월)</p>
+            <div class="flex items-end gap-2 h-32 mb-3">
+                <div class="flex-1 bg-green-500 rounded-t-md relative" style="height:92%;">
+                    <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-bold">35</span>
+                </div>
+                <div class="flex-1 bg-yellow-400 rounded-t-md relative" style="height:3%;">
+                    <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-bold">1</span>
+                </div>
+                <div class="flex-1 bg-red-500 rounded-t-md relative" style="height:3%;">
+                    <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-bold">1</span>
+                </div>
+            </div>
+            <div class="flex gap-4 text-xs text-center">
+                <div class="flex-1"><span class="inline-block w-3 h-3 bg-green-500 rounded mr-1"></span>매수</div>
+                <div class="flex-1"><span class="inline-block w-3 h-3 bg-yellow-400 rounded mr-1"></span>중립</div>
+                <div class="flex-1"><span class="inline-block w-3 h-3 bg-red-500 rounded mr-1"></span>매도</div>
+            </div>
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+                <p><strong>핵심 포인트:</strong> 37명 애널리스트 중 35명 매수 의견. 모건스탠리는 2026~2027년 EPS를 각각 56%, 63% 상향하며 메모리 섹터 Top Pick으로 유지. 현재 주가는 피크 이익 기준 약 5.5배 수준으로 HBM 기여도가 저평가되어 있다고 판단.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 8. CHARTS ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-chart-bar text-red-700 mr-2"></i>재무 차트</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+        <!-- Chart 1: Revenue & OPM -->
+        <div class="card p-5">
+            <p class="text-sm font-semibold mb-3">분기별 매출 & 영업이익률</p>
+            <canvas id="chartRevenue" height="220"></canvas>
+        </div>
+        <!-- Chart 2: HBM Revenue Growth -->
+        <div class="card p-5">
+            <p class="text-sm font-semibold mb-3">연간 실적 추이 & 2026 전망</p>
+            <canvas id="chartAnnual" height="220"></canvas>
+        </div>
+    </div>
+    <div class="card p-5 mt-4">
+        <p class="text-sm font-semibold mb-3">주가 흐름 & 목표가 (2025~현재)</p>
+        <canvas id="chartPrice" height="180"></canvas>
+    </div>
+</section>
+
+<!-- ===== 9. FINANCIAL DETAIL ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-table text-red-700 mr-2"></i>재무 상세 분석</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card p-5">
+            <h3 class="text-sm font-bold text-red-800 mb-3"><i class="fas fa-arrow-trend-up mr-1"></i>매출 성장</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">2025 매출</span><span class="font-bold">97.1조</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">YoY 성장률</span><span class="font-bold text-green-600">+47%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">2026E 매출</span><span class="font-bold">~166조</span></div>
+            </div>
+        </div>
+        <div class="card p-5">
+            <h3 class="text-sm font-bold text-red-800 mb-3"><i class="fas fa-coins mr-1"></i>수익성</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">영업이익</span><span class="font-bold">47.2조</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">영업이익률</span><span class="font-bold text-green-600">49%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">순이익률</span><span class="font-bold">44%</span></div>
+            </div>
+        </div>
+        <div class="card p-5">
+            <h3 class="text-sm font-bold text-red-800 mb-3"><i class="fas fa-money-bill-wave mr-1"></i>현금흐름</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">현금성 자산</span><span class="font-bold">27.9조+</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">순현금</span><span class="font-bold text-green-600">3.8조+</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">EBITDA(Q4)</span><span class="font-bold">22.7조</span></div>
+            </div>
+        </div>
+        <div class="card p-5">
+            <h3 class="text-sm font-bold text-red-800 mb-3"><i class="fas fa-landmark mr-1"></i>재무건전성</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">차입금비율</span><span class="font-bold text-green-600">개선중</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">순차입금비율</span><span class="font-bold text-green-600">순현금</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">자사주 소각</span><span class="font-bold">1,530만주</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="card p-5 mt-4 bg-gradient-to-r from-red-50 to-white border-l-4 border-red-500">
+        <p class="text-sm"><strong>💡 핵심 인사이트:</strong> SK하이닉스는 AI 메모리 수요 폭증으로 역대 최대 실적을 달성하며 순현금 체제로 전환에 성공. 2026년에는 HBM4 본격 양산과 범용 DRAM 가격 상승이 겹치며 영업이익 100조원 돌파가 기대됨. 특히 HBM과 범용 메모리 수익이 동시 개선되는 '전방위 레벨업' 국면에 진입.</p>
+    </div>
+</section>
+
+<!-- ===== 10. PORTFOLIO STRATEGY ===== -->
+<section>
+    <h2 class="text-xl font-bold mb-4"><i class="fas fa-chess text-red-700 mr-2"></i>포트폴리오 전략 & 실행</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-6">
+            <h3 class="font-bold mb-4">시나리오별 포지셔닝</h3>
+            <div class="space-y-4 text-sm">
+                <div class="p-3 bg-green-50 rounded-lg">
+                    <p class="font-bold text-green-800">🟢 Bull (₩1,120,000)</p>
+                    <p class="text-gray-600 mt-1">HBM4 풀가동 + 범용 DRAM 슈퍼사이클. 2026E OP 112조 달성 시 PER 6x 적용. 비중 확대 전략으로 분할 매수 접근.</p>
+                </div>
+                <div class="p-3 bg-yellow-50 rounded-lg">
+                    <p class="font-bold text-yellow-800">🟡 Base (₩950,000)</p>
+                    <p class="text-gray-600 mt-1">컨센서스 수준의 실적 달성. 현재가와 유사하므로 보유 유지. 주주환원 정책이 하방 지지. 이벤트 기반 트레이딩.</p>
+                </div>
+                <div class="p-3 bg-red-50 rounded-lg">
+                    <p class="font-bold text-red-800">🔴 Bear (₩700,000)</p>
+                    <p class="text-gray-600 mt-1">메모리 다운사이클 조기 진입 또는 지정학적 충격. ₩750,000 이하 분할 매수 기회. M15X 투자 부담 우려 시 비중 축소.</p>
+                </div>
+            </div>
+        </div>
+        <div class="card p-6">
+            <h3 class="font-bold mb-4">실행 가이드라인</h3>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-star text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold">투자의견: 매수 (BUY)</p>
+                        <p class="text-xs text-gray-500">Forward PER 5.5x는 역사적 밴드 하단</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-clock text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold">투자기간: 6~12개월</p>
+                        <p class="text-xs text-gray-500">HBM4 양산→루빈 출시 사이클</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-balance-scale text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold">Risk/Reward: 유리 (비대칭적)</p>
+                        <p class="text-xs text-gray-500">이익 상향 모멘텀 + 주주환원 강화</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-red-50 rounded-lg">
+                <p class="text-sm font-bold text-red-800 mb-2"><i class="fas fa-eye mr-1"></i>핵심 모니터링 포인트</p>
+                <ul class="text-xs text-gray-600 space-y-1">
+                    <li>📅 2026.2~3월: HBM4 양산 시작 & M15X 클린룸 가동</li>
+                    <li>📅 2026.4.29: 1Q26 실적 발표 (컨센서스 확인)</li>
+                    <li>📅 2026 H2: 엔비디아 '루빈' 출시 일정</li>
+                    <li>📅 2026.11: 미국 VEU 유예 만료 여부</li>
+                    <li>📊 범용 DRAM/NAND 분기 가격 동향</li>
+                    <li>📊 외국인·기관 수급 동향 (현 외국인 54%)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 11. FOOTER ===== -->
+<footer class="mt-12 border-t pt-6 pb-10 text-center text-xs text-gray-400">
+    <p class="mb-2"><strong>⚠️ 투자 유의사항:</strong> 본 대시보드는 정보 제공 목적이며 투자 권유가 아닙니다. 모든 투자 결정은 본인의 판단과 책임 하에 이루어져야 합니다.</p>
+    <p>마지막 업데이트: 2026년 2월 20일 · 종가 ₩949,000 기준</p>
+    <p class="mt-1">데이터 출처: SK하이닉스 뉴스룸, FnGuide, Investing.com, 대신증권, 하나증권, 키움증권, NH투자증권, 모건스탠리</p>
+    <p class="mt-2 text-gray-300">Powered by Claude AI · Dashboard Skill v1.0</p>
+</footer>
+
+</main>
+
+<!-- ===== CHART.JS SCRIPTS ===== -->
+<script>
+const skRed = '#c8102e';
+const skDark = '#2d1f3d';
+const skLight = 'rgba(200,16,46,0.15)';
+
+// Chart 1: Quarterly Revenue & OPM
+new Chart(document.getElementById('chartRevenue'), {
+    type: 'bar',
+    data: {
+        labels: ['Q1 25', 'Q2 25', 'Q3 25', 'Q4 25'],
+        datasets: [
+            {
+                label: '매출 (조원)',
+                data: [17.6, 22.2, 24.4, 32.8],
+                backgroundColor: [skLight, skLight, skLight, 'rgba(200,16,46,0.35)'],
+                borderColor: skRed,
+                borderWidth: 1,
+                borderRadius: 6,
+                yAxisID: 'y'
+            },
+            {
+                label: '영업이익률 (%)',
+                data: [42, 41, 47, 58],
+                type: 'line',
+                borderColor: skDark,
+                backgroundColor: 'transparent',
+                borderWidth: 2.5,
+                pointRadius: 5,
+                pointBackgroundColor: skDark,
+                tension: 0.3,
+                yAxisID: 'y1'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: {
+            y: { beginAtZero: true, title: { display: true, text: '매출 (조원)', font: { size: 10 } } },
+            y1: { position: 'right', min: 30, max: 70, title: { display: true, text: 'OPM (%)', font: { size: 10 } }, grid: { display: false } }
+        }
+    }
+});
+
+// Chart 2: Annual Performance
+new Chart(document.getElementById('chartAnnual'), {
+    type: 'bar',
+    data: {
+        labels: ['2023', '2024', '2025', '2026E'],
+        datasets: [
+            {
+                label: '매출 (조원)',
+                data: [32.8, 66.2, 97.1, 166],
+                backgroundColor: [skLight, skLight, 'rgba(200,16,46,0.3)', 'rgba(200,16,46,0.5)'],
+                borderColor: skRed,
+                borderWidth: 1,
+                borderRadius: 6,
+                yAxisID: 'y'
+            },
+            {
+                label: '영업이익 (조원)',
+                data: [-7.7, 23.5, 47.2, 101],
+                type: 'line',
+                borderColor: '#22c55e',
+                backgroundColor: 'transparent',
+                borderWidth: 2.5,
+                pointRadius: 5,
+                pointBackgroundColor: '#22c55e',
+                tension: 0.3,
+                yAxisID: 'y1'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: {
+            y: { beginAtZero: true, title: { display: true, text: '매출 (조원)', font: { size: 10 } } },
+            y1: { position: 'right', title: { display: true, text: '영업이익 (조원)', font: { size: 10 } }, grid: { display: false } }
+        }
+    }
+});
+
+// Chart 3: Price chart
+new Chart(document.getElementById('chartPrice'), {
+    type: 'line',
+    data: {
+        labels: ['25.1', '25.3', '25.5', '25.7', '25.9', '25.11', '26.1', '26.2.20'],
+        datasets: [
+            {
+                label: '주가 (천원)',
+                data: [170, 280, 400, 480, 560, 650, 800, 949],
+                borderColor: skRed,
+                backgroundColor: skLight,
+                fill: true,
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointBackgroundColor: skRed,
+                tension: 0.4
+            },
+            {
+                label: '컨센서스 평균 목표가',
+                data: [null, null, null, null, null, null, 895, 895],
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderDash: [8, 4],
+                pointRadius: 0,
+                fill: false
+            },
+            {
+                label: '하나증권 목표가',
+                data: [null, null, null, null, null, null, 1120, 1120],
+                borderColor: '#22c55e',
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                pointRadius: 0,
+                fill: false
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: {
+            y: { title: { display: true, text: '천원', font: { size: 10 } } }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

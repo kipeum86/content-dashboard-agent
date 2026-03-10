@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Dashboard: Money: A Story of Humanity</title>
+    
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter Font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS Styles --><style>
+        /* 1. Base Font & Thematic Design aligned with Book Cover */
+        :root {
+            /* Theme Inference: Book cover has a dark, slightly metallic/glowing aesthetic.
+               Palette: Dark, sophisticated base with metallic/gold accents.
+               - Base Background: Very dark blue/gray (inspired by the cover's depth)
+               - Sidebar/Primary: Darker blue-gray for distinction
+               - Text: Off-white/light gray for readability on dark backgrounds
+               - Accent: A subtle gold/amber for active states and highlights, mimicking the metallic gleam.
+            */
+            --color-bg-dark: #1A202C; /* Dark Slate Gray (almost black) */
+            --color-bg-medium: #2D3748; /* Slightly lighter for content areas */
+            --color-bg-sidebar: #171923; /* Even darker for sidebar contrast */
+            --color-text-light: #E2E8F0; /* Light Gray */
+            --color-text-lighter: #F7FAFC; /* White-ish for primary titles */
+            --color-accent-gold: #ECC94B; /* Amber/Gold for highlights */
+            --color-accent-gold-dark: #C05621; /* Darker amber for hover/active */
+            --color-border: #4A5568; /* Gray for borders */
+
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+        }
+
+        /* Override Tailwind defaults for specific elements to match theme */
+        .bg-slate-900 { background-color: var(--color-bg-sidebar); }
+        .bg-white { background-color: var(--color-bg-medium); color: var(--color-text-light); }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2); }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3); }
+        .text-slate-800 { color: var(--color-text-light); }
+        .text-slate-700 { color: var(--color-text-light); /* CHANGED: Readability increased */ }
+        .text-slate-600 { color: #CBD5E1; /* CHANGED: Readability increased */ }
+        .text-slate-900 { color: var(--color-text-lighter); }
+        .text-blue-700 { color: var(--color-accent-gold); }
+        .border-slate-200 { border-color: var(--color-border); }
+
+        /* 2. Sidebar Transitions */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 3. Custom Navigation Active State */
+        #chapter-navigation .nav-link.active {
+            background-color: var(--color-accent-gold-dark); /* Darker gold for active background */
+            color: var(--color-text-lighter);
+            font-weight: 600;
+            border-left: 4px solid var(--color-accent-gold); /* Gold bar for active */
+            padding-left: 12px; /* Adjust padding due to border */
+        }
+        #chapter-navigation .nav-link {
+            border-left: 4px solid transparent; /* Keep space for consistency */
+        }
+        #chapter-navigation .nav-link:hover {
+            background-color: #4A5568; /* Hover background */
+            color: var(--color-text-lighter);
+        }
+
+        /* 4. Custom Scrollbar for Sidebar */
+        #chapter-navigation::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chapter-navigation::-webkit-scrollbar-track {
+            background: var(--color-bg-sidebar);
+        }
+        #chapter-navigation::-webkit-scrollbar-thumb {
+            background: #4A5568; /* Gray for scrollbar */
+            border-radius: 4px;
+        }
+        #chapter-navigation::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Lighter gray on hover */
+        }
+
+        /* 5. Custom Timeline Visualization Styles */
+        .timeline-scroll {
+            /* REMOVED: -ms-overflow-style: none;  */
+            /* REMOVED: scrollbar-width: none;  */
+        }
+        .timeline-scroll::-webkit-scrollbar {
+            /* REMOVED: display: none; */
+            height: 8px; /* ADDED: Horizontal scrollbar height */
+        }
+        /* ADDED: Horizontal scrollbar styling */
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: var(--color-bg-dark);
+            border-radius: 4px;
+        }
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background: #4A5568; 
+            border-radius: 4px;
+        }
+        .timeline-scroll::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .timeline-container {
+            position: relative;
+            padding-top: 1.5rem; /* Space for the horizontal line */
+        }
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, #4A5568, var(--color-accent-gold), #4A5568); /* Gradient line */
+            z-index: 5;
+        }
+        .timeline-node {
+            position: relative;
+            padding-top: 1.5rem; /* Additional space for node content below line */
+            padding-bottom: 1rem;
+            text-align: center;
+            flex: 0 0 240px; /* CHANGED: Fixed width for each node, increased from 200px */
+        }
+        /* The dot on the timeline line */
+        .timeline-node::before {
+            content: '';
+            position: absolute;
+            top: -7px; /* Position on the line */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--color-accent-gold);
+            border: 2px solid var(--color-bg-medium); /* Inner ring for contrast */
+            z-index: 10;
+            box-shadow: 0 0 8px var(--color-accent-gold); /* Subtle glow */
+        }
+        .timeline-node-title {
+            color: var(--color-accent-gold); /* Gold title */
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .timeline-node-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        /* Quote Card Specific Styles */
+        .quote-card {
+            background: linear-gradient(135deg, var(--color-bg-medium), #3A475F); /* Subtle gradient */
+            border-left: 6px solid var(--color-accent-gold); /* Gold border for quotes */
+        }
+        .quote-card blockquote {
+            color: var(--color-text-light);
+            font-style: italic;
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem; /* leading-relaxed */
+        }
+        .quote-card h3 {
+            color: var(--color-text-lighter);
+        }
+
+        /* Keywords Card Specific Styles */
+        .keyword-tag {
+            background-color: #4A5568; /* Darker background for tags */
+            color: var(--color-text-light);
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .keyword-tag:hover {
+            background-color: var(--color-accent-gold-dark);
+            color: var(--color-text-lighter);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Dashboard Container --><div id="dashboard-container" class="flex min-h-screen">
+        
+        <!-- Mobile Overlay --><div id="overlay" class="fixed inset-0 bg-black/80 z-30 hidden lg:hidden" aria-hidden="true"></div>
+
+        <!-- Sidebar --><nav id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 flex-col bg-slate-900 text-gray-200 shadow-xl transform -translate-x-full lg:translate-x-0 lg:fixed">
+            
+            <!-- New scrollable wrapper for header and nav list -->
+            <div class="flex-1 overflow-y-auto">
+                <!-- Sidebar Header --><div class="sidebar-header p-4 pt-6 flex flex-col items-center border-b border-slate-700">
+                    <!-- Book Cover --><img src="https://i.imgur.com/UyuBeHc.jpg" alt="Money: A Story of Humanity" class="w-3/4 max-w-[180px] rounded-md shadow-lg mb-4 transform hover:scale-105 transition-transform duration-300 ease-in-out">
+                    
+                    <!-- Secondary Title --><h2 id="book-title-sidebar" class="text-xl font-bold text-center text-gray-100 mt-2">
+                        Money: A Story of Humanity
+                    </h2>
+                    <p class="text-sm text-gray-400">David McWilliams</p>
+                </div>
+                
+                <!-- Navigation List --><ul id="chapter-navigation" class="p-4 space-y-1">
+                    <!-- JavaScript will populate this list --></ul>
+            </div>
+            
+            <div class="sidebar-footer p-4 text-center text-xs text-slate-400 border-t border-slate-700">
+                Dashboard by Kipeum
+            </div>
+        </nav>
+
+        <!-- Main Content Area --><div class="flex-1 flex flex-col min-w-0 lg:ml-72">
+            
+            <!-- Mobile Header --><header id="mobile-header" class="lg:hidden flex items-center justify-between p-4 bg-slate-900 text-white sticky top-0 z-20 shadow-md">
+                <button id="hamburger-btn" class="p-2 rounded-md hover:bg-slate-700" aria-label="Open menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <h1 class="text-lg font-bold truncate" style="color: var(--color-text-lighter);">Money: A Story...</h1>
+                <div class="w-8"></div> <!-- Spacer --></header>
+
+            <!-- Content Header --><header id="content-header" class="p-6 bg-slate-800 shadow-md z-10 border-b border-gray-700">
+                <h1 id="book-title-main" class="text-3xl font-bold text-slate-900" style="color: var(--color-text-lighter);"></h1>
+                <p id="book-meta-main" class="text-lg text-slate-600 mt-1" style="color: var(--color-text-light);"></p>
+                <h2 id="current-section-title" class="text-2xl font-semibold text-blue-700 mt-4 border-t border-gray-700 pt-4" style="color: var(--color-accent-gold);"></h2>
+            </header>
+
+            <!-- Main Content Display --><main id="main-content" class="flex-1 p-6">
+                <div id="content-display" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- JavaScript will render content cards here --></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JavaScript --><script>
+        // Store the JSON data directly in the script
+        const jsonData = {
+            "book_meta": {
+                "title": "Money: A Story of Humanity",
+                "author": "David McWilliams",
+                "publication_year": "2024",
+                "main_theme": "Money is an abstract, trust‑based social technology that has co‑evolved with human societies, enabling credit, markets, state capacity and large‑scale cooperation—from tally sticks and coinage to fiat regimes and mobile money—so profoundly that humanity has become a \"plutophyte species\" adapted by money. "
+            },
+            "overall_summary": {
+                "abstract": "This book advances the thesis that money is the defining technology of Homo sapiens. It argues that the evolution of monetary technologies—from early accounting and contracts to coinage, banking, public debt, central banking, and fiat money—coincided with, and often catalyzed, advances in writing, law, logic, democracy, and commerce. Using narrative economic history and case‑based chapters, McWilliams traces how new monetary forms repeatedly overturn older arrangements, setting off feedback loops of economic, social, and political change. The author emphasizes money’s abstract nature and reliance on trust, presenting currency and credit as complementary facets of the same system, and foregrounding the institutional balance between state issuance and commercial bank credit creation. \n\nThe study highlights money’s “dark side” (imperial predation, debasement, hyperinflation, and the politics of destabilization) alongside its role in enabling prosperity. It contends that the post‑1970s fiat era produced unprecedented global development even as policy responses such as quantitative easing amplified wealth inequality and political backlash. The book closes by framing an ongoing contest over whether money’s future will remain public (state‑anchored fiat with bank‑mediated credit) or tilt toward private issuance (e.g., cryptocurrencies), while noting that successful monetary innovations emerge organically to solve practical problems—as illustrated by Kenya’s M‑Pesa. ",
+                "keywords": [
+                    "financial innovation",
+                    "trust",
+                    "credit creation",
+                    "fiat money",
+                    "evolution",
+                    "state vs private money",
+                    "inequality"
+                ]
+            },
+            "chapters": [
+                {
+                    "chapter_number": 1,
+                    "chapter_title": "Money in the Beginning",
+                    "summary": "McWilliams situates the origins of money in the social complexities that followed settled agriculture, arguing that trade, not plunder, became the dominant organizer of interactions among strangers. He uses the Ishango Bone as a possible record of counting and rudimentary bookkeeping to illustrate early abstraction. Grain surpluses provided stable units of account and measurement, seeding relations among prices, labor, and taxation. Money is framed as a peace‑promoting technology that enabled exchange in lieu of conflict. The chapter introduces the broader claim that societies optimized around money gain durable advantages in innovation and state formation. ",
+                    "key_arguments": [
+                        "Early tally systems show abstraction and value representation preceding formal coinage.",
+                        "Surpluses from agriculture created measurable stores, making prices and wages commensurable.",
+                        "Trade at negotiated prices substituted for violence, enabling peaceful coexistence among strangers."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Monetary record‑keeping arises to solve practical coordination problems.",
+                        "Embedding exchange norms can lower conflict and expand specialization."
+                    ],
+                    "notable_quote": "“Slavery was money’s original sin.” ",
+                    "keywords": ["Ishango Bone", "agriculture", "tally", "surplus", "trade", "abstraction"]
+                },
+                {
+                    "chapter_number": 2,
+                    "chapter_title": "By the Rivers of Babylon",
+                    "summary": "In Mesopotamia, finance takes center stage: cuneiform ledgers record credit, taxes, contracts, and the earliest named individual, Kushim. The Sumerians’ decisive innovation is the rate of interest, which prices time and allows present consumption on the basis of future income. Administrations and merchants develop sophisticated accounting, including compound interest and balance‑sheet logic, supported by a base‑60 numerical system. Writing emerges to track obligations, making money and lists the first objects of written communication. The chapter positions this debt‑based, contractual money as the matrix for later financial evolution. ",
+                    "key_arguments": [
+                        "Interest converts time into a tradable price, unlocking investment.",
+                        "Writing and numeracy scaled to the administrative demands of commerce.",
+                        "Debt contracts (virtual money) predate coins and anchor early complex economies."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Pricing time via interest is foundational to capital formation.",
+                        "Information systems (writing, ledgers) are inseparable from monetary systems."
+                    ],
+                    "notable_quote": "“The rate of interest is the crucial price here, a price anyone with a mortgage will be aware of.” ",
+                    "keywords": ["Kushim", "interest", "debt", "cuneiform", "base‑60", "contracts"]
+                },
+                {
+                    "chapter_number": 3,
+                    "chapter_title": "From Contracts to Coins",
+                    "summary": "Lydian coinage marks a shift from exclusively contractual/virtual money to standardized metal tokens stamped by the state. Coins accelerate retail exchange and the velocity of money, enabling a bottom‑up market ecology and the emergence of the “law of one price.” State seigniorage hardwires political power to monetary issuance. Standard denominations reduce cognitive load and transaction frictions, broadening participation in markets. The mental leap of accepting symbols as value spurs numeracy and rational calculation. ",
+                    "key_arguments": [
+                        "Coin standardization lowers transaction costs and integrates markets.",
+                        "State stamping ties sovereignty to monetary legitimacy and control.",
+                        "Coins amplify numeracy and rational decision‑making in daily life."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Design choices in currency (divisible, recognizable, portable) shape market depth.",
+                        "Public authority over issuance influences fiscal capacity and warfare."
+                    ],
+                    "notable_quote": "“Coinage is quite the abstraction. Accepting coinage requires humans to accept a new faith where tokens ‘represent’ value.” ",
+                    "keywords": ["Lydia", "coinage", "seigniorage", "standardization", "law of one price"]
+                },
+                {
+                    "chapter_number": 4,
+                    "chapter_title": "Money and the Greek Mind",
+                    "summary": "Widespread monetization in classical Greece coincides with a shift from mythos to logos—an orientation toward reason and argument. Markets such as the Athenian agora double as civic and intellectual spaces where economic life, debate, and philosophy intermingle. Thinkers including Xenophon formalize practical political economy, while monetized exchange flattens rigid hierarchies by conferring equal purchasing power. Material evidence and urban morphology reflect prosperity and social mobility. Money thus underwrites the Greek synthesis of commerce, citizenship, and rational inquiry. ",
+                    "key_arguments": [
+                        "Monetization fosters individual agency, merit, and civic participation.",
+                        "Marketplaces serve as hubs of both exchange and ideas.",
+                        "Economic expansion and rational thought advance together."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Open exchange ecosystems can incubate scientific and philosophical breakthroughs.",
+                        "Monetary inclusion supports social mobility and democratic norms."
+                    ],
+                    "notable_quote": "“This was a shift from what the Greeks termed mythos to what they called logos.” ",
+                    "keywords": ["logos", "Xenophon", "agora", "democracy", "social mobility"]
+                },
+                {
+                    "chapter_number": 5,
+                    "chapter_title": "The Empire of Credit",
+                    "summary": "Rome scales credit to imperial dimensions, channeling long‑distance capital flows and underwriting trade and infrastructure. The first recorded credit crisis (31 CE) exposes systemic fragility; Tiberius stabilizes markets as a proto–lender of last resort. Fiscal and monetary expedients—plunder, fixed money stocks, and debasement—illustrate policy trade‑offs under metallic regimes. Over time, repeated debasements erode credibility and purchasing power, contributing to social strain. Money’s forces can outrun politics, binding leaders to market psychology. ",
+                    "key_arguments": [
+                        "Credit cycles amplify booms and busts in monetized societies.",
+                        "Crisis management requires liquidity backstops and collateralized support.",
+                        "Debasement is a hidden tax that can destabilize polities."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Credibility is the core asset of any monetary regime.",
+                        "Policy makers must manage both price and quantity of money under constraint."
+                    ],
+                    "notable_quote": "“All financial crises follow a period of very low interest rates, when highly leveraged balance sheets come under pressure.” ",
+                    "keywords": ["credit cycle", "Tiberius", "lender of last resort", "debasement", "imperial finance"]
+                },
+                {
+                    "chapter_number": 6,
+                    "chapter_title": "Twilight of the Feudal Economy",
+                    "summary": "After the fall of Rome, Northwestern Europe’s coin scarcity, command structures, and weak trade networks suppress innovation. Around 1000 CE, the heavy metal plough transforms agricultural productivity in the North, enabling surpluses and market exchange. New silver inflows and urban guilds re‑animate commerce and support nascent banking. Specialization deepens interdependence, making money once again indispensable for coordination and savings. The chapter frames technology–money complementarities as Europe escapes the Malthusian bind. ",
+                    "key_arguments": [
+                        "Physical technologies (e.g., heavy plough) can force monetary resurgence.",
+                        "Urban guilds and specialization create dense market linkages.",
+                        "Savings safety (banks) becomes a prerequisite for city life."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Production innovations often require matching monetary infrastructure.",
+                        "Monetary scarcity can stall knowledge transmission and growth."
+                    ],
+                    "notable_quote": "“Enormous yields could be generated if only they could churn the fields with a deep, incisive plough.” ",
+                    "keywords": ["feudalism", "heavy plough", "silver", "guilds", "urbanization"]
+                },
+                {
+                    "chapter_number": 7,
+                    "chapter_title": "Saracen Magic",
+                    "summary": "Medieval Sicily absorbs Hindu‑Arabic numerals, zero, and algebra through Arab contact, transforming European commercial calculation. Money provides a lived context for zero and negative numbers, clarifying creditor/debtor positions. Fibonacci disseminates the new numeracy across Italy’s trading republics, advantaging merchants who abandon the abacus. Cross‑cultural exchange yields hybrid institutions and currencies, aligning religiously diverse populations under common accounting. This numerical revolution sets the stage for complex banking. ",
+                    "key_arguments": [
+                        "Zero as placeholder enables precision, scale, and double‑entry logic.",
+                        "Adoption of Hindu‑Arabic numerals conveys structural commercial advantage.",
+                        "Hybrid polities can standardize over shared monetary calculation."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Numeracy upgrades are multiplicative for trade and finance.",
+                        "Useful mathematical ideas diffuse fastest where money demands them."
+                    ],
+                    "notable_quote": "“Money makes zero real.” ",
+                    "keywords": ["zero", "algebra", "Fibonacci", "Hindu‑Arabic numerals", "Sicily"]
+                },
+                {
+                    "chapter_number": 8,
+                    "chapter_title": "Darkness into Light",
+                    "summary": "Florence’s merchant republic builds a monetary‑commercial order anchored by the gold florin, widely accepted as a reserve coin. Secular reckoning schools and Pacioli’s codification of double‑entry bookkeeping professionalize business practice. Merchant banking finances production and trade, even as Church prohibitions on usury are contested. The city’s horizontal networks contrast with hierarchical ecclesiastical structures, fostering resilience and innovation. Money, education, and civic organization align to launch the Renaissance. ",
+                    "key_arguments": [
+                        "Stable reserve coinage (florin) sustains long‑distance finance.",
+                        "Double‑entry bookkeeping codifies accountability and scale.",
+                        "Networked guild governance outperforms rigid hierarchies."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Accounting systems are growth technologies, not mere record‑keeping.",
+                        "Credible coinage underwrites regional leadership in trade."
+                    ],
+                    "notable_quote": "“God‑fearing Florentines initially banned Arabic numerals, but suppression rarely works and in time they changed their minds.” ",
+                    "keywords": ["Florence", "florin", "double‑entry", "reckoning schools", "usury"]
+                },
+                {
+                    "chapter_number": 9,
+                    "chapter_title": "God’s Printer",
+                    "summary": "Gutenberg, financed through Germany’s annuities and municipal debt markets, commercializes moveable‑type printing. Early profit comes from indulgence forms, but the core innovation is a capital‑intensive, scalable factory for ideas. Cheap, standardized books boost literacy and diffuse dissent; Luther leverages pamphlets to challenge Church authority. Printing cities grow faster and become nodes of intellectual and commercial freedom. The chapter links financial organization to transformative information technology. ",
+                    "key_arguments": [
+                        "Debt markets can incubate general‑purpose technologies.",
+                        "Printing reduces knowledge costs, empowering reform movements.",
+                        "Capital becomes an explicit factor of production in information industries."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Financial depth accelerates communication revolutions.",
+                        "Scale technologies reshape both commerce and ideology."
+                    ],
+                    "notable_quote": "Pius II on Gutenberg’s pages: “You could read them without your glasses.” ",
+                    "keywords": ["Gutenberg", "printing press", "indulgences", "Reformation", "capital"]
+                },
+                {
+                    "chapter_number": 10,
+                    "chapter_title": "Invisible Money",
+                    "summary": "The Dutch Republic invents a share‑owning society through the VOC, and normalizes highly abstract instruments like perpetual bonds, reflecting deep social trust in money and the future. Amsterdam’s exchange trades forwards and options, professionalizing speculation and risk‑sharing. Tulipmania demonstrates the “madness of crowds,” where rising prices fuel demand. The chapter juxtaposes commercial tolerance and republican governance with colonial brutality. It frames modern markets as institutions of trust layered on abstraction. ",
+                    "key_arguments": [
+                        "Perpetual bonds show society‑wide confidence in state and cash‑flow promises.",
+                        "Exchanges and derivatives distribute risk and stabilize financing.",
+                        "Speculative manias invert classical supply–demand dynamics."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Market depth depends on civic norms and credible legal frameworks.",
+                        "Trust is a public good that sustains abstract finance."
+                    ],
+                    "notable_quote": "“We can’t see money, we can’t touch money, we just have to believe in it.” ",
+                    "keywords": ["VOC", "perpetual bond", "exchange", "derivatives", "Tulipmania"]
+                },
+                {
+                    "chapter_number": 11,
+                    "chapter_title": "The Father of Monetary Economics",
+                    "summary": "John Law unchains money from metal in early‑18th‑century France, swapping government debt into equity of the Mississippi Company and expanding paper issuance via the Royal Bank. The scheme ignites a speculative boom and collapse, but leaves a durable insight: new money can raise activity and must be managed. Law’s experiment prefigures modern fiat money and central banking mandates over aggregate demand. Political economy lessons include distributional effects and expectations management. ",
+                    "key_arguments": [
+                        "Money supply can be policy‑determined rather than metal‑constrained.",
+                        "Debt‑equity conversions can restructure states but court bubbles.",
+                        "Credibility and exit strategies are central to paper money regimes."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Fiat frameworks require institutional guardrails to avoid manias.",
+                        "Liquidity creation boosts growth but alters wealth distribution."
+                    ],
+                    "notable_quote": "“John Law was the father of what would become known as fiat money – money issued by central banks that is not tied to gold.” ",
+                    "keywords": ["John Law", "Mississippi Company", "paper money", "fiat", "central banking"]
+                },
+                {
+                    "chapter_number": 12,
+                    "chapter_title": "The Bishop of Money",
+                    "summary": "Talleyrand proposes confiscating Church lands to collateralize assignats, financing the French Revolution and easing the fiscal crisis. Excess issuance by radical factions triggers hyperinflation; administrative price caps fail and black markets flourish. Britain counters with large‑scale counterfeiting. The episode underscores how revolutions require money and how credibility can be quickly destroyed by over‑issuance. Political ingenuity cannot substitute for monetary discipline. ",
+                    "key_arguments": [
+                        "Illiquid assets (land) can be monetized to jump‑start fiscal capacity.",
+                        "Over‑issuance of paper undermines trust and social order.",
+                        "Price controls cannot paper over monetary imbalances."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Collateral matters for paper credibility.",
+                        "Stability depends on disciplined issuance and enforceable rules."
+                    ],
+                    "notable_quote": "“His proposal was simplicity itself, namely the enforced confiscation of all ecclesiastical property in France.” ",
+                    "keywords": ["Talleyrand", "assignat", "hyperinflation", "Revolution", "counterfeiting"]
+                },
+                {
+                    "chapter_number": 13,
+                    "chapter_title": "Money and the American Republic",
+                    "summary": "Hamilton consolidates the young republic’s debts, establishes the dollar via the 1792 Coinage Act, and builds fiscal credibility through repayment and a proto‑central bank. Suppression of the Whiskey Rebellion affirms federal taxing authority. Anchoring to the Spanish dollar aligns with global practice and stabilizes valuation. His designs attract capital and talent, accelerating growth beyond Britain within decades. Money becomes the organizational glue of the federal union. ",
+                    "key_arguments": [
+                        "National money is a political instrument of union and credibility.",
+                        "Debt consolidation and repayment can crowd‑in investment.",
+                        "Institutionalizing banking and a sinking fund stabilizes finance."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Early policy choices set long‑run growth trajectories.",
+                        "Monetary credibility is geopolitical leverage for new states."
+                    ],
+                    "notable_quote": "“It’s almost impossible to imagine the United States of America without the dollar.” ",
+                    "keywords": ["Hamilton", "US dollar", "debt management", "Bank of the United States"]
+                },
+                {
+                    "chapter_number": 14,
+                    "chapter_title": "Empiricism and the Evolutionary Economy",
+                    "summary": "Nineteenth‑century empiricism, measurement, and decimalization strengthen quantitative reasoning across science and commerce. Darwin’s thinking draws on Malthus’s population dynamics, framing the economy as an evolving organism with selection pressures and feedback. Credit markets expand to fund industrialization and middle‑class enterprise. Incentive design misfires—the “cobra effect”—illustrate non‑linear policy outcomes. Profit functions as the economy’s selection metric for product survival. ",
+                    "key_arguments": [
+                        "Decimalization lowers cognitive costs for mass numeracy.",
+                        "Innovation emerges from recombination under selective pressures.",
+                        "Credit intermediation reallocates resources to growth sectors."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Design incentives cautiously; systems adapt in unanticipated ways.",
+                        "Treat the economy as complex and evolutionary, not mechanical."
+                    ],
+                    "notable_quote": "“Decimalisation simplified everyday calculation and aligned commerce with empiricism.” ",
+                    "keywords": ["Darwin", "Malthus", "decimalization", "evolution", "incentives"]
+                },
+                {
+                    "chapter_number": 15,
+                    "chapter_title": "Money on Trial",
+                    "summary": "Rubber profits in the Congo Free State expose the fusion of finance and atrocity under Leopold II. Public share companies sanitize distance between investment returns and coercive extraction. Roger Casement’s investigation and reporting mobilize transnational opposition and seed anti‑colonial sentiment. The case lays bare how legal forms and capital markets can perpetuate abuses when governance fails. Moral accountability becomes a financial as well as political question. ",
+                    "key_arguments": [
+                        "Corporate forms facilitate capital mobility and moral insulation.",
+                        "Middle‑class savings underwrote imperial predation via equities.",
+                        "Documentation and publicity can reprice ethical risk."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "ESG‑like concerns have deep historical roots.",
+                        "Legal architecture shapes the moral valence of profits."
+                    ],
+                    "notable_quote": "Casement and Morel became “an irresistible force for change,” turning atrocity into evidence and policy action. ",
+                    "keywords": ["Congo", "Casement", "rubber", "public company", "anti‑colonialism"]
+                },
+                {
+                    "chapter_number": 16,
+                    "chapter_title": "Yellow Brick Road",
+                    "summary": "The late‑19th‑century gold standard constrains money supply, generating deflationary pressure that aids creditors and hurts indebted farmers. Populists push for silver to ease conditions; Bryan’s “Cross of Gold” speech symbolizes the clash. Monetary relief ultimately arrives via major gold discoveries (e.g., Klondike, South Africa), not policy change. The chapter reads The Wizard of Oz as a monetary allegory. It underscores how metallic constraints widen inequality during debt deflation. ",
+                    "key_arguments": [
+                        "Hard‑money regimes impose pro‑creditor bias via deflation.",
+                        "Political coalitions form around monetary rules and distributional effects.",
+                        "Resource discoveries can relax monetary constraints exogenously."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Rule design in money has first‑order social consequences.",
+                        "Beware conflating price stability with broad‑based prosperity."
+                    ],
+                    "notable_quote": "Bryan condemned crucifixion “upon a cross of gold,” capturing the politics of money in a single image. ",
+                    "keywords": ["Gold Standard", "Populism", "silver", "inequality", "Wizard of Oz"]
+                },
+                {
+                    "chapter_number": 17,
+                    "chapter_title": "Modernist Money",
+                    "summary": "Pre‑WWI modernism in art parallels global capital market exuberance. The Suez Canal exemplifies financial engineering: equity finance, risk‑sharing, and international syndication. Trieste’s mercantile cosmopolitanism shapes James Joyce—artist as entrepreneur—linking creative destruction in art and commerce. Exchanges proliferate, funding mega‑projects and expanding middle‑class investing. Liberal, tolerant societies are depicted as fertile ground for innovation. ",
+                    "key_arguments": [
+                        "Capital markets socialized risk for infrastructure at continental scale.",
+                        "Artistic and commercial innovation share a Schumpeterian logic.",
+                        "Urban cosmopolitanism correlates with financial dynamism."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Financial architecture can be as decisive as engineering prowess.",
+                        "Pluralist norms support both creative and commercial breakthroughs."
+                    ],
+                    "notable_quote": "“The Suez Canal was as much a feat of finance as it was engineering.” ",
+                    "keywords": ["modernism", "Suez Canal", "capital markets", "Trieste", "entrepreneurship"]
+                },
+                {
+                    "chapter_number": 18,
+                    "chapter_title": "Into the Abyss",
+                    "summary": "Weimar Germany’s hyperinflation, born of war finance and reparations, culminates in a currency collapse that annihilates savings and social trust. The middle class is especially devastated, fueling political extremism. Markets re‑emerge even in extremis (e.g., POW camps using cigarettes as money), illustrating money’s universality. The Nazis weaponize money through Operation Bernhard, a mass sterling counterfeiting program. The chapter demonstrates how destroying money unravels civilization’s organizing fabric. ",
+                    "key_arguments": [
+                        "Excess issuance in weak states can spiral into hyperinflation.",
+                        "Monetary collapse radicalizes politics by wiping out perceived fairness.",
+                        "Mediums of exchange arise spontaneously to coordinate trade."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Sound money is a public good underpinning stability.",
+                        "Financial warfare targets an enemy’s trust architecture."
+                    ],
+                    "notable_quote": "“In August 1923, a dollar was worth 620,000 marks, and by November of that year, it was worth 630 billion marks.” ",
+                    "keywords": ["Weimar", "hyperinflation", "Operation Bernhard", "POW economy", "trust"]
+                },
+                {
+                    "chapter_number": 19,
+                    "chapter_title": "Who Controls Money?",
+                    "summary": "The fiat era, inaugurated after the breakdown of Bretton Woods, is presented as the most liberating monetary innovation since coinage. The book distinguishes currency (state‑issued base money) from finance (bank‑created credit) and argues most money is created by commercial banks via double‑entry loans. Central bankers, the “Brahmins” of money, influence prices (rates) more than quantities; their control is partial, not absolute. Offshore dollar markets (Eurodollars) illustrate porous boundaries of state control. The chapter reframes the monetary system as a state–bank partnership where credibility and regulation anchor trust. ",
+                    "key_arguments": [
+                        "Fiat broadened access to money but rests on fragile trust.",
+                        "Bank lending creates most money by expanding balance sheets.",
+                        "Policy operates through prices amid globalized credit networks."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Understanding credit creation is key to macro‑financial stability.",
+                        "Regulatory design must acknowledge cross‑border money creation."
+                    ],
+                    "notable_quote": "“When you go to the bank and ask for a loan for a car, the bank creates the money out of nothing, and puts it into your account.” ",
+                    "keywords": ["fiat money", "commercial banks", "credit creation", "Eurodollar", "central banks"]
+                },
+                {
+                    "chapter_number": 20,
+                    "chapter_title": "The Psychology of Money",
+                    "summary": "Market behavior is driven by cycles of optimism and fear; rising prices act as “financial aphrodisiacs,” pulling in momentum investors. In downturns, the paradox of aggregation triggers fire sales and collateral collapse. The chapter invokes Minsky’s borrower taxonomy (hedge/speculative/Ponzi) to explain crisis dynamics. Post‑2008 quantitative easing stabilizes finance but lifts asset prices, widening wealth inequality and feeding political populism. Monetary policy thus has psychological and distributional consequences. ",
+                    "key_arguments": [
+                        "Herding and feedbacks destabilize markets despite rational‑agent models.",
+                        "Leverage structures determine where failures begin (Ponzi first).",
+                        "QE channels benefits unevenly through financial asset holders."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Risk management must model sentiment and feedback loops.",
+                        "Crisis tools should be paired with distribution‑aware policies."
+                    ],
+                    "notable_quote": "“Rising prices act as financial ‘aphrodisiacs’, increasing demand and contracting supply.” ",
+                    "keywords": ["psychology", "Minsky", "leverage", "QE", "momentum", "inequality"]
+                },
+                {
+                    "chapter_number": 21,
+                    "chapter_title": "The Evolution of Money",
+                    "summary": "The concluding chapter contrasts private crypto experiments with public fiat institutions, arguing crypto’s fixed‑supply volatility and lack of problem‑solving utility limit it to speculation. It anticipates a major struggle between private money and public money, but forecasts state primacy given taxation and regulatory leverage. In parallel, M‑Pesa in Kenya demonstrates bottom‑up, phone‑credit money that solves access and remittance frictions, embodying organic monetary evolution. MMT’s ambitions are tempered by inflation and bond‑market constraints. The chapter returns to the theme that successful monies emerge empirically to meet real economic demands. ",
+                    "key_arguments": [
+                        "Crypto’s design fails core currency functions; benefits accrue to exchanges and early holders.",
+                        "States retain decisive monetary power; public money remains dominant.",
+                        "Inclusive, low‑friction payment rails (e.g., M‑Pesa) scale when they solve real problems."
+                    ],
+                    "key_takeaways_or_insights": [
+                        "Expect continued evolution through pragmatic, incremental innovations.",
+                        "Policy debates (e.g., MMT) are bounded by inflation and market discipline."
+                    ],
+                    "notable_quote": "“A major battle in the years to come will be between private money issued by private entities and public money issued by the organs of the state in the name of the citizen.” ",
+                    "keywords": ["cryptocurrency", "MMT", "M‑Pesa", "public vs private", "evolution"]
+                }
+            ],
+            "limitations_and_future_directions": {
+                "acknowledged_constraints": [
+                    "The chapter stories are necessarily selective and reflect the author’s perspective as a Dublin‑based writer; different choices would be equally valid. ",
+                    "The author explicitly identifies himself as a “white, almost pink, Irishman.” ",
+                    "He notes he is not a very organized person and required substantial editorial support to shape the material. "
+                ],
+                "future_research": [
+                    "Track the contest between private money (e.g., crypto or platform‑issued tokens) and public money (state fiat with bank‑mediated credit). ",
+                    "Study bottom‑up monetary innovations that expand access, with M‑Pesa as a model for large parts of Africa. ",
+                    "Evaluate real‑world constraints on Modern Monetary Theory imposed by inflation dynamics and bond markets. "
+                ]
+            },
+            "field_context": {
+                "statement": "Situated at the intersection of monetary economics and economic history, the book synthesizes how monetary technologies co‑evolve with institutions, ideas, and political orders. It reframes money as both currency (state‑anchored) and finance (credit created by banks), arguing that modern systems are hybrids of public issuance and private credit with regulation as connective tissue. The analysis places fiat money as the most consequential innovation since coinage while emphasizing its trust‑based fragility. It complements institutional literature by foregrounding psychological cycles and distributional effects of crisis policy (e.g., QE). The concluding discussion engages contemporary debates—crypto’s privatization push and MMT’s public‑spending thesis—through an empirical lens that privileges solutions to actual economic frictions, consistent with the book’s emphasis on organic evolution. "
+            }
+        };
+
+
+        // Wait for the DOM to be fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. DOM Element Selection ---
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const chapterNav = document.getElementById('chapter-navigation');
+            const mainTitle = document.getElementById('book-title-main');
+            const mainMeta = document.getElementById('book-meta-main');
+            const currentSectionTitle = document.getElementById('current-section-title');
+            const contentDisplay = document.getElementById('content-display');
+
+            // --- 2. Helper Functions for Rendering ---
+
+            /**
+             * Creates a standard content card.
+             * @param {string} title - The title of the card.
+             * @param {string} content - The HTML content for the card body.
+             * @param {string} [gridSpan='md:col-span-1'] - Tailwind grid span class.
+             */
+            function createCard(title, content, gridSpan = 'md:col-span-1') {
+                // Use col-span-full for full-width items, otherwise default
+                const spanClass = gridSpan === 'full' ? 'md:col-span-2 xl:col-span-3' : gridSpan;
+                
+                // Sanitize content to replace newlines with paragraphs for readability
+                const formattedContent = content.split('\n\n')
+                                                .map(p => `<p class="text-slate-700 leading-relaxed">${p}</p>`)
+                                                .join('<div class="h-4"></div>'); // Spacer between paragraphs
+
+                return `
+                    <div class="bg-white p-6 rounded-lg shadow-md ${spanClass}">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3 border-b border-gray-700 pb-2">${title}</h3>
+                        <div class="space-y-4">
+                            ${formattedContent}
+                        </div>
+                    </div>
+                `;
+            }
+
+            /**
+             * Creates a card with a bulleted list.
+             * @param {string} title - The title of the card.
+             * @param {string[]} listItems - An array of strings for the list.
+             */
+            function createListCard(title, listItems) {
+                const itemsHtml = listItems.map(item => `
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="color: var(--color-accent-gold);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        <span class="text-slate-700">${item}</span>
+                    </li>
+                `).join('');
+
+                return `
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3 border-b border-gray-700 pb-2">${title}</h3>
+                        <ul class="space-y-3">
+                            ${itemsHtml}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            /**
+             * Creates a special card for quotes.
+             * @param {string} quote - The quote text.
+             */
+            function createQuoteCard(quote) {
+                return `
+                    <div class="quote-card p-6 rounded-lg shadow-md md:col-span-1">
+                        <h3 class="text-xl font-semibold text-gray-100 mb-3 border-b border-gray-700 pb-2">Notable Quote</h3>
+                        <blockquote class="pl-4">
+                            ${quote}
+                        </blockquote>
+                    </div>
+                `;
+            }
+
+            /**
+             * Creates a card for keywords.
+             * @param {string[]} keywords - An array of keyword strings.
+             */
+            function createKeywordsCard(keywords) {
+                const keywordsHtml = keywords.map(keyword => `
+                    <span class="keyword-tag inline-block px-3 py-1 rounded-full text-sm font-medium">
+                        ${keyword}
+                    </span>
+                `).join(' ');
+
+                return `
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3 border-b border-gray-700 pb-2">Keywords</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${keywordsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            /**
+             * Creates the custom timeline visualization for the summary page.
+             */
+            function createTimelineVisual() {
+                // ADDED: A map of historical eras for each chapter to make the timeline more informative.
+                const eraMap = [
+                    "Prehistory / Early Agriculture", // Ch 1
+                    "Ancient Mesopotamia",           // Ch 2
+                    "Iron Age (Lydia)",              // Ch 3
+                    "Classical Greece",              // Ch 4
+                    "Roman Empire",                  // Ch 5
+                    "Early Middle Ages (c. 1000 CE)",// Ch 6
+                    "Medieval (Arab Influence)",     // Ch 7
+                    "The Renaissance",               // Ch 8
+                    "Early Modern Period",           // Ch 9
+                    "Dutch Golden Age (17th C)",     // Ch 10
+                    "Early 18th Century",            // Ch 11
+                    "French Revolution",             // Ch 12
+                    "Early American Republic",       // Ch 13
+                    "19th Century",                  // Ch 14
+                    "High Imperialism",              // Ch 15
+                    "Late 19th C (USA)",             // Ch 16
+                    "Pre-WWI Modernism",             // Ch 17
+                    "Interwar Period",               // Ch 18
+                    "Post-War Fiat Era",             // Ch 19
+                    "Post-2008 Era",                 // Ch 20
+                    "Contemporary & Future"          // Ch 21
+                ];
+
+                // Generate a node for each chapter
+                const timelineNodes = jsonData.chapters.map(chapter => {
+                    // Get the corresponding era, fallback to chapter number if map is incomplete
+                    const era = eraMap[chapter.chapter_number - 1] || `Chapter ${chapter.chapter_number}`;
+
+                    return `
+                    <div class="timeline-node relative flex-shrink-0 pb-4">
+                        <div class="timeline-node-title">${era}</div>
+                        <div class="timeline-node-subtitle">Ch. ${chapter.chapter_number}: ${chapter.chapter_title}</div>
+                        <p class="text-xs text-slate-600 mt-1">${chapter.keywords.slice(0, 2).join(', ')}...</p>
+                    </div>
+                `;
+                }).join('');
+
+                return `
+                    <div class="md:col-span-2 xl:col-span-3 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-4 border-b border-gray-700 pb-2">Book Progression: A Timeline of Money</h3>
+                        <!-- Horizontal scrolling container --><div class="timeline-scroll overflow-x-auto whitespace-nowrap py-4">
+                            <div class="flex space-x-8 px-2 timeline-container">
+                                ${timelineNodes}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+
+            // --- 3. Core Logic ---
+
+            /**
+             * Displays the content for a given section ID.
+             * @param {string} id - The ID of the section ('overall_summary' or a chapter number).
+             */
+            function displayContent(id) {
+                // Clear the main content area
+                contentDisplay.innerHTML = '';
+                
+                let data, title;
+
+                // Find the data and title based on the ID
+                if (id === 'overall_summary') {
+                    data = jsonData.overall_summary;
+                    title = "Overall Summary & Main Theme";
+                } else if (id === 'context') {
+                    data = jsonData.field_context;
+                    title = "Field Context & Contribution";
+                } else if (id === 'limitations') {
+                    data = jsonData.limitations_and_future_directions;
+                    title = "Limitations & Future Directions";
+                } else {
+                    data = jsonData.chapters.find(c => c.chapter_number == id);
+                    if (data) {
+                        title = `Chapter ${data.chapter_number}: ${data.chapter_title}`;
+                    } else {
+                        // Fallback if data not found
+                        contentDisplay.innerHTML = createCard('Error', 'Content not found.', 'full');
+                        return;
+                    }
+                }
+
+                // Update the main content header title
+                currentSectionTitle.textContent = title;
+
+                // --- Render Cards Based on Available Data ---
+                
+                if (id === 'overall_summary') {
+                    // Special layout for summary
+                    contentDisplay.innerHTML += createCard('Book Theme', jsonData.book_meta.main_theme, 'full');
+                    contentDisplay.innerHTML += createCard('Abstract', data.abstract, 'full');
+                    contentDisplay.innerHTML += createTimelineVisual(); // Add the custom visual
+                    contentDisplay.innerHTML += createKeywordsCard(data.keywords);
+                } else if (id === 'context') {
+                    contentDisplay.innerHTML += createCard('Field Context', data.statement, 'full');
+                } else if (id === 'limitations') {
+                    contentDisplay.innerHTML += createListCard('Acknowledged Constraints', data.acknowledged_constraints);
+                    contentDisplay.innerHTML += createListCard('Future Research Directions', data.future_research);
+                } else {
+                    // Standard chapter layout
+                    if (data.summary) {
+                        contentDisplay.innerHTML += createCard('Chapter Summary', data.summary, 'full');
+                    }
+                    if (data.key_arguments) {
+                        contentDisplay.innerHTML += createListCard('Key Arguments', data.key_arguments);
+                    }
+                    if (data.key_takeaways_or_insights) {
+                        contentDisplay.innerHTML += createListCard('Key Takeaways', data.key_takeaways_or_insights);
+                    }
+                    if (data.notable_quote) {
+                        contentDisplay.innerHTML += createQuoteCard(data.notable_quote);
+                    }
+                    if (data.keywords) {
+                        contentDisplay.innerHTML += createKeywordsCard(data.keywords);
+                    }
+                }
+            }
+            
+            /**
+             * Toggles the mobile menu (sidebar and overlay).
+             */
+            function toggleMenu() {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+
+            /**
+             * Sets the active state for a navigation link.
+             * @param {HTMLElement} linkElement - The <a> element to set as active.
+             */
+            function setActiveLink(linkElement) {
+                // Remove 'active' from all links
+                chapterNav.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                // Add 'active' to the clicked link
+                if(linkElement) {
+                    linkElement.classList.add('active');
+                }
+            }
+
+
+            // --- 4. Initialization ---
+
+            function initialize() {
+                // 1. Populate main header
+                mainTitle.textContent = jsonData.book_meta.title;
+                mainMeta.textContent = `${jsonData.book_meta.author} (${jsonData.book_meta.publication_year})`;
+
+                // 2. Populate navigation
+                let navHtml = '';
+                
+                // Add Overall Summary link
+                navHtml += `
+                    <li>
+                        <a href="#" class="nav-link active block p-3 rounded-lg text-gray-200 hover:bg-slate-700 hover:text-white transition-colors" data-id="overall_summary">
+                            Overall Summary
+                        </a>
+                    </li>
+                `;
+                
+                // Add links for each chapter
+                jsonData.chapters.forEach(chapter => {
+                    navHtml += `
+                        <li>
+                            <a href="#" class="nav-link block p-3 rounded-lg text-gray-200 hover:bg-slate-700 hover:text-white transition-colors" data-id="${chapter.chapter_number}">
+                                <span class="font-medium">Ch. ${chapter.chapter_number}:</span> ${chapter.chapter_title}
+                            </a>
+                        </li>
+                    `;
+                });
+
+                // Add links for Context and Limitations
+                navHtml += `
+                    <li>
+                        <a href="#" class="nav-link block p-3 rounded-lg text-gray-200 hover:bg-slate-700 hover:text-white transition-colors" data-id="context">
+                            Field Context
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link block p-3 rounded-lg text-gray-200 hover:bg-slate-700 hover:text-white transition-colors" data-id="limitations">
+                            Limitations & Future
+                        </a>
+                    </li>
+                `;
+                
+                chapterNav.innerHTML = navHtml;
+
+                // 3. Load default content
+                displayContent('overall_summary');
+            }
+
+
+            // --- 5. Event Listeners ---
+            
+            // Mobile menu toggles
+            hamburgerBtn.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+
+            // Navigation click handling (using event delegation)
+            chapterNav.addEventListener('click', (e) => {
+                // Find the link that was clicked
+                const link = e.target.closest('a.nav-link');
+                
+                if (link) {
+                    e.preventDefault();
+                    const id = link.dataset.id;
+                    
+                    // Load the content
+                    displayContent(id);
+
+                    // Update the active state
+                    setActiveLink(link);
+                    
+                    // Close the menu if on mobile
+                    if (window.innerWidth < 1024) {
+                        toggleMenu();
+                    }
+                }
+            });
+
+            // --- Run Initialization ---
+            initialize();
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+

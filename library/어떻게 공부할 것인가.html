@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도서 대시보드: 어떻게 공부할 것인가</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Custom Properties for Theming */
+        :root {
+            --bg-primary: #f8fafc; /* Light Gray */
+            --bg-secondary: #ffffff; /* White */
+            --bg-accent: #eef2ff; /* Indigo Light */
+            --text-primary: #111827; /* Dark Gray */
+            --text-secondary: #4b5563; /* Medium Gray */
+            --accent-color: #4f46e5; /* Indigo */
+            --border-color: #e5e7eb; /* Light Border Gray */
+            --font-main: 'Noto Sans KR', 'Inter', sans-serif;
+        }
+
+        /* Basic Body Styling */
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Dashboard Container Layout */
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: 400px; /* Increased width significantly for readability */
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            overflow-y: auto; /* Make the entire sidebar scrollable */
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+        }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .sidebar-header img {
+            max-width: 150px;
+            margin: 0 auto; /* Adjusted margin */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Chapter Navigation List */
+        #chapter-navigation {
+            padding: 1rem 0;
+        }
+
+        #chapter-navigation li a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        #chapter-navigation li a:hover {
+            background-color: var(--bg-accent);
+            color: var(--accent-color);
+        }
+        
+        #chapter-navigation li a.active {
+            background-color: var(--bg-accent);
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #9ca3af; /* Gray-400 */
+            border-top: 1px solid var(--border-color);
+            margin-top: auto; /* Pushes footer to the bottom */
+        }
+
+        /* Main Content Area */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Main Content Header */
+        #content-header {
+            padding: 1.5rem 2rem;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #book-title-main {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        #book-meta-main {
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        #current-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            color: var(--accent-color);
+        }
+
+        /* Main Content Display Area */
+        #content-display {
+            padding: 2rem;
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+
+        /* Card Styling */
+        .content-card {
+            background-color: var(--bg-secondary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title svg {
+            margin-right: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .content-card p, .content-card ul {
+            color: var(--text-secondary);
+            line-height: 1.7; /* Adjusted for Korean font */
+        }
+
+        .content-card ul {
+            list-style-position: inside;
+            padding-left: 0.5rem;
+        }
+
+        .content-card ul li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            position: relative;
+        }
+
+        .content-card ul li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            position: absolute;
+            left: 0;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background-color: var(--bg-accent);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+        
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #374151; /* Gray-700 */
+        }
+
+        /* Visualization Styling */
+        .visualization-container {
+            grid-column: 1 / -1; /* Span full width */
+        }
+
+        .chart {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            padding: 1rem;
+            border-top: 2px solid var(--border-color);
+            margin-top: 1rem;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+        }
+
+        .bar {
+            width: 60px;
+            background-color: var(--accent-color);
+            transition: height 0.5s ease-out;
+            border-radius: 0.25rem 0.25rem 0 0;
+            position: relative;
+        }
+        
+        .bar-label {
+            margin-top: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        #bar-massed { background-color: #a5b4fc; /* Indigo-300 */ }
+        #bar-interleaved { background-color: var(--accent-color); }
+
+        /* Mobile Header and Navigation */
+        #mobile-header {
+            display: none; /* Hidden on desktop */
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 50;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 35;
+        }
+
+        /* Responsive Design: Mobile-first approach */
+        @media (max-width: 992px) {
+            #dashboard-container {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                transform: translateX(-100%);
+                box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+                width: 280px; /* Keep mobile sidebar width consistent */
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #main-content {
+                margin-left: 0;
+            }
+
+            #mobile-header {
+                display: flex;
+                align-items: center;
+            }
+            
+            #content-header {
+                position: static;
+            }
+            
+            #content-display {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.imgur.com/5oGVeOW.jpg" alt="어떻게 공부할 것인가 책 표지" onerror="this.onerror=null;this.src='https://placehold.co/150x220/eef2ff/4f46e5?text=어떻게+공부할+것인가';">
+            </div>
+            <ul id="chapter-navigation">
+                <!-- Navigation links will be populated by JavaScript -->
+            </ul>
+            <div class="sidebar-footer">
+                Dashboard by Kipeum
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Mobile Header with Hamburger Menu -->
+            <header id="mobile-header">
+                <button id="hamburger-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </header>
+
+            <!-- Main Header -->
+            <div id="content-header">
+                <div class="flex justify-between items-start flex-wrap gap-4">
+                    <div>
+                        <h1 id="book-title-main"></h1>
+                        <p id="book-meta-main"></p>
+                    </div>
+                    <a href="https://codepen.io/Kipeum-Lee/full/ZYbrZJj" target="_blank" rel="noopener noreferrer" class="inline-block bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors whitespace-nowrap">
+                        English Version
+                    </a>
+                </div>
+                <h2 id="current-section-title"></h2>
+            </div>
+
+            <!-- Content Display Area -->
+            <div id="content-display">
+                <!-- Dynamic content cards will be rendered here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay for mobile menu -->
+    <div id="overlay"></div>
+
+    <script>
+        // Embed the JSON data directly into the script
+        const jsonData = {
+          "book_meta": {
+            "title": "어떻게 공부할 것인가",
+            "author": "헨리 뢰디거, 마크 맥대니얼, 피터 브라운 저자(글) · 김아영 번역",
+            "publication_year": "2014",
+            "main_theme": "이 책의 중심 주제는 실증적 연구를 통해 널리 퍼진 학습법의 비효율성을 밝히고, 인출 연습, 분산 연습 등 직관에 반하지만 과학적으로 증명된 효과적인 학습 전략을 제시하는 것이다."
+          },
+          "overall_summary": {
+            "abstract": "이 책은 사람들이 일반적으로 학습을 잘못된 방식으로 이해하고 있으며, 널리 받아들여지는 학습법 중 상당수가 비효율적임을 실증적 연구를 통해 밝힌다. 저자들은 학습과 기억에 대한 125년간의 연구, 특히 최근의 성과를 바탕으로 가장 효율적인 학습 전략은 직관에 어긋난다는 점을 제시한다. 이 책의 목표는 복잡한 지식과 기술을 습득한 사람들의 이야기를 통해 학습과 기억이 어떻게 작용하는지 설명하고, 개인, 교사, 기업 및 군사 훈련 담당자, 코치 등 모든 평생 학습자가 즉시 적용할 수 있는 효과적인 증거 기반의 전략을 제시하는 것이다. 주요 발견으로는 노력하는 학습이 더 깊고 오래 지속되며, 반복 읽기나 집중 연습은 비생산적이고 아는 것 같은 착각을 불러일으킨다는 것이다. 대신 인출 연습, 시간 간격을 둔 연습(분산 연습), 교차 연습, 그리고 문제 해결 전의 노력 등이 훨씬 효과적이며, 지능은 타고나는 것이 아니라 노력과 심성 모형 구축을 통해 향상될 수 있다는 점을 강조한다. 궁극적으로 이 책은 학습에 대한 인식을 전환하고, 증거 기반의 학습 전략을 통해 개인의 지적 능력을 최대한 발휘하도록 돕는 데 중점을 둔다.",
+            "keywords": [
+              "학습의 과학",
+              "인출 연습",
+              "분산 연습",
+              "교차 연습",
+              "바람직한 어려움",
+              "심성 모형",
+              "성장 사고방식"
+            ]
+          },
+          "chapters": [
+            {
+              "chapter_number": 1,
+              "chapter_title": "우리는 잘못된 방식으로 배우고 있다",
+              "summary": "이 장은 사람들이 학습에 대해 잘못된 신념을 가지고 있으며 비효율적인 공부 방식을 선호한다고 지적한다. 흔히 사용되는 반복 읽기와 집중 연습은 피상적인 유창성 감각을 주어 실제 지식 습득으로 착각하게 만들지만, 사실은 비생산적이다. 대신, 노력을 요하는 학습, 즉 인출 연습, 분산 연습, 교차 연습, 심성 모형 구축 등이 더 깊고 오래 지속되는 학습으로 이어진다고 주장한다.",
+              "key_arguments": [
+                "대중적인 학습 방식은 비효율적이며, 배움이 직업인 사람들도 최적이 아닌 기법을 사용한다.",
+                "노력하는 학습일수록 더 깊고 오래 기억에 남는다; 쉬운 학습은 일시적이다.",
+                "학습자들은 자신이 잘 배우고 있는지 아닌지를 제대로 판단하지 못한다.",
+                "반복 읽기와 집중 연습은 가장 선호되지만 가장 비생산적인 학습 전략이다.",
+                "인출 연습(시험 보기)은 기억을 강화하고 망각을 막는 데 매우 효과적이다.",
+                "분산 연습(시간 간격을 두고 복습), 교차 연습(여러 주제를 번갈아 학습), 다양하게 변화를 준 연습은 학습 효과를 증진시킨다.",
+                "개인이 선호하는 학습 유형(예: 청각, 시각 학습자)에 맞춰 학습하면 더 잘 배운다는 대중적인 개념은 실증 연구로 뒷받침되지 않는다.",
+                "새로운 지식을 자신의 말로 표현하고 기존 지식과 연결하는 정교화는 학습 분량의 한계를 없앤다.",
+                "핵심 아이디어를 추출하고 이를 정신적 모형으로 조직화하여 사전 지식과 연결하는 능력이 복잡한 지식 숙달에 유리하다.",
+                "지적 능력은 타고나는 것이 아니라 노력과 학습을 통해 변화될 수 있다."
+              ],
+              "key_takeaways_or_insights": [
+                "연구 기반의 학습 전략을 신뢰하고, 직관에 어긋나더라도 노력을 요하는 방법을 시도해야 한다.",
+                "반복적인 암기 대신 정기적인 자기 퀴즈를 통해 자신의 이해도를 정확히 파악하고 학습을 재조정해야 한다.",
+                "학습이 어렵게 느껴질 때 중요한 학습이 이루어지고 있음을 인지하고 어려움을 극복하는 노력을 해야 한다."
+              ],
+              "notable_quote": "노력하는 학습일수록 더 깊고 오래 기억에 남는다; 쉬운 학습은 일시적이다.",
+              "keywords": [
+                "학습 오해",
+                "노력하는 학습",
+                "반복 읽기",
+                "집중 연습",
+                "인출 연습",
+                "분산 연습",
+                "교차 연습",
+                "아는 것 같은 착각",
+                "심성 모형",
+                "학습 유형",
+                "정교화"
+              ]
+            },
+            {
+              "chapter_number": 2,
+              "chapter_title": "배우려면 먼저 인출하라",
+              "summary": "이 장은 기억에서 정보를 능동적으로 인출하는 것, 즉 '시험'의 힘을 강조한다. 이는 단순히 지식을 평가하는 수단을 넘어 기억을 강화하고 학습을 심화하는 가장 강력한 방법 중 하나이다. 인출은 무엇을 알고 무엇을 모르는지 알려주어 향후 학습 방향을 설정하는 데 도움을 주며, 기억을 재통합하여 장기 기억을 공고히 한다.",
+              "key_arguments": [
+                "유용한 학습은 기억을 필요로 하므로, 배운 것이 나중에 필요할 때 활용 가능해야 한다.",
+                "인출 행위는 기억을 강화하고 망각을 막는 두 가지 심오한 이점을 제공한다.",
+                "노력을 요하는 인출일수록 학습 효과가 더 강력하다.",
+                "규칙적인 저부담 퀴즈는 시험을 보지 않고 복습만 한 경우보다 훨씬 높은 학업 성취도를 가져온다.",
+                "즉각적인 피드백보다 지연된 피드백이 장기 학습에 더 이롭다.",
+                "교사가 시작하지 않아도 플래시카드 등을 이용한 자기 테스트는 효과적인 인출 연습이 된다.",
+                "암기는 복잡한 문제 해결과 무관하다는 생각은 잘못된 선택이다; 지식의 기반 없이는 고차원 기술이나 창의성이 흔들린다."
+              ],
+              "key_takeaways_or_insights": [
+                "교재를 반복해서 읽는 대신 주기적으로 자신에게 퀴즈를 내는 것을 주된 학습 전략으로 삼아야 한다.",
+                "시험은 지식 평가뿐 아니라 학습 자체를 위한 강력한 도구로 활용해야 한다.",
+                "학습 내용을 떠올리는 데 어려움을 느낄 때, 그 노력이 오히려 기억을 강화하고 있음을 인지해야 한다."
+              ],
+              "notable_quote": "인출 행위는 기억을 강화하고 망각을 막는 두 가지 심오한 이점을 제공한다.",
+              "keywords": [
+                "인출 연습",
+                "시험 효과",
+                "기억 강화",
+                "망각",
+                "심성 모형",
+                "피드백",
+                "자기 테스트"
+              ]
+            },
+            {
+              "chapter_number": 3,
+              "chapter_title": "뒤섞어서 연습하라",
+              "summary": "이 장은 '집중 연습'이라는 널리 퍼진 학습 신화에 도전하며, 학습 효과를 위해 연습 방식을 혼합하는 것의 중요성을 강조한다. 시간 간격을 두고 복습하는 '분산 연습', 여러 주제를 번갈아 학습하는 '교차 연습', 그리고 다양한 조건에서 기술을 연습하는 '변화 주기 연습'이 단기적 이득보다 장기적이고 유연한 학습 숙달에 훨씬 효과적이다. 이 방법들은 초기에는 생산성이 떨어진다고 느껴질 수 있지만, 근본적인 습관 강도를 구축하고 문제 유형을 식별하는 능력을 향상시킨다.",
+              "key_arguments": [
+                "'집중 연습'(massed practice, 한 번에 몰아서 반복)은 단기적인 성과를 빠르게 보여주지만, 학습 내용을 장기 기억으로 전환하는 데는 비효율적이다.",
+                "'분산 연습'(spaced practice, 시간 간격을 두고 복습)은 잠시 망각이 일어난 후 다시 회상하는 노력을 통해 학습을 더 강력하고 오래 지속되게 만든다.",
+                "'교차 연습'(interleaved practice, 다른 종류의 문제나 주제를 번갈아 연습)은 문제 유형을 구별하고 적절한 해결책을 선택하는 능력을 향상시킨다.",
+                "'변화 주기 연습'(varied practice, 다양한 상황에서 기술을 연습)은 학습 내용을 다른 상황에 성공적으로 적용하는 능력을 높여 더 유연한 지식 표현을 가능하게 한다.",
+                "이러한 전략들은 '순간적인 강도'(momentary strength)보다 '근본적인 습관 강도'(underlying habit strength)를 구축하여 진정한 숙달을 이끈다."
+              ],
+              "key_takeaways_or_insights": [
+                "벼락치기나 한 가지에만 집중하는 연습 방식이 아닌, 의도적으로 시간 간격을 두고 여러 주제나 문제 유형을 번갈아 가며 연습하는 계획을 세워야 한다.",
+                "연습이 어렵고 비효율적으로 느껴지더라도, 그 노력이 장기적인 학습 효과를 가져온다는 사실을 믿고 지속해야 한다.",
+                "학습한 내용을 다양한 맥락에서 적용하고 연습하여 지식의 유연성과 전이 능력을 향상시켜야 한다."
+              ],
+              "notable_quote": "벼락치기 같은 집중 연습은 단기적인 성과를 빠르게 보여주지만, 학습 내용을 장기 기억으로 전환하는 데는 비효율적이다.",
+              "keywords": [
+                "집중 연습",
+                "분산 연습",
+                "교차 연습",
+                "변화 주기 연습",
+                "습관 강도",
+                "순간 강도",
+                "문제 식별",
+                "학습 전이"
+              ]
+            },
+            {
+              "chapter_number": 4,
+              "chapter_title": "어렵게 배워야 오래 남는다",
+              "summary": "이 장은 학습이 어려울수록 더 효과적이라는 '바람직한 어려움'의 역설을 탐구한다. 노력을 요하는 학습 과정은 기억을 재통합하고, 기존 지식과의 연결을 강화하며, 지식을 더 깊고 오래 지속되게 한다. 망각이 어느 정도 일어난 후의 인출은 재학습을 통해 학습 효과를 극대화하며, 새로운 지식을 자신의 말로 표현하거나 기존 지식과 연결하는 '정교화'와 해결책을 배우기 전에 문제를 스스로 풀어보려 하는 '생성'도 학습을 심화하는 데 기여한다.",
+              "key_arguments": [
+                "'바람직한 어려움'은 인출(retrieval)과 부호화(encoding) 과정을 촉진하여 학습, 이해, 기억을 강화한다.",
+                "노력을 요하는 인출은 학습을 유연하게 만들고, 주요 측면을 명확하게 하며, 기억 재통합을 통해 의미를 강화하고 기존 지식과의 연결을 공고히 한다.",
+                "어느 정도의 망각은 새로운 학습을 위해 필수적이며, 이는 이후의 인출 노력을 증가시켜 학습 효과를 높인다.",
+                "새로운 지식에 추가적인 의미를 부여하는 '정교화'(elaboration)는 학습을 강화하고 나중에 정보를 불러올 수 있는 정신적 단서를 늘린다.",
+                "해결책을 알기 전에 문제를 풀기 위해 노력하는 '생성'(generation)은 학습 공백에 대한 경로를 강화하고 답이 주어졌을 때 관련된 자료와 연결을 만든다.",
+                "'반추'(reflection)는 인출, 정교화, 생성 등 여러 인지 활동을 포함하며 기술 향상과 이해 심화에 매우 효과적인 학습 기법이다.",
+                "모든 어려움이 바람직한 것은 아니다; 학습자가 극복할 수 있는 범위 내의 어려움이어야만 효과적이다."
+              ],
+              "key_takeaways_or_insights": [
+                "학습 과정에서 겪는 어려움이나 좌절을 실패의 징후가 아닌, 학습이 심화되고 있음을 보여주는 긍정적인 신호로 받아들여야 한다.",
+                "새로운 내용을 배우기 전에 스스로 질문하고, 자신의 말로 설명하며, 기존 지식과 연결하는 노력을 해야 한다.",
+                "문제에 대한 해답을 바로 찾아보는 대신, 스스로 해결하기 위해 먼저 고민하고 노력하는 습관을 들여야 한다.",
+                "정기적으로 자신의 학습 경험을 돌아보고(반추), 무엇이 효과적이었고 무엇을 다르게 할 수 있을지 생각해야 한다."
+              ],
+              "notable_quote": "학습 과정에서 겪는 어려움이나 좌절은 실패의 징후가 아니라 학습이 심화되고 있음을 보여주는 긍정적인 신호이다.",
+              "keywords": [
+                "바람직한 어려움",
+                "노력하는 학습",
+                "기억 재통합",
+                "망각",
+                "정교화",
+                "생성",
+                "반추",
+                "문제 해결"
+              ]
+            },
+            {
+              "chapter_number": 5,
+              "chapter_title": "안다는 착각에서 벗어나라",
+              "summary": "이 장은 사람들이 '아는 것 같은 착각'에 빠져 자신의 지식 수준을 과대평가하는 경향을 경고한다. 직관적이고 자동적인 '시스템 1'과 분석적이고 의식적인 '시스템 2' 사고 방식의 상호 작용에서 착각이 발생할 수 있으며, 기억 왜곡도 이러한 착각을 심화시킨다. 이를 피하려면 자신의 지식에 대한 객관적인 판단, 즉 '상위 인지' 능력을 키우고, 빈번한 테스트와 피드백을 통해 지속적으로 자신의 이해도를 '조정(calibration)'해야 한다고 강조한다.",
+              "key_arguments": [
+                "반복 읽기 등 유창성에서 비롯된 '아는 것 같은 착각'은 실제 내용 숙달과 다르며, 학생들이 자신의 시험 성적을 과대평가하게 만든다.",
+                "'시스템 1' (직관적, 자동적) 사고가 잘못된 인식이나 착각에서 비롯될 때 문제를 일으킬 수 있다.",
+                "기억은 동기화된 추론, 잘못된 서사, 암시, 사회적 전염 등에 의해 왜곡될 수 있으며, 기억에 대한 확신이 정확성을 보장하지 않는다.",
+                "전문가가 자신의 지식을 초보자에게 가르치기 어려워하는 '지식의 저주'는 전문가의 지식이 너무 통합되어 구성 요소가 배경으로 사라지기 때문이다.",
+                "'더닝-크루거 효과'는 무능한 사람들이 자신의 능력을 과대평가하며, 개선의 필요성을 인지하지 못하는 경향을 설명한다.",
+                "'학생 주도 학습'이 학생의 직관에만 의존할 경우, 학생들은 스스로 학습 전략을 효과적으로 선택하지 못하기 때문에 비효율적일 수 있다."
+              ],
+              "key_takeaways_or_insights": [
+                "자신이 무엇을 알고 무엇을 모르는지 객관적으로 판단하기 위해 자주 테스트하고 인출 연습을 해야 한다.",
+                "단순히 익숙하거나 유창하게 느껴지는 것이 학습의 지표가 아님을 인지하고, 아이디어들을 통합하고 추론하는 정신적 모형을 구축하는 데 집중해야 한다.",
+                "오류를 범하고 피드백을 받는 것을 통해 자신의 판단을 현실에 맞게 조정(보정)하는 습관을 길러야 한다."
+              ],
+              "notable_quote": "단순히 익숙하거나 유창하게 느껴지는 것이 학습의 지표가 아니며, 객관적인 테스트를 통해 자신의 이해도를 정확하게 조정해야 한다.",
+              "keywords": [
+                "아는 것 같은 착각",
+                "상위 인지",
+                "인지적 편향",
+                "기억 왜곡",
+                "시스템 1",
+                "시스템 2",
+                "지식의 저주",
+                "더닝-크루거 효과",
+                "자기 평가",
+                "보정"
+              ]
+            },
+            {
+              "chapter_number": 6,
+              "chapter_title": "학습 유형이라는 신화",
+              "summary": "이 장은 학습자의 선호하는 '학습 유형'에 맞춰 교육해야 한다는 널리 퍼진 믿음이 실증 연구에 의해 지지되지 않음을 명확히 한다. 오히려 학습은 교육 방식이 '내용의 본질'에 부합할 때 모든 학습자에게 효과적이다. 저자들은 지능이 고정되어 있지 않으며, 학습 성공은 다양한 인지 자원을 활용하고, 새로운 경험에서 근본 원칙을 추출하며('규칙 학습'), 중요한 정보를 정신적 구조로 조직화하는('구조 형성') 능력에 달려 있음을 강조한다.",
+              "key_arguments": [
+                "'학습 유형' 이론은 과학적 증거가 부족하며, 교수법이 학습 유형과 일치한다고 해서 학습이 향상된다는 결정적 증거는 거의 없다.",
+                "중요한 것은 교수법이 내용의 본질(예: 기하학은 시각적, 시는 언어적)과 일치할 때 모든 학습자가 더 잘 배운다는 것이다.",
+                "'규칙 학습'(rule learning)은 예시에서 근본 원칙이나 규칙을 추출하는 능력으로, 새로운 상황에서 올바른 해결책을 선택하는 데 성공률을 높인다.",
+                "'구조 형성'(structure building)은 새로운 자료에서 핵심 아이디어를 선별하고 이를 정신적 구조로 연결하는 능력으로, 복잡한 지식 습득에 필수적이다.",
+                "'역동적 평가'(dynamic testing)는 개인의 지식이나 수행의 약점을 파악하고 개선하는 데 중점을 두는 평가 방식이다.",
+                "난독증 환자들이 '큰 그림'을 파악하고 전략적으로 생각하는 보상 기술을 개발하는 경우가 있는데, 이는 뇌의 가소성과 학습 능력의 확장 가능성을 보여준다."
+              ],
+              "key_takeaways_or_insights": [
+                "자신이 특정 학습 유형에 '고정'되어 있다고 생각하여 학습 방식을 제한하지 말고, 모든 지적 능력과 자원을 활용하여 학습에 임해야 한다.",
+                "새로운 내용을 학습할 때는 단순히 예시를 암기하는 대신, 그 밑에 깔린 근본 원칙과 구조를 파악하려 노력해야 한다.",
+                "자신의 약점을 발견하고 개선하는 것을 학습 전략의 핵심으로 삼아 지속적으로 능력을 향상시켜야 한다."
+              ],
+              "notable_quote": "학습 성공은 선호하는 학습 유형에 맞추는 것이 아니라, 모든 지적 자원을 활용하고 내용의 본질에 맞는 방식으로 근본 원칙과 구조를 파악하는 능력에 달려 있다.",
+              "keywords": [
+                "학습 유형",
+                "실증 연구",
+                "규칙 학습",
+                "구조 형성",
+                "역동적 평가",
+                "난독증",
+                "다중 지능",
+                "성공 지능"
+              ]
+            },
+            {
+              "chapter_number": 7,
+              "chapter_title": "꾸준한 노력은 뇌를 변화시킨다",
+              "summary": "이 장은 지적 능력이 유전자나 고정된 재능에 의해 결정되는 것이 아니라, '성장 사고방식'을 바탕으로 한 노력과 '의도적 연습'을 통해 크게 향상될 수 있다는 점을 강조한다. 뇌는 가소성이 높아서 노력을 통해 새로운 연결과 능력을 구축할 수 있으며, '기억술(mnemonic devices)'은 복잡한 정보를 조직화하고 쉽게 인출하는 데 유용한 도구로 활용될 수 있다.",
+              "key_arguments": [
+                "뇌는 '가소성'이 매우 높아(neuroplastic) 노력하는 학습을 통해 새로운 연결과 능력을 구축하며 평생에 걸쳐 변화하고 성장한다.",
+                "'성장 사고방식'(growth mindset)은 자신의 지적 능력이 노력에 의해 발달할 수 있다고 믿는 것으로, 학습 목표를 추구하고 어려움에 끈기 있게 도전하는 데 결정적인 영향을 미친다.",
+                "전문가의 수행 능력은 타고난 재능이 아니라 '지속적인 의도적 연습'(sustained deliberate practice)의 결과이며, 이는 목표 지향적이고 현재 수준을 뛰어넘기 위한 반복적인 노력을 포함한다.",
+                "'기억술'(mnemonic devices), 특히 '기억의 궁전'(memory palace)과 같은 기법은 방대한 양의 임의적 정보를 조직화하고 효율적으로 인출하는 데 효과적인 정신적 도구이다.",
+                "'뇌 훈련 게임'과 같은 제품은 유동 지능 향상에 대한 강력한 과학적 증거가 부족하며, 효과가 있다고 느껴지는 것은 종종 집중력 및 끈기 같은 좋은 학습 습관의 결과일 수 있다."
+              ],
+              "key_takeaways_or_insights": [
+                "자신의 지적 능력이 고정되어 있다는 믿음을 버리고, 노력을 통해 능력을 성장시킬 수 있다는 '성장 사고방식'을 길러야 한다.",
+                "현재의 능력 수준을 넘어서기 위한 '의도적 연습'에 몰두하고, 실패를 유용한 정보로 삼아 전략을 조정해야 한다.",
+                "복잡한 정보를 효과적으로 조직화하고 인출하기 위해 기억술과 같은 기억 단서 도구를 활용하되, 이는 깊은 이해의 지름길이 아님을 인지해야 한다."
+              ],
+              "notable_quote": "지적 능력은 고정된 재능이 아니라, 성장 사고방식을 바탕으로 한 의도적 연습을 통해 평생에 걸쳐 향상될 수 있다.",
+              "keywords": [
+                "신경 가소성",
+                "성장 사고방식",
+                "의도적 연습",
+                "전문가 수행",
+                "기억술",
+                "기억의 궁전",
+                "유동 지능",
+                "결정 지능",
+                "뇌 훈련"
+              ]
+            },
+            {
+              "chapter_number": 8,
+              "chapter_title": "어떻게 공부할 것인가",
+              "summary": "이 장은 앞선 장들에서 제시된 학습 원리들을 통합하여 학생, 평생 학습자, 교사, 그리고 훈련 담당자를 위한 구체적이고 실용적인 전략들을 제공한다. 인출 연습, 분산 연습, 교차 연습, 정교화, 생성, 보정과 같은 노력을 요하는 증거 기반 학습 기법들이 복잡한 지식과 기술을 숙달하고 장기적인 학습을 달성하는 데 필수적임을 재확인하며, 이러한 전략들을 일상적인 학습과 교육 과정에 통합할 것을 강조한다.",
+              "key_arguments": [
+                "학생을 위한 학습 팁: 읽기 대신 자기 퀴즈를 주된 학습 전략으로 삼고, 학습 세션 사이에 충분한 시간 간격을 두며, 다양한 문제 유형이나 주제를 번갈아 가며 학습해야 한다. 또한, 정교화, 생성, 보정과 같은 활동을 통해 이해를 심화하고 지식의 공백을 식별해야 한다.",
+                "평생 학습자를 위한 팁: 직업이나 취미 생활에서 인출 연습, 분산 연습, 교차 연습, 생성, 정교화, 반추 등의 원리를 적용하여 지속적인 학습과 능력 향상을 이루어야 한다.",
+                "교사를 위한 팁: 학생들이 효과적인 학습 방법을 이해하고 꾸준히 실천하도록 가르쳐야 한다. '바람직한 어려움'을 수업에 통합하고, 인출 연습, 생성, 정교화를 촉진하는 활동을 설계해야 한다.",
+                "훈련 담당자를 위한 팁: 전통적인 '소방 호스식' 강의 방식에서 벗어나, 분산 인출 연습, 교차 연습, 변화 주기 연습을 활용하여 기업 및 전문 훈련 프로그램을 재설계해야 한다.",
+                "어떤 분야에서든 능력을 숙달하는 것은 궁극적으로 학습하는 능력에 달려 있다."
+              ],
+              "key_takeaways_or_insights": [
+                "'반복 읽기' 대신 '자기 퀴즈'를 학습의 주된 축으로 삼아 능동적으로 지식을 인출하라.",
+                "학습한 내용을 다시 볼 때 의도적으로 시간 간격을 두고, 여러 관련 없는 주제나 문제 유형을 번갈아 가며 공부하여 장기 기억과 전이 능력을 강화하라.",
+                "새로운 내용을 자신의 말로 설명하거나, 예시를 만들어보거나, 해결책을 배우기 전에 스스로 문제를 풀어보려 노력하는 등 '생성'과 '정교화'를 통해 깊이 있게 이해하라.",
+                "자신의 지식에 대한 주관적인 느낌이 아닌, 객관적인 테스트와 피드백을 통해 자신의 이해도를 정확하게 '보정'하고 학습 방향을 조정하라.",
+                "교육자와 훈련 담당자는 학생들이 이러한 효과적인 학습 전략을 배우고 활용하도록 돕는 교육 환경과 커리큘럼을 설계해야 한다."
+              ],
+              "notable_quote": "능력을 숙달하는 것은 궁극적으로 학습하는 능력에 달려 있으며, 이는 증거 기반의 전략을 일상에 통합함으로써 달성될 수 있다.",
+              "keywords": [
+                "실용 전략",
+                "인출 연습",
+                "분산 연습",
+                "교차 연습",
+                "정교화",
+                "생성",
+                "보정",
+                "반추",
+                "평생 학습",
+                "교육 전략",
+                "훈련 프로그램"
+              ]
+            }
+          ],
+          "limitations_and_future_directions": {
+            "acknowledged_constraints": [
+              "학습과 그 신경학적 기반에 대해 아직 알려지지 않은 부분이 많다.",
+              "'뇌 훈련' 게임이 유동 지능을 향상시킨다는 스위스 연구(2008)는 참가자 수가 적고, 참가자 집단이 비슷하게 지능이 높았으며, 한 가지 훈련 과제에만 초점을 맞췄다는 한계가 있다.",
+              "향상된 뇌 훈련 수행의 지속성이 알려지지 않았고 다른 연구들에 의해 결과가 반복 검증되지 않았다.",
+              "'학습 유형' 이론의 타당성을 검증하기 위한 엄격한 실험 연구의 수가 극히 적으며, 현재로서는 널리 가정되는 학습 유형의 존재에 대한 증거가 거의 없다.",
+              "하워드 가드너는 다중 지능의 특정 조합을 결정하는 것이 과학이라기보다는 예술에 가깝다고 인정했다."
+            ],
+            "future_research": [
+              "변동 훈련의 범위(예: 60cm 및 120cm 던지기)가 특정 과제(90cm 던지기)를 포함해야 하는지에 대해서는 추가 연구가 필요하다.",
+              "바람직한 어려움의 종류를 결정하는 포괄적인 규칙에 대한 답은 시간과 추가 연구를 통해 밝혀질 수 있다.",
+              "구조 형성 능력에 대한 이해는 아직 초기 단계에 있으며, 구조 형성 능력이 잘못된 인지 메커니즘의 결과인지, 아니면 자연스럽게 습득되거나 가르쳐야 하는 기술인지에 대한 연구가 더 필요하다."
+            ]
+          },
+          "field_context": {
+            "statement": "이 책은 인지 심리학, 특히 학습과 기억에 관한 수십 년간의 과학적 연구 결과를 일반 대중, 교육자, 그리고 훈련 전문가들이 쉽게 이해하고 적용할 수 있도록 연결하는 중요한 가교 역할을 한다. 전통적이고 직관적이지만 비효율적인 학습 관행(예: 반복 읽기, 집중 연습)에 대해 실증적 증거를 바탕으로 도전하며, '바람직한 어려움'이라는 개념을 중심으로 더욱 효과적인 대안을 제시한다. 이 책은 '성장 사고방식'과 같은 교육 심리학의 주요 개념과도 맥을 같이하며, 학습 과학을 실험실에서 벗어나 실제 교실과 직장, 그리고 개인의 삶으로 가져오는 데 크게 기여했다. 결과적으로, 이 책은 증거 기반 학습 운동의 핵심 문헌으로 자리 잡았다."
+          }
+        };
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const chapterNav = document.getElementById('chapter-navigation');
+        const mainContent = document.getElementById('main-content');
+        const contentDisplay = document.getElementById('content-display');
+        const bookTitleMain = document.getElementById('book-title-main');
+        const bookMetaMain = document.getElementById('book-meta-main');
+        const currentSectionTitle = document.getElementById('current-section-title');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const overlay = document.getElementById('overlay');
+
+        /**
+         * Creates an SVG icon.
+         * @param {string} pathData - The 'd' attribute for the SVG path.
+         * @returns {string} - The complete SVG element as a string.
+         */
+        function createIcon(pathData) {
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${pathData}</svg>`;
+        }
+
+        // Icon paths for different card types
+        const icons = {
+            summary: createIcon('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>'),
+            arguments: createIcon('<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path>'),
+            takeaways: createIcon('<path d="M15.03 5.3a2.4 2.4 0 0 1 3.4 3.4l-7.6 7.6a2.4 2.4 0 0 1-3.4-3.4Z"></path><path d="M9.06 16.64 2.26 9.84a3 3 0 0 1 0-4.24l7.6-7.6a3 3 0 0 1 4.24 0l7.6 7.6a3 3 0 0 1 0 4.24l-7.6 7.6a3 3 0 0 1-4.24 0Z"></path><path d="m14 9-3 3"></path>'),
+            quote: createIcon('<path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h3v1c0 3-1 7-6 7z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h3v1c0 3-1 7-6 7z"></path>'),
+            keywords: createIcon('<path d="m15 5-3.42 3.42"></path><path d="M16.53 16.53 22 22"></path><path d="M2 8.82V15a2 2 0 0 0 2 2h6.18a2 2 0 0 0 1.41-.59l8.82-8.82a2 2 0 0 0 0-2.83L15.41 2.59a2 2 0 0 0-2.83 0L3.76 11.41a2 2 0 0 0-.59 1.41Z"></path>'),
+            visualization: createIcon('<path d="M4 20h16"></path><path d="M4 16h16"></path><path d="M4 12h16"></path><path d="M4 8h16"></path><path d="M4 4h16"></path>'),
+            constraints: createIcon('<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>'),
+            research: createIcon('<path d="m9 18 6-6-6-6"></path>'),
+            context: createIcon('<circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path>')
+        };
+
+        /**
+         * Initializes the dashboard content and navigation.
+         */
+        function initialize() {
+            // Populate main header and sidebar with book meta data
+            const { title, author, publication_year } = jsonData.book_meta;
+            bookTitleMain.textContent = title;
+            bookMetaMain.textContent = `${author} • ${publication_year}`;
+
+            // Create navigation links
+            const navFragment = document.createDocumentFragment();
+            
+            let li = document.createElement('li');
+            li.innerHTML = `<a href="#" data-id="overall_summary">책 전체 요약</a>`;
+            navFragment.appendChild(li);
+
+            jsonData.chapters.forEach(chapter => {
+                li = document.createElement('li');
+                li.innerHTML = `<a href="#" data-id="chapter_${chapter.chapter_number}">제 ${chapter.chapter_number}장: ${chapter.chapter_title}</a>`;
+                navFragment.appendChild(li);
+            });
+            
+            li = document.createElement('li');
+            li.innerHTML = `<a href="#" data-id="limitations">한계 및 향후 연구 방향</a>`;
+            navFragment.appendChild(li);
+
+            li = document.createElement('li');
+            li.innerHTML = `<a href="#" data-id="context">분야별 맥락</a>`;
+            navFragment.appendChild(li);
+
+            chapterNav.appendChild(navFragment);
+
+            // Load the default view
+            displayContent('overall_summary');
+            updateActiveLink('overall_summary');
+        }
+
+        /**
+         * Creates a content card with a title and content.
+         * @param {string} title - The title of the card.
+         * @param {string} contentHtml - The HTML content for the card body.
+         * @param {string} icon - The SVG icon for the card title.
+         * @param {string} [customClasses=''] - Optional additional classes for the card.
+         * @returns {HTMLElement} - The created card element.
+         */
+        function createCard(title, contentHtml, icon, customClasses = '') {
+            const card = document.createElement('div');
+            card.className = `content-card ${customClasses}`;
+            card.innerHTML = `
+                <h3 class="card-title">${icon} ${title}</h3>
+                <div>${contentHtml}</div>
+            `;
+            return card;
+        }
+        
+        /**
+         * Renders the content for a given section ID.
+         * @param {string} id - The ID of the section to display (e.g., 'overall_summary', 'chapter_1').
+         */
+        function displayContent(id) {
+            contentDisplay.innerHTML = ''; // Clear previous content
+            const contentFragment = document.createDocumentFragment();
+
+            if (id === 'overall_summary') {
+                const data = jsonData.overall_summary;
+                currentSectionTitle.textContent = '책 전체 요약';
+                
+                contentFragment.appendChild(createCard('초록', `<p>${data.abstract.replace(/\n/g, '</p><p>')}</p>`, icons.summary, 'grid-column: 1 / -1;'));
+                const keywordsHtml = data.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('');
+                contentFragment.appendChild(createCard('핵심어', keywordsHtml, icons.keywords));
+
+            } else if (id.startsWith('chapter_')) {
+                const chapterNum = parseInt(id.split('_')[1]);
+                const data = jsonData.chapters.find(c => c.chapter_number === chapterNum);
+                if (!data) return;
+
+                currentSectionTitle.textContent = `제 ${data.chapter_number}장: ${data.chapter_title}`;
+                
+                contentFragment.appendChild(createCard('요약', `<p>${data.summary}</p>`, icons.summary, 'grid-column: 1 / -1;'));
+                
+                const argumentsHtml = `<ul>${data.key_arguments.map(arg => `<li>${arg}</li>`).join('')}</ul>`;
+                contentFragment.appendChild(createCard('핵심 주장', argumentsHtml, icons.arguments));
+                
+                const takeawaysHtml = `<ul>${data.key_takeaways_or_insights.map(t => `<li>${t}</li>`).join('')}</ul>`;
+                contentFragment.appendChild(createCard('핵심 시사점', takeawaysHtml, icons.takeaways));
+                
+                contentFragment.appendChild(createCard('인용문', `<blockquote>${data.notable_quote}</blockquote>`, icons.quote));
+                
+                const keywordsHtml = data.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('');
+                contentFragment.appendChild(createCard('핵심어', keywordsHtml, icons.keywords));
+
+                // Conditional Visualization for Chapter 3
+                if (chapterNum === 3) {
+                    const vizCard = createCard(
+                        '시각화: 집중 연습 vs. 교차 연습',
+                        `
+                        <p>이 장에서는 집중 연습(벼락치기)과 교차 연습을 대조합니다. 집중 연습이 처음에는 더 생산적으로 느껴지지만, 교차 연습이 장기적인 기억력과 지식 적용 능력 면에서 훨씬 뛰어난 결과를 가져옵니다.</p>
+                        <div class="chart">
+                            <div class="bar-group">
+                                <div class="bar" id="bar-massed" style="height: 89%;"><span class="bar-value">89%</span></div>
+                                <div class="bar-label">초기 연습<br/>(집중)</div>
+                            </div>
+                             <div class="bar-group">
+                                <div class="bar" id="bar-interleaved-practice" style="height: 60%;"><span class="bar-value">60%</span></div>
+                                <div class="bar-label">초기 연습<br/>(교차)</div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar" id="bar-massed" style="height: 20%;"><span class="bar-value">20%</span></div>
+                                <div class="bar-label">최종 시험<br/>(집중)</div>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar" id="bar-interleaved" style="height: 63%;"><span class="bar-value">63%</span></div>
+                                <div class="bar-label">최종 시험<br/>(교차)</div>
+                            </div>
+                        </div>
+                        `,
+                        icons.visualization,
+                        'visualization-container'
+                    );
+                    contentFragment.appendChild(vizCard);
+                }
+
+            } else if (id === 'limitations') {
+                const data = jsonData.limitations_and_future_directions;
+                currentSectionTitle.textContent = '한계 및 향후 연구 방향';
+
+                const constraintsHtml = `<ul>${data.acknowledged_constraints.map(c => `<li>${c}</li>`).join('')}</ul>`;
+                contentFragment.appendChild(createCard('인지된 한계점', constraintsHtml, icons.constraints));
+
+                const researchHtml = `<ul>${data.future_research.map(r => `<li>${r}</li>`).join('')}</ul>`;
+                contentFragment.appendChild(createCard('향후 연구 과제', researchHtml, icons.research));
+
+            } else if (id === 'context') {
+                const data = jsonData.field_context;
+                currentSectionTitle.textContent = '분야별 맥락';
+                contentFragment.appendChild(createCard('설명', `<p>${data.statement}</p>`, icons.context, 'grid-column: 1 / -1;'));
+            }
+
+            contentDisplay.appendChild(contentFragment);
+        }
+
+        /**
+         * Updates the active state of navigation links.
+         * @param {string} activeId - The ID of the currently active section.
+         */
+        function updateActiveLink(activeId) {
+            document.querySelectorAll('#chapter-navigation a').forEach(link => {
+                if (link.dataset.id === activeId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        
+        // --- Event Listeners ---
+
+        // Initialize the dashboard when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        // Event delegation for sidebar navigation
+        chapterNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (e.target.tagName === 'A') {
+                const id = e.target.dataset.id;
+                displayContent(id);
+                updateActiveLink(id);
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('open');
+                    overlay.style.display = 'none';
+                }
+            }
+        });
+
+        // Toggle mobile navigation
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.style.display = 'none';
+        });
+
+    </script>
+</body>
+</html>

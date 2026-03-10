@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC 2026: 뮌헨 안보회의 심층 대시보드</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        proBlue: '#0052cc',
+                        proBlueDark: '#003d99',
+                        proText: '#172b4d',
+                        proBg: '#f0f2f5',
+                        proCard: '#ffffff',
+                        proHighlight: '#e6f0ff'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* 필수 폰트 및 테마 스타일 적용 */
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+            background-color: #f0f2f5;
+            color: #172b4d;
+            margin: 0;
+            overflow-x: hidden;
+            display: none; /* FOUC 방지 */
+        }
+        
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f2f5; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* 사이드바 애니메이션 및 상태 */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 700;
+            border-left: 4px solid white;
+        }
+        .nav-link {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 카드 호버 효과 */
+        .info-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased flex h-screen">
+
+    <div id="mobile-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 hidden md:hidden"></div>
+
+    <aside id="sidebar" class="bg-proBlue text-white w-64 flex-shrink-0 fixed h-full flex flex-col transform -translate-x-full md:translate-x-0 md:relative md:flex">
+        <div class="p-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold tracking-tight">MSC 2026</h1>
+            <button id="close-sidebar" class="md:hidden text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="px-6 pb-4 text-sm opacity-80 border-b border-blue-400 leading-snug">
+            제62차 뮌헨 안보회의<br>
+            <strong>해체되는 질서<br>(Under Destruction)</strong>
+        </div>
+        <nav id="main-nav" class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><a href="#background" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">🏛️</span> 배경 및 의의 (도입)</a></li>
+                <li><a href="#overview" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">📊</span> 핵심 메시지 요약</a></li>
+                <li><a href="#europe-defense" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">🛡️</span> 유럽 방위 및 안보 재편</a></li>
+                <li><a href="#alliance" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">🤝</span> 대서양 동맹 갈등·조정</a></li>
+                <li><a href="#regions" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">🌍</span> 중동 및 글로벌 사우스</a></li>
+                <li><a href="#non-traditional" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">💡</span> 비전통 안보 (AI/경제)</a></li>
+                <li><a href="#implications" class="nav-link block px-6 py-3 text-sm flex items-center"><span class="mr-3">🎯</span> 산업·국가적 시사점</a></li>
+            </ul>
+        </nav>
+        <div class="p-4 text-xs text-center opacity-60 border-t border-blue-400">
+            작성일: 2026-02-21 (KST)
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-proBg">
+        
+        <header class="bg-white shadow-sm z-10 p-4 flex items-center justify-between md:justify-end">
+            <div class="flex items-center md:hidden">
+                <button id="mobile-menu-button" class="text-proText hover:text-proBlue focus:outline-none p-2 rounded-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <span class="ml-4 font-bold text-proBlue text-lg">MSC 2026 대시보드</span>
+            </div>
+            <div class="hidden md:flex items-center text-sm font-medium text-gray-500">
+                심층 분석 리포트 - 전략 및 비주얼 매핑
+            </div>
+        </header>
+
+        <div id="scroll-container" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+            <div class="max-w-6xl mx-auto space-y-12">
+
+                <section id="background" class="content-section pt-4">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-proBlueDark mb-2">제62차 뮌헨 안보회의(MSC 2026) 개요</h2>
+                        <p class="text-gray-600">미국 중심의 전후 국제질서가 약화되는 가운데 열린 핵심 글로벌 안보 포럼의 배경과 특징</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-start">
+                            <div class="text-3xl mr-4 mt-1">📅</div>
+                            <div>
+                                <h4 class="text-sm text-gray-500 font-bold mb-1">일시 및 장소</h4>
+                                <p class="text-proText font-bold">2026년 2월 13일 ~ 15일</p>
+                                <p class="text-sm text-gray-600 mt-1">독일 뮌헨</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-start">
+                            <div class="text-3xl mr-4 mt-1">👥</div>
+                            <div>
+                                <h4 class="text-sm text-gray-500 font-bold mb-1">주요 참석자</h4>
+                                <p class="text-sm text-proText leading-relaxed">각국 정상, 외교·국방 장관, 국제기구 수장, 학계 및 산업계 리더 등 글로벌 최고위급 인사</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-proBlue shadow-sm flex items-start bg-proHighlight">
+                            <div class="text-3xl mr-4 mt-1">🏷️</div>
+                            <div>
+                                <h4 class="text-sm text-proBlue font-bold mb-1">공식 보고서 주제</h4>
+                                <p class="text-lg font-bold text-proBlueDark">"해체되는 질서"</p>
+                                <p class="text-sm text-proBlue mt-1">(Under Destruction)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-proBlueDark text-white p-4">
+                            <h3 class="font-bold flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                올해 MSC가 기존과 다른 점: 왜 주목받았는가?
+                            </h3>
+                        </div>
+                        <div class="p-6 space-y-4 text-sm leading-relaxed">
+                            <p>이번 MSC 2026은 단순히 개별 국가의 분쟁 현안을 다루는 데 그치지 않고, <strong>"전후 국제질서가 붕괴·재편되는 전환기에서 유럽과 서방이 어떤 안보 아키텍처를 설계할 것인가"</strong>라는 근본적이고 존재론적인 질문을 회의의 중심에 두었습니다.</p>
+                            
+                            <ul class="space-y-3 mt-4">
+                                <li class="flex items-start">
+                                    <span class="text-proBlue mr-2">📌</span>
+                                    <div><strong>'예외적 사건'에서 '구조적 추세'로의 인식 전환:</strong> 과거에는 질서의 균열을 일시적이거나 예외적인 사건으로 보았다면, 올해는 미국의 역할 축소, 규범 네트워크 균열, 블록화 심화 등을 피할 수 없는 <strong>'구조적 추세'</strong>로 완전히 확정 지었습니다.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-proBlue mr-2">📌</span>
+                                    <div><strong>"유럽 소멸론"의 파장과 반발:</strong> 회의 직전 미국발 '유럽 쇠퇴/소멸 시나리오' 보고서와 그린란드 영유권 관련 강경 입장이 공개되면서, 미·유럽 간 갈등이 최고조에 달한 상태에서 회의가 개막했습니다. 이는 유럽의 능동적 '자강론'을 폭발시키는 기폭제가 되었습니다.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-proBlue mr-2">📌</span>
+                                    <div><strong>포괄적 안보의 본격 편입:</strong> 전통적 군사 안보를 넘어 경제, 무역, AI 기술, 공급망, 기후 등 비전통적 의제들이 단순한 부가 요소가 아닌 <strong>핵심 안보 프레임으로 완전히 통합</strong>되었습니다.</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="overview" class="content-section pt-4">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6">6대 핵심 아젠다 한눈에 보기</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">01</div>
+                            <h4 class="font-bold text-proText mb-2">우크라이나 전쟁 향방</h4>
+                            <p class="text-sm text-gray-600">전쟁 종식의 방식이 곧 유럽 안보 구조 전체의 향방을 결정짓는 존재론적 문제로 연동됨.</p>
+                        </div>
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">02</div>
+                            <h4 class="font-bold text-proText mb-2">유럽 전략적 자율성</h4>
+                            <p class="text-sm text-gray-600">미국의 역할 축소 및 재조정 압력에 맞서 유럽 스스로의 방위 강화 및 자율성 확보 시급.</p>
+                        </div>
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">03</div>
+                            <h4 class="font-bold text-proText mb-2">자강론의 부상</h4>
+                            <p class="text-sm text-gray-600">EU 수뇌부들이 '유럽 소멸론'에 강하게 반발하며, 수동적 동맹을 벗어난 자체 역량 강화 천명.</p>
+                        </div>
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">04</div>
+                            <h4 class="font-bold text-proText mb-2">중동 질서 재편</h4>
+                            <p class="text-sm text-gray-600">가자 사태 등 휴전 이후의 불안정성을 관리하기 위한 새로운 거버넌스 및 지역 질서 논의 부상.</p>
+                        </div>
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">05</div>
+                            <h4 class="font-bold text-proText mb-2">비전통 안보의 주류화</h4>
+                            <p class="text-sm text-gray-600">경제, 무역, AI, 핵심 공급망, 기후 문제가 안보 프레임과 직결되어 핵심 의제로 편입.</p>
+                        </div>
+                        <div class="info-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-proBlue font-bold text-xl mb-2">06</div>
+                            <h4 class="font-bold text-proText mb-2">규범 질서의 재설계</h4>
+                            <p class="text-sm text-gray-600">기존 규칙 기반 질서 해체 위험에 대비하여 서방을 중심으로 한 새로운 룰과 제도의 재설계 요구.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="europe-defense" class="content-section pt-4">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-proBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                        유럽 안보 구조 재편 및 방위 자립
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-bold text-proText mb-4">우크라이나 지원 및 집단 안보</h3>
+                            <div class="space-y-4">
+                                <p class="text-sm">우크라이나 측은 미국의 <strong>15~20년 장기 안보보장</strong> 및 EU 가입 시한 명시를 강하게 요구했습니다. 반면 주요 EU 인사들은 가입에 대한 원칙적 지지는 유지하면서도 구체적 시한은 유보하는 신중한 태도를 보였습니다.</p>
+                                <div class="p-4 bg-proHighlight rounded-lg border border-blue-200">
+                                    <h4 class="font-bold text-proBlue mb-2">새로운 아키텍처 구상</h4>
+                                    <p class="text-sm mb-2">NATO 및 EU 편입과 별개로 <strong>'유럽이 주도하는 새로운 집단 안보 체제'</strong>를 설계해야 한다는 주장이 부상했습니다.</p>
+                                    <ul class="text-sm list-disc pl-4 text-gray-700">
+                                        <li>러시아에 대한 군사력 상한(cap) 부과</li>
+                                        <li>전범 책임 추궁 및 피해 배상</li>
+                                        <li>미국은 우크라이나 지원의 주 책임자로 '유럽'을 지목</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                            <h3 class="text-lg font-bold text-proText mb-4">독일의 'Six Key Messages'</h3>
+                            <p class="text-sm text-gray-600 mb-4">독일은 유럽의 외교·안보 리더십 복원을 선언하며, 성장을 동반한 대규모 방위력 확충 계획을 발표했습니다.</p>
+                            
+                            <div class="relative flex-1 min-h-[200px] w-full mt-auto">
+                                <canvas id="defenseChart"></canvas>
+                            </div>
+                            <div class="text-center mt-4">
+                                <p class="text-xs text-gray-500 font-bold">독일 방위비 지출 목표 (2035년 기준 GDP 5% 구성)</p>
+                                <p class="text-xs text-proBlue mt-1">※ 2029년까지 6,000억 유로 규모 군 현대화 추진</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="alliance" class="content-section pt-4">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6">대서양 동맹 재조정과 갈등 구도</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-gray-100 relative">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <span class="text-red-500 mr-2">🇺🇸</span> 미국의 메시지: 글로벌 역할 재조정
+                                </h3>
+                                <ul class="space-y-4 text-sm text-gray-700">
+                                    <li class="bg-gray-50 p-3 rounded">
+                                        <strong class="block text-proText mb-1">우선순위 변경</strong>
+                                        서반구와 인도·태평양 지역을 최우선으로 하는 새로운 전략 구축 시사.
+                                    </li>
+                                    <li class="bg-gray-50 p-3 rounded">
+                                        <strong class="block text-proText mb-1">안보 책임 전가</strong>
+                                        "진정한 동맹이라면 스스로 더 많은 책임을 져야 한다"며 유럽의 자체 방위 역량 및 재정 부담 확대를 강하게 촉구.
+                                    </li>
+                                    <li class="bg-gray-50 p-3 rounded">
+                                        <strong class="block text-proText mb-1">주도권 유지 구역</strong>
+                                        북극(그린란드), 미사일 방어, 중국/러시아 견제 등에서는 미국 주도의 구도를 강화하며 유럽의 수용을 요구.
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="md:w-1/2 p-6 relative">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-proBlue"></div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <span class="text-proBlue mr-2">🇪🇺</span> 유럽의 대응: 자립과 '유럽 기둥'
+                                </h3>
+                                <blockquote class="bg-proHighlight border-l-4 border-proBlue p-4 italic text-sm text-proBlueDark mb-4 font-bold">
+                                    "우리는 미국을 대체하려는 것이 아니라, 동등한 축으로 서기 위해 자립을 추구한다."
+                                </blockquote>
+                                <ul class="space-y-4 text-sm text-gray-700">
+                                    <li>
+                                        <strong class="text-proText">NATO의 보완재 구축:</strong> NATO를 대체하기보다는 이를 보완하는 '유럽 기둥(European pillar)'을 구축하여 다층적 모델 설계.
+                                    </li>
+                                    <li>
+                                        <strong class="text-proText">프랑스의 구상:</strong> 공동 핵억지 논의를 포함한 포괄적인 유럽 안보 아키텍처 제시.
+                                    </li>
+                                    <li>
+                                        <strong class="text-proText">경제 레버리지:</strong> 세계 최대 수준의 시장과 경제력을 바탕으로 강력한 경제·규범·외교적 영향력 행사 천명.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="regions" class="content-section pt-4">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6">지역 질서 재편: 중동 및 글로벌 사우스</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                            <h3 class="text-lg font-bold text-proText mb-3 border-b pb-2">가자 사태 및 중동 거버넌스</h3>
+                            <p class="text-sm text-gray-600 mb-4">이름뿐인 휴전 상태와 높은 민간인 희생 속에서 가자 재건 및 중동 질서 관리가 논의되었습니다. 아울러 이란의 미사일 프로그램과 이스라엘의 선제 타격 옵션 등 역내 안보 위협이 주요 이슈로 다뤄졌습니다.</p>
+                            <div class="bg-gray-50 rounded p-4 text-sm border-l-4 border-gray-400">
+                                <strong class="block text-gray-800 mb-1">Board of Peace 이니셔티브</strong>
+                                미국은 워싱턴에서 새로운 협의체를 출범해 재건 및 UN 체제 견제를 도모했으나, 유럽 일부와 팔레스타인은 주권 보장 없는 재정적 통제 위험성을 강하게 우려하고 있습니다.
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                            <h3 class="text-lg font-bold text-proText mb-3 border-b pb-2">중국과 대안적 회랑 구상</h3>
+                            <p class="text-sm text-gray-600 mb-4">중국이 평화 프로세스에서 담당할 역할이 주목받는 가운데, 중국이 글로벌 사우스와 연대하여 '대안적 국제질서'를 구축하려 한다는 분석이 제기되었습니다.</p>
+                            <div class="bg-gray-50 rounded p-4 text-sm border-l-4 border-gray-400">
+                                <strong class="block text-gray-800 mb-1">중간 회랑 (Middle Corridor)</strong>
+                                아제르바이잔, 튀르키예, 조지아, 카자흐스탄이 참여하는 새로운 물류/에너지 루트입니다. 러시아와 이란을 경유하지 않는 대체 지정학적 인프라로서 유럽 공급망 전략과 연계됩니다.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="non-traditional" class="content-section pt-4">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6">비전통 안보 의제의 무기화</h2>
+                    <p class="text-gray-600 mb-6">군사 안보를 넘어 경제, 기술, 기후가 모두 안보 프레임으로 통합되는 포괄적 변화가 두드러졌습니다.</p>
+                    
+                    <div class="relative h-64 w-full bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+                        <canvas id="nonTraditionalChart"></canvas>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-2xl mb-2">🏭</div>
+                            <h4 class="font-bold mb-2 text-proText">경제안보 및 디커플링</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">핵심 광물, 반도체, 배터리 공급망을 중심으로 중국 의존도를 낮추기 위한 무역·투자 심사 및 수출통제 보조금 정책이 논의되었습니다.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-2xl mb-2">💻</div>
+                            <h4 class="font-bold mb-2 text-proText">첨단 기술 및 AI 동맹</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">사이버전 및 선거 개입에서 AI 위험성이 부각되며, 규제 표준 선점 및 민주주의 국가 간 '기술 클럽' 구축 필요성이 제기되었습니다.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-2xl mb-2">🌱</div>
+                            <h4 class="font-bold mb-2 text-proText">기후, 자원, 에너지</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">기후 이주 및 식량 안보 악화가 테러·분쟁과 결합되는 현상, 그리고 원전 주기 및 전력망 사이버 위협 대응이 논의되었습니다.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="implications" class="content-section pt-4 pb-12">
+                    <h2 class="text-2xl font-bold text-proBlueDark mb-6">디지털 산업 및 국가 전략 시사점</h2>
+                    <div class="bg-gradient-to-br from-proBlueDark to-proBlue text-white rounded-xl shadow-lg p-6 lg:p-8">
+                        <div class="space-y-6">
+                            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center border-b border-blue-400 border-opacity-30 pb-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center font-bold text-xl">1</div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1 text-blue-100">기술 및 규제의 안보화에 따른 정치 리스크 증가</h4>
+                                    <p class="text-sm opacity-90 leading-relaxed">AI, 데이터, 사이버 인프라가 국가 안보의 핵심으로 격상됨에 따라 기업들은 전례 없는 수출 통제 및 데이터 이동 제한 규제에 직면하게 됩니다.</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center border-b border-blue-400 border-opacity-30 pb-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center font-bold text-xl">2</div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1 text-blue-100">유럽의 디지털 주권 강화 모델 대비</h4>
+                                    <p class="text-sm opacity-90 leading-relaxed">독자적 자강 노선을 택한 EU는 디지털 시장 및 플랫폼, AI 규제를 경제 주권 수단으로 적극 활용할 것이며, 이에 맞춘 철저한 현지화 규제 대응이 요구됩니다.</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center font-bold text-xl">3</div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1 text-blue-100">콘텐츠 및 공급망 구조의 다변화 필수</h4>
+                                    <p class="text-sm opacity-90 leading-relaxed">글로벌 블록화 심화로 미·중·EU 간 규범 차이가 벌어지고 있습니다. 단일 글로벌 전략을 폐기하고 지정학적 블록별 맞춤형 포트폴리오를 재편해야 합니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. FOUC 방지 - 스크립트 실행 시 화면 노출
+            document.body.style.display = 'flex';
+
+            // 2. 모바일 사이드바 토글 로직
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuBtn = document.getElementById('mobile-menu-button');
+            const closeSidebarBtn = document.getElementById('close-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+
+            function toggleSidebar() {
+                if (sidebar && overlay) {
+                    sidebar.classList.toggle('-translate-x-full');
+                    overlay.classList.toggle('hidden');
+                }
+            }
+
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+            // 3. Scrollspy 네비게이션 로직
+            const scrollContainer = document.getElementById('scroll-container');
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function updateNavOnScroll() {
+                if (!scrollContainer) return;
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollContainer.scrollTop >= sectionTop - 150) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            if (scrollContainer) {
+                scrollContainer.addEventListener('scroll', updateNavOnScroll);
+                updateNavOnScroll(); 
+            }
+
+            // 네비게이션 클릭 이동 부드럽게 처리
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if(targetSection && scrollContainer) {
+                        scrollContainer.scrollTo({
+                            top: targetSection.offsetTop - 20,
+                            behavior: 'smooth'
+                        });
+                    }
+                    
+                    if (window.innerWidth < 768) {
+                        toggleSidebar();
+                    }
+                });
+            });
+
+            // 4. Chart.js 시각화
+            // Chart 1: 독일 방위비 지출 비중 (도넛 차트)
+            const defenseCtx = document.getElementById('defenseChart');
+            if (defenseCtx) {
+                new Chart(defenseCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['군 전력 및 현대화 (3.5%)', '인프라 및 수송로 (1.5%)'],
+                        datasets: [{
+                            data: [70, 30],
+                            backgroundColor: ['#0052cc', '#cbd5e1'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { font: { family: "'Paperlogy', sans-serif", size: 12 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) { return ' ' + context.label; }
+                                }
+                            }
+                        },
+                        cutout: '75%'
+                    }
+                });
+            }
+
+            // Chart 2: 비전통 안보 의제 통합 수준 (수평 막대 차트 - 개념화)
+            const nonTradCtx = document.getElementById('nonTraditionalChart');
+            if (nonTradCtx) {
+                new Chart(nonTradCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['경제·공급망 (디리스킹)', 'AI·첨단 기술 패권', '기후 및 자원 갈등'],
+                        datasets: [{
+                            label: '안보 프레임 통합 정도 (추세)',
+                            data: [95, 88, 75],
+                            backgroundColor: ['#003d99', '#0052cc', '#6699ff'],
+                            borderRadius: 4,
+                            barThickness: 25
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { display: false }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { font: { family: "'Paperlogy', sans-serif", weight: 'bold' } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: '비전통 의제의 안보 의제화 파급력',
+                                font: { family: "'Paperlogy', sans-serif", size: 14 }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

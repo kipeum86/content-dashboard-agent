@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 시대, 대체 불가능한 인간의 조건 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #fdf6e3; /* Classic Academia Background */
+            color: #4a4a4a; /* Classic Academia Text */
+        }
+        .kpi-card {
+            background-color: #fffef7;
+            border: 1px solid #e8e2d4;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #800000; /* Classic Academia Primary */
+            color: #fdf6e3;
+        }
+        .content-section {
+            scroll-margin-top: 80px;
+        }
+        .pill-button {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #800000;
+            color: #800000;
+        }
+        .pill-button.active, .pill-button:hover {
+            background-color: #800000;
+            color: white;
+        }
+        .main-title-color {
+            color: #800000;
+        }
+        .sidebar-bg {
+             background-color: #fffef7;
+        }
+        .outlook-card {
+            background-color: #fffef7;
+            border: 1px solid #e8e2d4;
+        }
+        .outlook-card h3 svg {
+            transition: transform 0.3s ease;
+        }
+        .outlook-card.open h3 svg {
+            transform: rotate(180deg);
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 40vh;
+            width: 100%;
+            max-width: 800px;
+            max-height: 400px;
+        }
+        .philosophy-card {
+            background: linear-gradient(135deg, #fffef7, #f5f0e1);
+            border-left: 5px solid #800000;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen">
+        <div class="md:hidden flex justify-between items-center p-4 sidebar-bg/80 backdrop-blur-sm sticky top-0 z-20 shadow-md">
+            <h1 class="text-xl font-bold main-title-color">AI 시대, 인간의 조건</h1>
+            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="sidebar" class="sidebar-bg text-gray-800 w-64 space-y-2 py-7 px-2 fixed inset-y-0 left-0 transform md:translate-x-0 transition duration-200 ease-in-out z-30 shadow-lg md:h-screen md:overflow-y-auto">
+            <a href="#" class="block px-4 py-2.5 text-2xl font-bold main-title-color">AI 시대, 인간의 길</a>
+            <nav id="main-nav">
+                <a href="#overview" class="nav-link block px-4 py-2.5 rounded-lg font-medium">개요</a>
+                <a href="#irreplaceability" class="nav-link block px-4 py-2.5 rounded-lg font-medium">대체 불가능성</a>
+                <a href="#philosophy" class="nav-link block px-4 py-2.5 rounded-lg font-medium">핵심 철학</a>
+                <a href="#education" class="nav-link block px-4 py-2.5 rounded-lg font-medium">교육적 접근</a>
+                <a href="#entrepreneurship" class="nav-link block px-4 py-2.5 rounded-lg font-medium">사회적 기업가 정신</a>
+                <a href="#critical-thinking" class="nav-link block px-4 py-2.5 rounded-lg font-medium">비판적 사고와 AI</a>
+                <a href="#outlook" class="nav-link block px-4 py-2.5 rounded-lg font-medium">전략과 제언</a>
+            </nav>
+            <div class="px-2 pt-8">
+                <a href="https://www.youtube.com/watch?v=xWYb7tImErI" target="_blank" class="block w-full text-center px-4 py-2.5 rounded-lg font-medium border border-red-800 text-red-800 hover:bg-red-800 hover:text-white transition-colors duration-300">
+                    원본 영상 보기
+                </a>
+                <a href="https://codepen.io/Kipeum-Lee/full/raOdzgP" target="_blank" class="block w-full text-center px-4 py-2.5 mt-2 rounded-lg font-medium border border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white transition-colors duration-300">
+                    English Version
+                </a>
+            </div>
+        </div>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-10 md:ml-64">
+            <section id="overview" class="content-section mb-16">
+                <h2 class="text-4xl font-bold mb-4 text-gray-900">AI 시대, 대체 불가능한 인간의 조건</h2>
+                <p class="text-lg leading-relaxed">카네기 멜론 대학교의 포 션 로 교수는 AI 시대에 인간이 대체 불가능한 존재가 되기 위한 핵심 역량을 제시합니다. 그는 AI가 아무리 뛰어나도 인간만이 가질 수 있는 <strong>'사려 깊음(thoughtfulness)'</strong>과 타인에게 가치를 창출하려는 진정한 동기가 중요하다고 강조합니다. 특히, 학교에서 AI를 활용한 숙제는 '달리기 훈련을 차를 타고 하는 것'과 같다고 비유하며, 스스로 생각하고 문제를 해결하는 자율적 사고 능력을 키워야 함을 역설합니다. 이 대시보드는 인간 고유의 가치를 발견하고 더 나은 세상을 만들기 위한 실질적인 통찰을 제공합니다.</p>
+            </section>
+
+            <section id="irreplaceability" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🤖 대체 불가능성: 창의성과 사려 깊음</h2>
+                <p class="mb-8 text-md leading-relaxed">AI가 인간 고유의 영역으로 여겨졌던 창의성마저 넘보는 시대입니다. 구글 AI가 국제 수학 올림피아드 문제의 2/3를 해결하는 등 AI의 능력은 이미 증명되었습니다. 그러나 이러한 시대 변화 속에서 인간 지능의 유일한 고유성은 타인을 위하는 '사려 깊음'과 자율적인 사고 능력에 있음을 포 션 로 교수는 강조합니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-bold mb-3 main-title-color">🤖 AI의 창의력</h3>
+                        <p class="text-base leading-relaxed flex-grow">AI는 이제 인간의 고유 영역으로 여겨졌던 창의성마저 발휘합니다. 구글 AI는 매우 독창적인 사고를 요구하는 국제 수학 올림피아드 문제 6개 중 4개를 해결하며 그 능력을 증명했습니다. 이는 AI의 창의력이 인간을 능가할 수 있는 가능성을 보여줍니다.</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-bold mb-3 main-title-color">❤️ 인간 고유성</h3>
+                        <p class="text-base leading-relaxed flex-grow">AI가 인간의 지능 대부분을 모방할 수 있게 되더라도, 인간에게는 최후의 고유성이 남습니다. 그것은 바로 타인을 생각하고 배려하는 '사려 깊음(Thoughtfulness)'입니다. 이는 기술로 복제할 수 없는 인간관계와 사회의 근간입니다.</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-bold mb-3 main-title-color">⚠️ AI 교육의 함정</h3>
+                        <p class="text-base leading-relaxed flex-grow">학생들이 숙제를 할 때 AI를 사용하는 것은 '달리기 훈련을 차를 타고 하는 것'과 같습니다. 결과물은 얻지만, 가장 중요한 '생각하는 훈련' 과정을 건너뛰게 됩니다. 이러한 AI 의존은 논리적 사고 능력 상실로 이어질 수 있습니다.</p>
+                    </div>
+                     <div class="kpi-card">
+                        <h3 class="text-xl font-bold mb-3 main-title-color">💡 핵심 역량</h3>
+                        <p class="text-base leading-relaxed flex-grow">AI 시대에 가장 중요한 역량은 스스로 생각하고, 이전에 겪어보지 못한 문제를 해결하는 '자율적 인간 사고'입니다. 이는 정해진 답을 찾는 능력이 아닌, 새로운 상황에 대처하고 가치를 만들어내는 근본적인 힘입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="philosophy" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🧠 핵심 철학: 경쟁에서 가치 창출로</h2>
+                <p class="mb-8 text-md leading-relaxed">AI가 기술적 우위를 점하는 시대에, 인간 성공의 열쇠는 경쟁에서의 승리가 아닌, 타인의 관점에서 세상을 이해하고 진정한 가치를 제공하는 능력에 있습니다. 우리의 타고난 '사려 깊음'은 기술이 복제할 수 없는 대체 불가능한 핵심 자산입니다.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">AI 시대의 역량 가치 변화</h3>
+                        <div class="chart-container"><canvas id="competencyChart"></canvas></div>
+                    </div>
+                    <div class="philosophy-card rounded-lg shadow-md flex flex-col justify-center p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center main-title-color">삶의 철학 전환</h3>
+                        <div class="flex items-center justify-around text-center">
+                            <div class="w-2/5">
+                                <div class="text-5xl mb-2">🏆</div>
+                                <h4 class="text-lg font-bold mb-2">From: 경쟁</h4>
+                                <p class="text-sm">"남보다 낫다는 것을 증명하는 것." 불만족으로 이어지기 쉬운 길.</p>
+                            </div>
+                            <div class="text-4xl main-title-color mx-4">→</div>
+                            <div class="w-2/5">
+                                <div class="text-5xl mb-2">❤️</div>
+                                <h4 class="text-lg font-bold mb-2">To: 가치 창출</h4>
+                                <p class="text-sm">"다른 사람들을 행복하게 만드는 것." 진정한 성공과 일치하는 성취감 있는 목표.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="education" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🎓 교육적 접근: Win-Win 커뮤니티 구축</h2>
+                <p class="mb-8 text-md leading-relaxed">자신의 교육 철학을 실현하기 위해, 로 교수는 사회적 기업 '온라인 라이브 프로그램'을 운영합니다. 이 프로그램은 단순한 지식 전달을 넘어, 모든 참여자가 함께 성장하고 서로 신뢰하는 '사려 깊은 인재' 커뮤니티를 구축하는 것을 목표로 합니다. 그는 미래의 불확실한 도전에 맞서기 위해서는 이러한 신뢰 기반의 팀이 필수적이라고 믿습니다.</p>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="p-4 rounded-lg">
+                            <div class="text-6xl mb-4">👨‍🏫</div>
+                            <h3 class="text-xl font-bold">고등학생 코치</h3>
+                            <p class="text-sm text-gray-600">수학에 재능이 있지만 소통, 자신감, 리더십 기술이 부족한 15-18세 학생들을 코치로 양성합니다.</p>
+                        </div>
+                        <div class="p-4 rounded-lg">
+                            <div class="text-6xl mb-4">🎭</div>
+                            <h3 class="text-xl font-bold">전문가 코칭</h3>
+                            <p class="text-sm text-gray-600">전문 코미디언과 배우가 고등학생들에게 카리스마 있는 말하기와 설득에 대해 실시간 코칭을 제공합니다.</p>
+                        </div>
+                        <div class="p-4 rounded-lg">
+                            <div class="text-6xl mb-4">🧑‍🎓</div>
+                            <h3 class="text-xl font-bold">중학생 멘티</h3>
+                            <p class="text-sm text-gray-600">비판적 사고를 배우기에 이상적인 나이인 10-13세 학생들이 고등학생 코치들로부터 즐겁게 문제 해결을 배웁니다.</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-6 rounded-lg text-center" style="background-color: #f5f0e1;">
+                        <h4 class="text-xl font-bold mb-2 main-title-color">'Live' 프로그램의 Win-Win 구조</h4>
+                        <p class="leading-relaxed">고등학생들은 리더십과 소통 능력을 개발하고, 중학생들은 즐겁게 비판적 사고를 배우며, 이 프로그램은 지속 가능한 교육 생태계를 만듭니다. 목표는 사람들을 연결하고 미래의 리더를 양성하는 커뮤니티를 구축하는 것입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="entrepreneurship" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🤝 사회적 기업가 정신: 지속 가능한 가치 창출</h2>
+                <p class="mb-8 text-md leading-relaxed">사회적 기업가는 다른 사람을 행복하게 하는 데서 기쁨을 찾지만, 실행 가능한 비즈니스 모델을 통해 지속 가능성을 보장합니다. 핵심은 사회 문제를 파악하고, 해결을 통해 가치를 창출하며, 모든 참여자에게 이익이 돌아가는 선순환 구조를 만드는 것입니다. 가장 큰 과제는 '해결할 가치가 있는 문제'를 해결책에 '기꺼이 비용을 지불할 사람들'과 연결하는 것입니다.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">사회적 기업가의 핵심 요소</h3>
+                        <div class="chart-container"><canvas id="entrepreneurshipChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">혁신 과정: 생성과 파괴</h3>
+                        <div class="flex flex-col space-y-4">
+                            <div>
+                                <h4 class="font-bold text-lg main-title-color">1. 아이디어 생성 💡</h4>
+                                <p class="mt-1 text-gray-700">끊임없이 "다른 방법은 없을까?"라고 질문하여 새롭고 독특한 해결책을 상상합니다. 로 교수는 현재의 교육 모델을 구상하는 데 8년이 걸렸다고 말합니다.</p>
+                            </div>
+                            <div class="border-t pt-4">
+                                <h4 class="font-bold text-lg main-title-color">2. 아이디어 파괴 💥</h4>
+                                <p class="mt-1 text-gray-700">생성된 아이디어의 결점을 찾습니다. "무엇이 잘못될 수 있을까?"를 끈질기게 물어 근본적인 결함이 있는 아이디어의 99%를 걸러냅니다.</p>
+                            </div>
+                            <div class="border-t pt-4">
+                                <h4 class="font-bold text-lg main-title-color">3. 아이디어 실행 🚀</h4>
+                                <p class="mt-1 text-gray-700">파괴 과정에서 살아남은 1%의 '다이아몬드' 같은 아이디어를 식별하고 추진합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="critical-thinking" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🤖 비판적 사고와 AI</h2>
+                <p class="mb-8 text-md leading-relaxed">AI 시대에는 정보의 편향성을 인식하고, 다양한 관점에 참여하며, 세상을 시뮬레이션하기 위한 비판적 사고 능력을 개발하는 것이 중요합니다. AI는 단순한 답안 생성기가 아니라, 맥락을 이해하고 판단력을 향상시키는 '시뮬레이션' 도구로 사용되어야 합니다. 독립적인 사고의 즐거움을 잃으면 복잡한 세상에서 조작에 취약해집니다.</p>
+                <div class="flex justify-center mb-6">
+                    <div class="bg-gray-200 p-1 rounded-full flex space-x-1">
+                        <button class="pill-button active px-4 py-2 rounded-full text-sm font-semibold" data-tech="risks">AI 활용의 위험성</button>
+                        <button class="pill-button px-4 py-2 rounded-full text-sm font-semibold" data-tech="strategies">대응 전략</button>
+                    </div>
+                </div>
+                <div id="tech-content-container">
+                    <div id="tech-risks" class="tech-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">사고력 저해</h3>
+                            <p>숙제에 AI를 사용하는 것은 '달리기 훈련을 차를 타고 하는 것'과 같아서 독립적인 사고를 위한 정신적 근육을 약화시킵니다.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">기만과 조작</h3>
+                            <p>비판적 사고가 없으면, 사실처럼 보이는 편향된 정보에 쉽게 속을 수 있습니다.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">관점의 획일화</h3>
+                            <p>소수의 AI 모델에 의존하는 것은 75억 개의 다양한 인간 관점을 소수로 줄이는 위험을 초래합니다.</p>
+                        </div>
+                    </div>
+                    <div id="tech-strategies" class="tech-content hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">세상 시뮬레이션</h3>
+                            <p>단순히 AI에게 답을 묻지 마세요. 관련 정보와 맥락을 요청하여 스스로 결론을 내리는 훈련을 하세요.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">다양한 관점 추구</h3>
+                            <p>로 교수는 CNN과 폭스 뉴스, X와 페이스북 등 다양한 출처의 뉴스를 의식적으로 소비하여 더 완전한 그림을 얻습니다.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">의도 파악하기</h3>
+                            <p>모든 정보에는 의도가 있다는 것을 인식하세요. "이것이 정말 전체 이야기인가?"라고 묻는 습관을 기르세요.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="outlook" class="content-section">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🔭 전략과 제언</h2>
+                <p class="mb-8 text-md leading-relaxed">AI 시대에 대체 불가능한 존재가 되기 위해서는 삶의 목적을 재설정하고, 끊임없이 생각하며, 아이디어를 검증해야 합니다. 다음은 로 교수가 제안하는 핵심 전략입니다.</p>
+                <div class="space-y-4">
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md cursor-pointer open">
+                        <h3 class="text-xl font-bold flex justify-between items-center"><span>삶의 목표 전환: 경쟁 → 가치 창출 🚀</span> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h3>
+                        <div class="outlook-content mt-4 text-gray-700">
+                            <p>'어떻게 다른 사람을 이길까?'라고 묻는 대신, '어떻게 다른 사람을 행복하게 할 수 있을까?'에 집중해야 합니다. 이는 내면의 성취감과 실질적인 성공으로 이어지는 지속 가능한 동기 부여 형태입니다.</p>
+                        </div>
+                    </div>
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md cursor-pointer open">
+                        <h3 class="text-xl font-bold flex justify-between items-center"><span>AI 활용: 정답지 → 시뮬레이터 🛡️</span> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h3>
+                        <div class="outlook-content mt-4 text-gray-700">
+                            <p>AI는 단순한 과제 완료 도구가 아니라, 세상의 복잡한 맥락을 이해하고 판단력을 연마하는 '개인용 시뮬레이터'로 사용되어야 합니다. 이를 통해 정보의 표면을 넘어 더 나은 결정을 내릴 수 있습니다.</p>
+                        </div>
+                    </div>
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md cursor-pointer open">
+                        <h3 class="text-xl font-bold flex justify-between items-center"><span>사고 습관: 수용 → 비판적 검증 🔮</span> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h3>
+                        <div class="outlook-content mt-4 text-gray-700">
+                            <p>새로운 아이디어를 생성한 후에는 즉시 그 결점을 찾아 파괴하려고 노력해야 합니다. 이 과정은 실패의 99%를 걸러내고 성공 가능성이 있는 1%를 찾는 데 도움이 됩니다. 혁신은 이러한 생성과 파괴의 순환을 통해 이루어집니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const chartColors = {
+        maroon: 'rgba(128, 0, 0, 0.6)',
+        maroonBorder: 'rgba(128, 0, 0, 1)',
+        gold: 'rgba(212, 175, 55, 0.7)',
+        goldBorder: 'rgba(212, 175, 55, 1)',
+        beige: 'rgba(222, 214, 194, 0.7)',
+        beigeBorder: 'rgba(205, 185, 150, 1)',
+        darkBlue: 'rgba(74, 68, 58, 0.6)',
+        darkBlueBorder: 'rgba(74, 68, 58, 1)',
+    };
+    
+    // Competency Chart
+    const competencyCtx = document.getElementById('competencyChart');
+    if(competencyCtx) {
+        new Chart(competencyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['단순 지식/기술', '비판적 사고', '공감/가치창출'],
+                datasets: [
+                    {
+                        label: '과거 중요도',
+                        data: [80, 60, 50],
+                        backgroundColor: chartColors.beige,
+                        borderColor: chartColors.beigeBorder,
+                        borderWidth: 1
+                    },
+                    {
+                        label: '미래 중요도',
+                        data: [40, 85, 100],
+                        backgroundColor: chartColors.maroon,
+                        borderColor: chartColors.maroonBorder,
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: value => value + '점'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: context => `${context.dataset.label}: ${context.parsed.y}점`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Entrepreneurship Chart
+    const entrepreneurshipCtx = document.getElementById('entrepreneurshipChart');
+    if(entrepreneurshipCtx){
+        new Chart(entrepreneurshipCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['타인을 향한 동기', '지속가능한 수익모델', '문제 해결 능력'],
+                datasets: [{
+                    data: [45, 35, 20],
+                    backgroundColor: [chartColors.maroon, chartColors.gold, chartColors.darkBlue],
+                    borderColor: '#fdf6e3',
+                    borderWidth: 4,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                         callbacks: {
+                            label: context => `${context.label}: ${context.parsed}%`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Tech Section Interactivity
+    const techButtons = document.querySelectorAll('.pill-button');
+    const techContents = document.querySelectorAll('.tech-content');
+
+    if (techButtons.length > 0 && techContents.length > 0) {
+        techButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                techButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const techToShow = button.dataset.tech;
+                
+                techContents.forEach(content => {
+                    if (content.id === `tech-${techToShow}`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+    
+    // Accordion handler
+    const outlookCards = document.querySelectorAll('.outlook-card');
+    if (outlookCards.length > 0) {
+        outlookCards.forEach(card => {
+            const header = card.querySelector('h3');
+            const content = card.querySelector('.outlook-content');
+            if(header && content) {
+                header.addEventListener('click', () => {
+                    content.classList.toggle('hidden');
+                    card.classList.toggle('open');
+                });
+            }
+        });
+    }
+    
+    // Smooth scrolling & active nav link
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.content-section');
+
+    function changeNav() {
+        let index = sections.length;
+        while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+        
+        navLinks.forEach((link) => link.classList.remove('active'));
+        if(index >= 0 && navLinks[index]) {
+            navLinks[index].classList.add('active');
+        }
+    }
+    
+    if (navLinks.length > 0 && sections.length > 0) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if(targetSection){
+                     window.scrollTo({
+                        top: targetSection.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+                 if(window.innerWidth < 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) sidebar.classList.add('-translate-x-full');
+                }
+            });
+        });
+
+        window.addEventListener('scroll', changeNav);
+        changeNav(); // Initial call
+    }
+    
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const sidebar = document.getElementById('sidebar');
+    if(mobileMenuButton && sidebar){
+        // Make sidebar visible by default on mobile
+        sidebar.classList.remove('-translate-x-full');
+
+        mobileMenuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    }
+
+    // Initialize UI state
+    function initializeUI() {
+        const firstPillButton = document.querySelector('.pill-button');
+        if (firstPillButton) {
+            firstPillButton.classList.add('active');
+        }
+        const techContents = document.querySelectorAll('.tech-content');
+        techContents.forEach((content, index) => {
+            if (index !== 0) {
+                content.classList.add('hidden');
+            } else {
+                 content.classList.remove('hidden');
+            }
+        });
+    }
+    
+    initializeUI();
+
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제5차 중동 전쟁 및 이란 사태 심층 분석 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #ffffff;
+            color: #1f2937;
+            scroll-behavior: smooth;
+        }
+        .chart-container { position: relative; margin: auto; height: 350px; width: 100%; }
+        .kpi-card {
+            background-color: white; border-radius: 0.75rem; padding: 1.5rem;
+            border: 1px solid #fee2e2;
+            box-shadow: 0 4px 6px -1px rgb(255 77 79 / 0.1), 0 2px 4px -2px rgb(255 77 79 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(255 77 79 / 0.15), 0 4px 6px -4px rgb(255 77 79 / 0.1); }
+        .nav-link { transition: all 0.3s ease; color: #4b5563; }
+        .nav-link.active, .nav-link:hover { background-color: #ff4d4f; color: white; }
+        .content-section { scroll-margin-top: 80px; }
+        .theme-text-primary { color: #ff4d4f; }
+        .timeline-container { position: relative; padding-left: 2rem; }
+        .timeline-container::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background-color: #fca5a5; }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
+        .timeline-dot { position: absolute; left: -2.1rem; top: 0.25rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: #ff4d4f; border: 3px solid white; box-shadow: 0 0 0 2px #fca5a5; }
+        .expert-quote { border-left: 4px solid #ff4d4f; background: linear-gradient(to right, #fef2f2, transparent); }
+        .insight-box { background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%); border: 1px solid #fecaca; border-radius: 0.75rem; padding: 1.5rem; }
+        .strategy-card { background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; transition: all 0.3s ease; }
+        .strategy-card:hover { border-color: #fca5a5; box-shadow: 0 8px 25px -5px rgba(255,77,79,0.1); }
+        .phase-card { position: relative; overflow: hidden; }
+        .phase-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .phase-1::before { background: #1e40af; }
+        .phase-2::before { background: #d97706; }
+        .phase-3::before { background: #dc2626; }
+        .risk-meter { height: 8px; border-radius: 4px; background: #e5e7eb; overflow: hidden; }
+        .risk-meter-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .scenario-card { border: 1px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden; transition: all 0.3s ease; }
+        .scenario-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -8px rgba(0,0,0,0.12); }
+        .geopolitics-table th { background: #1f2937; color: white; padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .geopolitics-table td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .geopolitics-table tr:hover td { background: #fef2f2; }
+        .cta-slide-link { background: linear-gradient(135deg, #1f2937 0%, #374151 100%); border: 1px solid #4b5563; transition: all 0.3s ease; }
+        .cta-slide-link:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.3); border-color: #ff4d4f; }
+        .section-bridge { background: #f9fafb; border-left: 3px solid #ff4d4f; padding: 1rem 1.25rem; margin-bottom: 2rem; border-radius: 0 0.5rem 0.5rem 0; }
+        .section-number { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: #ff4d4f; color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 800; margin-right: 0.5rem; flex-shrink: 0; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen flex">
+        
+        <!-- 모바일 상단 바 -->
+        <div class="md:hidden fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/95 backdrop-blur-sm z-50 border-b border-red-100 shadow-sm">
+            <h1 class="text-xl font-bold theme-text-primary">위기 분석 대시보드</h1>
+            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- 고정 사이드바 -->
+        <aside id="sidebar" class="bg-gray-50 border-r border-gray-200 text-gray-800 w-64 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 shadow-sm overflow-y-auto pt-20 md:pt-8 pb-8 px-4 flex flex-col h-screen">
+            <div class="mb-8 px-2">
+                <span class="text-xs font-bold text-red-500 tracking-wider uppercase">Strategic Report</span>
+                <h2 class="text-2xl font-bold text-gray-900 leading-tight mt-1">제5차 중동 전쟁<br>심층 역학 분석</h2>
+            </div>
+            <nav id="main-nav" class="flex flex-col space-y-1.5">
+                <a href="#overview" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">1</span>사태 개요</a>
+                <a href="#geopolitics" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">2</span>왜 터졌나: 지정학적 동인</a>
+                <a href="#history" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">3</span>전쟁 타임라인</a>
+                <a href="#experts" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">4</span>전문가 심층 분석</a>
+                <a href="#military" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">5</span>전장의 역학: 비대칭 전략</a>
+                <a href="#regime" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">6</span>왜 안 끝나나: 체제 내구성</a>
+                <a href="#economy" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">7</span>경제 충격파: 한국 리스크</a>
+                <a href="#scenarios" class="nav-link px-4 py-2.5 rounded-lg font-medium text-sm flex items-center"><span class="section-number">8</span>최종 시나리오 및 제언</a>
+            </nav>
+            <div class="mt-auto pt-8 px-2 text-xs text-gray-400">
+                <p>Source: Zakaria, 박현도, 성일광, 인남식</p>
+                <p>Date: March 2026</p>
+            </div>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="flex-1 min-w-0 md:ml-64 pt-20 md:pt-8 px-4 sm:px-8 lg:px-12 pb-24 bg-white">
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 1: 사태 개요 (WHAT HAPPENED) -->
+            <!-- ============================================================ -->
+            <section id="overview" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 1 — CRISIS OVERVIEW</div>
+                <h2 class="text-4xl md:text-5xl font-black mb-6 text-gray-900 tracking-tight">트럼프의 '정권 교체'와<br>이란 체제의 결사 항전</h2>
+                <p class="text-lg md:text-xl leading-relaxed text-gray-700 mb-6 max-w-4xl">
+                    2026년 2월 28일, 미국과 이스라엘의 대규모 공습 <strong>'에픽 퓨리(Operation Epic Fury)'</strong> 작전으로 최고 지도자 아야톨라 알리 하메네이가 사망하며 제5차 중동 전쟁이 새로운 국면을 맞았습니다.
+                    미 공군 전체 전력의 약 45%와 항모강습단 2개가 투입된 이 전례 없는 규모의 작전은 이란의 '전략적 중심'을 정밀 타격했습니다. 그러나 47년간 뿌리내린 신정 체제는 쉽게 무너지지 않고 있으며, 이란의 호르무즈 해협 봉쇄 선언과 글로벌 유가 폭등, 지상군 투입이라는 최악의 시나리오가 현실화될 위험이 고조되고 있습니다.
+                </p>
+
+                <!-- 분석 기반 소스 -->
+                <div class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p class="text-sm font-bold text-gray-600 mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        분석 기반 소스 레퍼런스
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://www.youtube.com/watch?v=JlOai763iOw" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Zakaria 인터뷰 (3/3)</a>
+                        <a href="https://www.youtube.com/watch?v=EpOyzzNuwVk" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> Zakaria CNN GPS (3/2)</a>
+                        <a href="https://www.youtube.com/watch?v=MneeAAldEJg" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> 언더스탠딩: 박현도 교수 (3/3)</a>
+                        <a href="https://www.youtube.com/watch?v=UrMpNu_81_A" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors"><span class="text-red-500 mr-1.5">▶</span> 보다: 박현도 & 성일광 (3/3)</a>
+                        <a href="https://www.facebook.com/share/p/175xV3r1s8/" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> 인남식 교수 (3/1)
+                        </a>
+                        <a href="https://www.facebook.com/share/p/1P7wkPXPP5/" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 text-xs font-semibold rounded-md border border-gray-200 shadow-sm transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> 인남식 교수 (3/2)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 비주얼 슬라이드 CTA -->
+                <div class="mb-10">
+                    <a href="https://drive.google.com/file/d/1BlvUs1O1PdAgWbNqr-VmLVRoorF1-_if/view?usp=drive_link" target="_blank" class="cta-slide-link block rounded-xl p-5 text-white no-underline">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Visual Briefing Slides</p>
+                                <h3 class="text-lg md:text-xl font-black text-white mb-0.5">📊 환상과 현실의 충돌: 제5차 중동전쟁의 이면과 글로벌 지정학 리스크</h3>
+                                <p class="text-sm text-gray-400">전체 프레젠테이션 슬라이드 (15페이지) — Google Drive에서 보기 →</p>
+                            </div>
+                            <svg class="w-8 h-8 text-gray-400 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- KPI -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="kpi-card border-t-4 border-t-red-500">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">영향권 인구</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">9,200만 명</p>
+                        <p class="text-xs text-gray-500 mt-2">이란 전체 인구. 정권 교체의 핵심 변수로 작용할 내부 저항 세력의 잠재 규모.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-gray-800">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">신정 체제 지속 기간</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">47년</p>
+                        <p class="text-xs text-gray-500 mt-2">혁명수비대와 관료제로 무장하여 단기 공습만으로는 붕괴되기 힘든 견고한 권력 구조.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-red-500">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">미군 사상자</p>
+                        <p class="text-3xl font-black text-gray-900 mt-2">발생 확인</p>
+                        <p class="text-xs text-gray-500 mt-2">펜타곤 공식 확인. 이란의 이라크 및 걸프 지역 내 미군 기지 보복 타격 결과.</p>
+                    </div>
+                    <div class="kpi-card border-t-4 border-t-gray-800">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wide">투입 전력 규모</p>
+                        <p class="text-xl font-black text-gray-900 mt-2">미 공군 45% + 항모 2개</p>
+                        <p class="text-xs text-gray-500 mt-2">전례 없는 규모의 전력 투사. 나탄즈·포르도·이스파한 핵시설 및 미사일 기지 완파.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 2: 왜 터졌나 — 지정학적 동인 (WHY) -->
+            <!-- ============================================================ -->
+            <section id="geopolitics" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 2 — GEOPOLITICAL DRIVERS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">왜 터졌나: 40년 구원(舊怨)과<br>이익의 충돌</h2>
+                <p class="text-gray-600 mb-8 max-w-3xl">이번 사태는 단순한 종교적·종파적 갈등이 아닙니다. 1979년 이란 혁명 이후 40년 넘게 이어진 구조적 적대와, 이란의 약화된 틈을 타 중동 권력 구도를 재편하려는 철저한 '이익의 충돌'입니다.</p>
+
+                <!-- 동상이몽 테이블 -->
+                <div class="mb-10">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">동상이몽(同床異夢): 공격 주체들의 숨은 계산</h3>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                        <table class="geopolitics-table w-full">
+                            <thead><tr><th class="rounded-tl-xl">국가 / 지도자</th><th>핵심 목표</th><th class="rounded-tr-xl">행동 배경 (So What?)</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇺🇸 미국 (트럼프)</td>
+                                    <td><strong>정권 교체</strong> 및 '힘을 통한 평화' 입증</td>
+                                    <td>'거래가 곧 승리'라는 운명론적 성취. 중간선거 지지층 결집, 오바마를 넘어서는 외교적 성과. 의회 패싱을 감수한 독단적 결정.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇮🇱 이스라엘 (네타냐후)</td>
+                                    <td><strong>이란 미사일 완전 제거</strong> 및 실존적 위협 해소</td>
+                                    <td>"40년 된 꿈의 실현"이라 표현. 이란 정권 자체를 지도상에서 지우려는 이념적 전쟁. 가자 전쟁의 정치적 피로도 탈출.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-gray-900">🇸🇦 사우디 (MBS)</td>
+                                    <td><strong>이란 위협 근본적 제거</strong> 및 경제 발전 보호</td>
+                                    <td><strong class="text-red-600">이번 공격의 가장 주도적 동력.</strong> 네옴(NEOM) 및 비전 2030의 성공을 위해 이란이라는 안보 불안 요소를 이번 기회에 정리. 트럼프를 강력히 설득하여 공격을 이끌어냄.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 이란의 전략적 오판 -->
+                <div class="insight-box mb-10">
+                    <h4 class="font-bold text-gray-900 mb-3">🔴 이란의 치명적 전략적 오판: 걸프 국가 지지 오판</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed mb-4">이란은 사우디 등 걸프국들이 중립을 지킬 것이라 믿었으나, 반복된 도발에 피로감을 느낀 MBS는 오히려 트럼프를 설득하여 공격을 주도했습니다. GCC 국가들에서는 <strong>"협력하지 않으면 메뉴판에 오르게 된다(If we don't cooperate, we end up on the menu)"</strong>는 위기감이 팽배해졌고, 이란의 아람코·LNG 시설 타격은 오히려 걸프국들을 미국·이스라엘과 묶어주는 '전술적 연대'를 강화시키는 부메랑이 되었습니다.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">방공망 소모비</p>
+                            <p class="text-xl font-black text-red-600">3:1</p>
+                            <p class="text-xs text-gray-500">공격 1발당 요격 3발</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">대이란 연대 규모</p>
+                            <p class="text-xl font-black text-red-600">9개국</p>
+                            <p class="text-xs text-gray-500">오만·카타르 포함</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">바레인 시아파</p>
+                            <p class="text-xl font-black text-amber-600">75-80%</p>
+                            <p class="text-xs text-gray-500">내부 종파 리스크</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center border border-red-100">
+                            <p class="text-xs text-gray-500 mb-1">쿠웨이트 시아파</p>
+                            <p class="text-xl font-black text-amber-600">~50%</p>
+                            <p class="text-xs text-gray-500">내부 불안정 변수</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 러시아 vs 중국 -->
+                <h3 class="text-lg font-bold text-gray-900 mb-4">강대국의 셈법: 혼돈을 즐기는 자 vs 안정을 원하는 자</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="strategy-card border-l-4 border-l-amber-500">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">🇷🇺</span>
+                            <div><h4 class="font-bold text-gray-900">러시아: 불안정의 수혜자</h4><p class="text-xs text-amber-600 font-semibold">원자재 슈퍼파워 — 혼돈을 원한다</p></div>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-3">에너지 수출국인 러시아에 중동 전쟁으로 인한 고유가는 경제적 보너스입니다. 미국과 서방이 중동에 발이 묶일수록 <strong>우크라이나 전선에서의 운신 폭</strong>은 넓어집니다.</p>
+                        <div class="risk-meter"><div class="risk-meter-fill bg-amber-500" style="width: 85%;"></div></div>
+                        <p class="text-xs text-gray-400 mt-1">혼돈 이익 지수: 85/100</p>
+                    </div>
+                    <div class="strategy-card border-l-4 border-l-blue-500">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">🇨🇳</span>
+                            <div><h4 class="font-bold text-gray-900">중국: 이중 게임의 달인</h4><p class="text-xs text-blue-600 font-semibold">무역 슈퍼파워 — 안정을 원하지만...</p></div>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-3">'세계의 공장'인 중국은 호르무즈 해협의 안전이 생존과 직결됩니다. 그러나 이면에서는 이란에 <strong>'베이더우(Beidou)' 위성 항법 시스템</strong>을 제공하는 등 서구 질서를 견제하는 '불안정의 축' 역할을 병행합니다.</p>
+                        <div class="risk-meter"><div class="risk-meter-fill bg-blue-500" style="width: 65%;"></div></div>
+                        <p class="text-xs text-gray-400 mt-1">이중 게임 위험도: 65/100</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 3: 전쟁 타임라인 (WHEN) -->
+            <!-- ============================================================ -->
+            <section id="history" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 3 — TIMELINE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">전쟁 타임라인: 프록시 붕괴에서<br>전면전까지</h2>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 이러한 지정학적 이해관계가 실제 군사 행동으로 전환된 과정을 3개 페이즈로 추적합니다. 위기는 점진적으로 고조되어 폭발했습니다.</p>
+                </div>
+
+                <!-- Phase 1 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md">P1</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">이란 '불의 고리(프록시)' 붕괴</h3>
+                            <p class="text-sm text-amber-600 font-semibold">2023 ~ 2024</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-amber-400 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">2023년 10월</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">하마스의 기습 공격과 가자 전쟁 발발</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">중동 패권 전쟁의 서막. 이란이 40년간 구축한 '저항의 축(Axis of Resistance)' 프록시 네트워크가 실전에 돌입하며 이스라엘과의 그림자 전쟁이 본격화.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">2024년 4월</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">이란-이스라엘 사상 첫 영토 직접 타격</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">수십 년간 유지되어 온 '그림자 전쟁'의 종식. 양국이 상대방 영토를 직접 타격하는 금기가 파괴되며, 전면 충돌의 문턱이 결정적으로 낮아짐.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-400 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-amber-700">2024년 하반기</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">헤즈볼라 리더십 궤멸 및 시리아 아사드 정권 붕괴</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">이스라엘의 집중 작전으로 이란의 역내 핵심 프록시인 헤즈볼라의 지도부가 무력화. 동시에 시리아의 아사드 정권이 붕괴하면서 이란의 레바논·시리아를 잇는 육상 보급로가 완전히 차단됨. 이란의 '불의 고리' 전략이 사실상 와해.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md">P2</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">레드라인 교차와 핵 위기</h3>
+                            <p class="text-sm text-orange-600 font-semibold">2025 ~ 2026년 2월</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-orange-500 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-orange-500 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-orange-700">2025년 6월 — 제1차 타격: 12일 전쟁</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">이란 핵심 핵 시설 집중 폭격</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">트럼프 대통령의 지원 아래 이스라엘이 공격을 개시. 미군 B-2 폭격기가 투입되어 나탄즈(Natanz), 포르도(Fordow), 이스파한(Isfahan) 세 곳의 핵 시설을 집중 폭격. 이란 핵 프로그램의 물리적 기반을 파괴하며 2차 전쟁의 발발은 예견된 수순이 됨.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-orange-500 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-orange-700">2026년 2월 초 — 협상 결렬</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">제네바 핵 합의 최종 결렬</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">외교적 해결의 마지막 창구였던 제네바 핵 합의가 최종 결렬. 미-이 연합군의 본격적 군사 작전을 위한 정치적 명분이 확보되고, 외교적 브레이크가 완전히 파손됨.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-sm mr-3 flex-shrink-0 shadow-md animate-pulse">P3</div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900">레짐 체인지와 전면전</h3>
+                            <p class="text-sm text-red-600 font-semibold">2026년 2월 28일 ~ 현재</p>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-red-600 pl-6 ml-5 space-y-5">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-red-600 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow"></span>
+                                <span class="text-sm font-bold text-red-700">2026년 2월 28일 — 에픽 퓨리 작전</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">미-이 연합군의 대규모 기습 타격</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">비엔나 외교 협상을 기만 전술로 활용하며 기습 달성. 미 공군 전체 전력의 약 45%와 항모강습단 2개를 투입하여 이란 전역의 군사·미사일·지휘부 인프라 수백 곳을 정밀 타격. 최고 지도자 하메네이 및 IRGC 핵심 지휘부 다수 제거. 트럼프는 '정권 교체(Regime Change)'를 공식 목표로 선언.</p>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-red-600 mr-3 flex-shrink-0 -ml-8 border-2 border-white shadow animate-pulse"></span>
+                                <span class="text-sm font-bold text-red-700">2026년 3월 초 — 현재 진행 중</span>
+                            </div>
+                            <h4 class="font-bold text-red-700 mb-1">이란의 즉각 반격 및 전면전 비화</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">이란이 분권화된 매뉴얼에 따라 2시간 내 즉각 반격 개시. 호르무즈 해협 봉쇄를 선언하고, 걸프만 9개국 내 미군 기지 및 주요 에너지 시설(아람코, 카타르 LNG 등)에 탄도 미사일·드론 전방위 공격. 이스라엘 본토 관공서 타격 및 네타냐후 암살 시도. 헤즈볼라 잔존 세력 참전으로 다면전 비화.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 4: 전문가 심층 분석 (WHO SAYS WHAT) -->
+            <!-- ============================================================ -->
+            <section id="experts" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 4 — EXPERT INSIGHTS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">전문가들은 이 전쟁을<br>어떻게 보는가</h2>
+                
+                <div class="section-bridge mb-8">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 타임라인의 각 단계에서 드러난 전략적 함의를 세 명의 전문가가 각기 다른 관점에서 해부합니다.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">FZ</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">파리드 자카리아</h3><p class="text-xs text-gray-500">외교/정치 평론가, CNN</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "86세 폭군의 죽음은 9,200만 이란인에게 해방일 수 있으나, 미국의 '정권 교체' 전략은 매우 순진한 발상입니다. 총으로 무장하고 47년간 권력을 장악한 억압적 독재 정권은 하루아침에 무너지지 않습니다. 무인 AI 정밀 타격은 새로운 전쟁의 표준이 되었으며, 다음 타겟은 호르무즈 해협을 위협하는 이란의 해군력(잠수함, 소형 함정)과 중간 간부급 혁명수비대가 될 것입니다."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#정권교체의환상</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#AI정밀타격</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">PH</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">박현도 교수</h3><p class="text-xs text-gray-500">서강대 유로메나연구소</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "이 전쟁은 금방 끝나지 않습니다. 트럼프 대통령은 '정권 교체'라는 훈장을 원하지만, 가장 오래 걸리고 최악의 선택인 '지상군 투입' 없이는 이란 정부를 마비시킬 수 없습니다. 미군은 사상자를 냈지만 얻은 것은 없고, 주변 중동 국가들이나 러시아, 중국은 중재에 나설 의지도 능력도 없습니다. 출구 전략 없는 고착 상태가 가장 큰 위험입니다."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#지상군투입리스크</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#중재자부재</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col justify-between hover:border-red-300 transition-colors">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">SI</div>
+                                <div><h3 class="font-bold text-gray-900 text-lg">성일광 교수</h3><p class="text-xs text-gray-500">서강대 유로메나연구소</p></div>
+                            </div>
+                            <blockquote class="expert-quote p-4 text-sm text-gray-700 leading-relaxed mb-4 font-medium">
+                                "작년(2025년) 6월 B-2 폭격기를 동원한 이스라엘·미국의 이란 핵시설(나탄즈, 포르도 등) 12일 공습이 서막이었습니다. 가장 주목해야 할 변곡점은 이란의 보복 타겟입니다. 이란(알리 라리자니)은 '심장을 뚫겠다'며 이스라엘 관공서를 타격했고 네타냐후의 목숨을 직접적으로 노리고 있습니다. 네타냐후에 대한 공격 성공 여부가 확전과 종전의 거대한 변곡점이 될 것입니다."
+                            </blockquote>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#네타냐후타겟</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#보복의악순환</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 5: 전장의 역학 — 비대칭 전략 (HOW THEY FIGHT) -->
+            <!-- ============================================================ -->
+            <section id="military" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 5 — MILITARY DYNAMICS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">전장의 역학: 양측은<br>어떻게 싸우고 있는가</h2>
+                <p class="text-gray-600 mb-4 max-w-3xl">현대전은 기술력의 우위만으로 결정되지 않습니다. 이란은 '역량(Capability) 대 용량(Capacity)'의 싸움을 걸며, 상대의 경제적 한계를 공격하는 비대칭 전략을 구사하고 있습니다.</p>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 전문가들이 지적한 '장기전 불가피론'의 군사적 근거를 양측 전략 비교를 통해 구체적으로 분석합니다.</p>
+                </div>
+
+                <!-- 미·이 연합 전략 -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-black text-gray-900 mb-5 flex items-center">
+                        <span class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm mr-3">US</span>
+                        미국·이스라엘 연합: 무인 AI 정밀 참수 작전
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">🎯 최고 지휘부 타격 (참수작전)</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">하메네이 등 시니어 리더십 궤멸. 드론 및 AI 정밀 타격 기술이 모든 군사 활동 레벨에 적용되는 현대전의 새로운 표준. 하메네이의 위치를 정밀 추적한 이스라엘의 인텔리전스 능력은 GCC 국가들에 '실전적 신뢰'를 제공.</p>
+                        </div>
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">🚢 다음 타겟: 해군력 무력화</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">호르무즈 해협 봉쇄를 저지하기 위해 기뢰 부설함, 소형 함정, 디젤 잠수함 등 이란 해상 전력 선제 타격 예정. 에너지 공급망 안보의 핵심 분수령이 될 해상 캠페인.</p>
+                        </div>
+                        <div class="strategy-card">
+                            <h4 class="font-bold text-gray-900 mb-2">👤 중간 간부 제거</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">내부 반란/시위대와 협력할 수 있는 환경을 조성하기 위해 혁명수비대 중간 계층 지휘관 집중 제거. 그러나 분권화된 IRGC 매뉴얼에 따라 각 단위가 독립 작동하므로 실효성에는 한계.</p>
+                        </div>
+                        <div class="strategy-card border-red-200 bg-red-50/30">
+                            <h4 class="font-bold text-red-700 mb-2">⚠️ 핵심 딜레마: 역사적 맹점</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong>역사상 공습만으로 정권이 전복된 사례는 전무합니다.</strong> 아프가니스탄(2001), 이라크(2003), 리비아(2011) 모두 지상군 개입이 있었습니다. 트럼프의 4~6주 단기전 희망은 역사적 선례와 철저히 모순됩니다.</p>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <p class="text-blue-800 font-bold mb-3 text-center">미·이 연합군의 타겟 우선순위 추정</p>
+                        <div class="chart-container" style="height: 280px;"><canvas id="usTargetChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- 이란의 3단계 반격 전략 -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-black text-gray-900 mb-5 flex items-center">
+                        <span class="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm mr-3">IR</span>
+                        이란의 3단계 비대칭 반격 매뉴얼: Blind → Drain → Overwhelm
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="phase-card phase-1 strategy-card pl-8">
+                            <div class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Phase 1</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">눈 가리기 (Blind)</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">상대의 조기 경보 시스템을 무력화. 카타르 우데이드 공군기지 CAOC의 레이더망을 주 타깃으로, 저렴한 벌떼 드론을 투입해 레이더를 교란하거나 직접 타격. 이후 미사일 공격에 대한 대응 시간을 박탈합니다.</p>
+                        </div>
+                        <div class="phase-card phase-2 strategy-card pl-8">
+                            <div class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Phase 2</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">자원 소진 (Drain)</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">대당 <strong>$20,000</strong>(약 2,600만원)의 '샤헤드(순교자)' 드론과 구형 미사일을 대량 살포. 적은 이를 막기 위해 발당 <strong>$1,000,000+</strong>(약 13억원)의 요격 미사일을 소모. <strong>50배 이상의 비용 격차</strong>로 적의 '지갑'을 공격합니다.</p>
+                        </div>
+                        <div class="phase-card phase-3 strategy-card pl-8">
+                            <div class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Phase 3</div>
+                            <h4 class="font-black text-gray-900 text-lg mb-2">압도 (Overwhelm)</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed">방공 미사일이 소진되고 지휘 체계가 교란된 틈을 타, 아껴두었던 <strong>'파타(Fattah)' 극초음속 미사일</strong> 등 고성능 정밀 무기로 핵심 목표물을 포화 공격(Saturation Attack). 잔존 탄도 미사일 <strong>1,000발 이상</strong>이 이 단계를 위해 대기 중.</p>
+                        </div>
+                    </div>
+
+                    <!-- 전쟁 경제학 -->
+                    <div class="insight-box mb-8">
+                        <h4 class="font-bold text-gray-900 mb-3">💡 전쟁 경제학: Capability vs. Capacity의 구조적 비대칭</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-700 leading-relaxed mb-3">미국·이스라엘은 바늘구멍을 뚫는 '정밀 타격 능력(Capability)'이 뛰어나지만, 이란은 '물량(Capacity)'으로 승부합니다. 이란의 드론 이름 '샤헤드'는 '순교자'를 의미하며, 1개 발사대 구축에 12명이 사망해도 불사하는 '순교의 문화'가 전력의 핵심 동력으로 작용합니다.</p>
+                                <p class="text-sm text-gray-700 leading-relaxed">또한 이란은 미국산 GPS 대신 <strong>중국의 '베이더우(Beidou)' 위성 항법 시스템</strong>을 활용해 미사일 정밀도를 높이고 있어, 비대칭 전력의 실질적 위협이 더욱 증대되고 있습니다.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-red-100">
+                                <p class="text-red-800 font-bold mb-3 text-center text-sm">공격-방어 비용 비대칭 구조</p>
+                                <div class="chart-container" style="height: 220px;"><canvas id="costAsymmetryChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-5 rounded-xl border border-red-100">
+                        <p class="text-red-800 font-bold mb-3 text-center">이란의 보복 자산 구성 및 잔존 전력 추정</p>
+                        <div class="chart-container" style="height: 280px;"><canvas id="iranAssetChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 6: 왜 안 끝나나 — 체제 내구성 (WHY IT WON'T END) -->
+            <!-- ============================================================ -->
+            <section id="regime" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 6 — REGIME RESILIENCE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">왜 안 끝나나: 이란 체제의<br>제도적 내구성</h2>
+                <p class="text-gray-600 mb-4 max-w-3xl">"지도자만 제거하면 끝난다"는 낙관론이 위험한 오판인 이유. 이란은 사담 후세인의 이라크나 카다피의 리비아와 달리, '사람'이 아닌 '제도'로 버티는 국가입니다.</p>
+
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 양측의 군사 전략을 이해한 바탕 위에서, 미·이 연합의 참수 작전이 왜 체제 붕괴로 이어지지 않는지 그 구조적 이유를 분석합니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                    <div class="strategy-card">
+                        <h4 class="font-bold text-gray-900 mb-3 text-lg">🔗 소련식 하이브리드 복합체 구조</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">이란 정권은 과거 소련의 공산당(종교계)과 군부(혁명수비대)의 관계와 유사한 고도의 제도화된 하이브리드 복합체입니다. 이념적 정당성을 부여하는 88명의 성직자 기구인 <strong>'전문가 의회(Assembly of Experts)'</strong>는 최고 지도자 유고 시 감정에 휘둘리지 않고 즉각적인 승계 프로세스를 가동하도록 설계되어 있습니다.</p>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">헌법 제111조 승계 시스템</p>
+                            <p class="text-sm text-gray-700">최고 지도자 사망 시 → 사법부 수장, 국회의장, 헌법수호위원회로 구성된 임시 지도부가 즉시 가동 → 합법적이고 구조적인 권력 승계 진행. <strong class="text-red-600">현재 이 시스템이 실제로 작동 중</strong>이라는 점이 체제의 건재함을 입증합니다.</p>
+                        </div>
+                    </div>
+
+                    <div class="strategy-card">
+                        <h4 class="font-bold text-gray-900 mb-3 text-lg">⚙️ IRGC의 분권화된 저항 메커니즘</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">혁명수비대는 '머리'가 잘려도 '몸통'이 멈추지 않도록 설계되었습니다. 사전 구축된 매뉴얼에 따라 각 지역 단위 부대가 독립적으로 반격할 수 있는 분권화 시스템을 갖추고 있습니다.</p>
+                        <div class="space-y-3">
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">①</span>
+                                <div><p class="text-sm font-bold text-gray-900">희생을 감수한 결기</p><p class="text-xs text-gray-600">1개 발사대 구축에 12명 사망을 치르면서도 즉각적 미사일 발사 강행</p></div>
+                            </div>
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">②</span>
+                                <div><p class="text-sm font-bold text-gray-900">매뉴얼화된 지휘 체계</p><p class="text-xs text-gray-600">사령관 참수에도 불구, 사전 구축된 매뉴얼에 따라 2시간 내 즉각 반격 전개</p></div>
+                            </div>
+                            <div class="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <span class="text-red-500 font-bold text-lg mt-0.5">③</span>
+                                <div><p class="text-sm font-bold text-gray-900">지하화된 비대칭 자산</p><p class="text-xs text-gray-600">산악 지대 깊숙이 건설된 방대한 탄도미사일 기지 네트워크. 공습만으로는 완전 파괴 불가.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 부수적 피해와 정당성 -->
+                <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg">
+                    <h4 class="font-bold text-red-400 mb-3 text-lg">🚨 정당성 상실의 위험: 부수적 피해(Collateral Damage)와 여론</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">군사적 속도전이 도덕적 명분 상실과 결합될 때, 단기 승리의 희망은 치명적인 정치적 부메랑으로 돌아옵니다.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-red-400 font-bold text-sm mb-1">부수적 피해 발생</p>
+                            <p class="text-xs text-gray-400">반다르압바스(미납) 여학교 폭격으로 약 80명의 어린이 희생 추정. 이란 내 체제 결집 촉발.</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-amber-400 font-bold text-sm mb-1">국제적 고립 심화</p>
+                            <p class="text-xs text-gray-400">UN 비준 부재 및 글로벌 사우스의 비판. 인도의 실용주의적(Realpolitik) 침묵 유지.</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-yellow-400 font-bold text-sm mb-1">미국 내 정치적 리스크</p>
+                            <p class="text-xs text-gray-400">의회 패싱에 대한 반발 및 11월 선거 앞 '끝없는 전쟁(Forever War)' 프레임 고립 위험.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 7: 경제 충격파 (SO WHAT — IMPACT) -->
+            <!-- ============================================================ -->
+            <section id="economy" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 7 — ECONOMIC SHOCKWAVE</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">경제 충격파: 호르무즈 봉쇄와<br>한국의 아킬레스건</h2>
+                <p class="text-lg leading-relaxed text-gray-700 mb-4 max-w-4xl">
+                    한국이 사용하는 에너지의 <strong>70% 이상이 중동에서 오며, 그중 99%가 호르무즈 해협을 통과</strong>합니다. 한국의 석유 의존도는 일본의 2배, 독일의 4배에 달하는 절대적 취약국입니다.
+                </p>
+
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 이란 체제가 쉽게 무너지지 않는다는 것은 곧 이 전쟁이 장기화된다는 의미이며, 장기전은 호르무즈 해협 봉쇄의 고착화로 직결됩니다. 그 경제적 파급력을 분석합니다.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg md:col-span-1 flex flex-col justify-center">
+                        <h3 class="text-xl font-bold text-red-400 mb-4">경제 타격 도미노</h3>
+                        <ol class="space-y-4 text-sm text-gray-300">
+                            <li><strong class="text-white">1단계:</strong> 호르무즈 상선 운항 중단 선언</li>
+                            <li><strong class="text-white">2단계:</strong> 글로벌 유가 수직 상승 및 에너지망 혼란</li>
+                            <li><strong class="text-white">3단계:</strong> 해운/항공 물류 마비 및 운임 폭등</li>
+                            <li><strong class="text-white">4단계:</strong> 에너지 수입국(한국 등) 무역 적자 및 인플레이션 직격탄</li>
+                        </ol>
+                    </div>
+                    <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm md:col-span-2">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">글로벌 에너지 위기 체감도 추정</h3>
+                        <div class="chart-container"><canvas id="economyChart"></canvas></div>
+                        <p class="text-xs text-gray-400 text-center mt-2">* 전문가 분석 기반 가상의 충격 지수 시각화</p>
+                    </div>
+                </div>
+
+                <!-- 한국 특수 취약성 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="strategy-card border-t-4 border-t-red-500">
+                        <h4 class="font-bold text-gray-900 mb-3">🇰🇷 한국의 구조적 에너지 취약성</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">중동 원유 의존도</span><span class="font-bold text-red-600">70%</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-500" style="width: 70%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">호르무즈 해협 통과 비율</span><span class="font-bold text-red-600">99%</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-600" style="width: 99%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">석유 비축량</span><span class="font-bold text-amber-600">약 210일분</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-amber-500" style="width: 58%;"></div></div>
+                            <div class="flex justify-between items-center"><span class="text-sm text-gray-600">GDP 대비 석유 의존도 (vs 일본)</span><span class="font-bold text-red-600">2배</span></div>
+                            <div class="risk-meter"><div class="risk-meter-fill bg-red-400" style="width: 80%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="strategy-card border-t-4 border-t-gray-800">
+                        <h4 class="font-bold text-gray-900 mb-3">🌐 호르무즈 해협 의존도 글로벌 랭킹</h4>
+                        <div class="chart-container" style="height: 280px;"><canvas id="hormuzDependencyChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- 이란의 비대칭 공격 대상 -->
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                    <table class="geopolitics-table w-full">
+                        <thead><tr><th class="rounded-tl-xl">공격 대상</th><th>전략적 목적</th><th class="rounded-tr-xl">예상 영향 및 특징</th></tr></thead>
+                        <tbody>
+                            <tr><td class="font-bold">사우디 아람코 / 카타르 LNG</td><td>국제 유가 및 에너지 시장 마비</td><td>글로벌 인플레이션 유발, 주변국 중립화 포기 압박</td></tr>
+                            <tr><td class="font-bold">호르무즈 해협</td><td>글로벌 공급망 차단</td><td>한국 석유 수급의 99% 차단 리스크 (봉쇄 선언 상태)</td></tr>
+                            <tr><td class="font-bold">바레인 / 쿠웨이트</td><td>내부 종파 갈등 유발</td><td>시아파 다수 지역에 '순교 서사'를 유포하여 군주제 안정성 위협</td></tr>
+                            <tr><td class="font-bold">오만 (Oman)</td><td>예상을 깬 '잽(Jab)' 공격</td><td>전통적 중재자까지 타격하여 퇴로 없는 전면전 의지 표명</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ============================================================ -->
+            <!-- SECTION 8: 최종 시나리오 및 제언 (WHAT'S NEXT) -->
+            <!-- ============================================================ -->
+            <section id="scenarios" class="content-section mb-20">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-700 font-bold text-sm rounded-full mb-4">SECTION 8 — SCENARIOS & RECOMMENDATIONS</div>
+                <h2 class="text-3xl md:text-4xl font-black mb-3 text-gray-900 tracking-tight">최종 시나리오 평가 및<br>전략적 제언</h2>
+                <p class="mb-4 text-md leading-relaxed text-gray-700 max-w-3xl">전쟁이 장기화의 늪으로 빠지는 가운데, 단기 종결에 대한 낙관적 편향(Optimism Bias)을 경계하고 각 시나리오의 실현 가능성을 냉정하게 평가합니다.</p>
+                
+                <div class="section-bridge">
+                    <p class="text-sm text-gray-700"><strong>맥락:</strong> 지정학적 동인(§2), 군사적 교착(§5), 체제 내구성(§6), 경제적 파급(§7)을 종합하여 가능한 미래 경로를 도출합니다.</p>
+                </div>
+
+                <!-- 시나리오 카드 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- A -->
+                    <div class="scenario-card">
+                        <div class="bg-gray-100 p-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">시나리오 A</span>
+                                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">실현 가능성 &lt; 5%</span>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-lg">외교적 타결 / 민주화</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-4">이란이 서구와 협력하는 정상 국가로 변모하거나, 오만·EU 등 제3국 중재로 협상이 성사되는 시나리오. 그러나 트럼프의 요구(완전한 항복)와 이란의 생존 본능 간의 간극은 좁혀질 수 없으며, 도시 자유주의자와 농촌 보수주의자 간의 깊은 분열로 단기 실현은 '파이프 드림'에 가깝습니다.</p>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-xs font-bold text-red-600">⚠️ 낙관적 편향(Optimism Bias) 주의</p>
+                                <p class="text-xs text-red-700">기업 전략 수립 시 이 시나리오에 베팅하지 마십시오.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B (가장 유력) -->
+                    <div class="scenario-card border-2 border-red-300">
+                        <div class="bg-red-500 text-white text-center py-1.5 text-sm font-black tracking-wide">🔥 가장 유력한 시나리오</div>
+                        <div class="bg-red-50 p-4 border-b border-red-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">시나리오 B</span>
+                                <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-full">실현 가능성: 높음</span>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-lg">소모적 장기전 / 실용주의 군부 독재</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3"><strong>단기(1~3개월):</strong> 출구 전략(Off-ramp) 부재로 공습 장기화. 이란의 분권화된 IRGC가 지속적 반격.</p>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3"><strong>중장기(6개월~1년+):</strong> 이란의 국가적 내성 발동. 트럼프 체면 유지를 위한 지상군 투입 강요 리스크 증가. 신정 체제는 껍데기만 남고, IRGC 중심의 실용적 군사 독재가 등장하여 '관리된 긴장'을 선택할 가능성.</p>
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong>경제적 영향:</strong> 호르무즈 물류 마비 → 에너지 가격 슈퍼 스파이크(Super-spike) 장기화 → 1970년대식 에너지 위기 환경.</p>
+                        </div>
+                    </div>
+
+                    <!-- C -->
+                    <div class="scenario-card">
+                        <div class="bg-gray-800 text-white p-4 border-b border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">시나리오 C</span>
+                                <span class="px-2 py-0.5 bg-gray-600 text-gray-200 text-xs font-bold rounded-full">최악의 리스크</span>
+                            </div>
+                            <h4 class="font-black text-white text-lg">발칸화(Balkanization) 및 내전</h4>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-gray-700 leading-relaxed mb-4">중앙 통제력이 완전히 상실되면서 쿠르드, 발로치, 아제리 등 소수 민족의 분리 독립 움직임이 분출. 이란을 '제2의 시리아'로 만들며 대규모 난민과 역내 통제 불가능한 혼돈을 초래하는 지정학적 재앙 시나리오입니다.</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">주변국에도 통제 불가능한 난민 위기와 내전을 확산시키며, 러시아가 이 혼돈을 에너지 가격 부양의 도구로 악용할 여지를 줍니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 변곡점 -->
+                <h3 class="text-xl font-bold text-gray-900 mb-6">⚡ 핵심 변곡점 (Game Changers)</h3>
+                <div class="space-y-4 mb-12">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-1">
+                            <span class="font-bold text-lg text-gray-900">변곡점 1: 네타냐후 총리의 생존 여부 🔥</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-1" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            이란이 하메네이 폭사에 대한 보복으로 이스라엘 관공서를 집중 타격하며 네타냐후 총리 암살을 1순위로 노리고 있습니다. 알리 라리자니는 '심장을 뚫겠다'고 선언했으며, 만약 이 공격이 성공한다면 전쟁의 확전 규모와 방향을 완전히 뒤엎는 <strong>가장 거대한 지정학적 변곡점</strong>이 될 것입니다.
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-2">
+                            <span class="font-bold text-lg text-gray-900">변곡점 2: 중재자의 등장과 '우아한 퇴장' 경로 🕊️</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-2" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            러시아·중국은 개입을 꺼리고 주변국도 보복이 두려워 나서지 못하고 있습니다. 오만이나 EU 등 제3국이 중재에 성공할 가능성이 있으나, 핵심은 트럼프에게 <strong>"정권 교체나 다름없는 큰 승리를 거두었다"는 과장된 명분(Exit Strategy)</strong>을 쥐여주고, 이란도 체면을 구기지 않고 전쟁을 멈출 수 있는 외교적 경로를 만드는 것입니다. 그러나 이란이 전통적 중재자인 오만까지 타격한 점은 이 경로의 실현 가능성을 더욱 낮추고 있습니다.
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none hover:bg-gray-100 transition-colors accordion-btn" data-target="acc-3">
+                            <span class="font-bold text-lg text-gray-900">변곡점 3: 'The Grandson Factor' - 하산 호메이니 ♟️</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-3" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-gray-200">
+                            체제 붕괴 직전, 호메이니의 손자이자 개혁 성향인 <strong>하산 호메이니(Hassan Khomeini)</strong>를 추대하여 서방과 파격적인 딜을 시도하는 시나리오. 이는 체제의 간판만 바꾸어 생존을 도모하는 '전략적 후퇴'이며, 혁명수비대의 실용파가 주도할 경우 제한적이지만 의미 있는 변화를 가져올 수 있습니다.
+                        </div>
+                    </div>
+                    <div class="border border-red-200 rounded-lg overflow-hidden bg-red-50/30">
+                        <button class="w-full px-6 py-4 bg-red-50 flex justify-between items-center text-left focus:outline-none hover:bg-red-100 transition-colors accordion-btn" data-target="acc-4">
+                            <span class="font-bold text-lg text-red-700">최악의 시나리오: 지상군 투입의 늪 ⚠️</span>
+                            <svg class="w-5 h-5 text-red-400 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-4" class="px-6 py-4 bg-white text-gray-700 text-sm leading-relaxed border-t border-red-200">
+                            공습만으로 이란 정부 기능이 마비되지 않고 항복도 하지 않을 경우, 트럼프는 아무 성과 없이 전쟁을 끝낼 수 없는 딜레마에 빠집니다. 이란 내부에는 아프간의 북부동맹이나 리비아의 반군 같은 유의미한 무장 세력이 부재하며, 결국 미 지상군 투입이라는 최악의 수렁으로 빠질 위험이 있습니다. 이는 이라크·아프간의 사례처럼 수년간의 출구 없는 '영원한 전쟁(Forever War)'으로 이어집니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 경영진 전략적 제언 -->
+                <div class="bg-gray-900 text-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-black text-white mb-2">📋 경영진 및 정책 입안자를 위한 전략적 제언</h3>
+                    <p class="text-gray-400 text-sm mb-6">막연한 '단기 정권 붕괴'에 베팅하지 마십시오. 장기화될 전쟁과 한국 경제의 구조적 취약성 노출에 즉각 대비해야 합니다.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                            <div class="text-blue-400 font-bold text-sm mb-2">Action 1</div>
+                            <h4 class="font-bold text-white mb-2">비축유 및 에너지 컨틴전시 즉각 가동</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">210일 비축유에 의존하는 현 체제를 넘어, 즉각적인 국가/기업 차원의 수요 관리 및 비상 수급 계획 실행.</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                            <div class="text-green-400 font-bold text-sm mb-2">Action 2</div>
+                            <h4 class="font-bold text-white mb-2">중동 공급망 강제 다변화</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">중동 외 지역(미국, 남미 등)으로 원유 및 LNG 수급 채널 즉각 다변화. 물류 운송 경로 및 물류비 재평가.</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-5 border border-red-500/50">
+                            <div class="text-red-400 font-bold text-sm mb-2">Action 3 (Critical)</div>
+                            <h4 class="font-bold text-white mb-2">호르무즈 완전 봉쇄 스트레스 테스트</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">모든 기업의 중장기 사업 및 투자 계획에 '호르무즈 해협 완전 봉쇄 장기화' 시나리오를 필수 리스크로 즉각 반영.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="h-8"></div>
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Accordion
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const t = document.getElementById(btn.getAttribute('data-target'));
+            const icon = btn.querySelector('svg');
+            if (t) { t.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); }
+        });
+    });
+
+    // Mobile Menu
+    const mb = document.getElementById('mobile-menu-button'), sb = document.getElementById('sidebar');
+    if (mb && sb) mb.addEventListener('click', () => sb.classList.toggle('-translate-x-full'));
+
+    // ScrollSpy
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.content-section');
+    function updateNav() {
+        let i = sections.length;
+        while(--i && window.scrollY + 120 < sections[i].offsetTop) {}
+        navLinks.forEach(l => { l.classList.remove('bg-red-500','text-white'); l.classList.add('text-gray-600'); });
+        if(i >= 0 && navLinks[i]) { navLinks[i].classList.remove('text-gray-600'); navLinks[i].classList.add('bg-red-500','text-white'); }
+    }
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const s = document.querySelector(this.getAttribute('href'));
+            if(s) window.scrollTo({ top: s.offsetTop - 80, behavior: 'smooth' });
+            if(window.innerWidth < 768 && sb) sb.classList.add('-translate-x-full');
+        });
+    });
+    window.addEventListener('scroll', updateNav);
+    updateNav();
+
+    // Charts
+    Chart.defaults.font.family = '"Paperlogy", sans-serif';
+    Chart.defaults.color = '#4b5563';
+
+    const c1 = document.getElementById('usTargetChart');
+    if(c1) new Chart(c1, { type:'doughnut', data:{ labels:['핵/미사일 인프라','최고 지휘부(참수)','해군력(호르무즈 방어)','중간 간부(IRGC)'], datasets:[{data:[35,25,25,15],backgroundColor:['#1e3a8a','#3b82f6','#93c5fd','#dbeafe'],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12}}}}});
+
+    const c2 = document.getElementById('iranAssetChart');
+    if(c2) new Chart(c2, { type:'doughnut', data:{ labels:['잔존 탄도미사일 (~1,000+발)','저가 드론(샤헤드 등)','대리 세력(헤즈볼라 등)','해협 봉쇄(기뢰/잠수함)','극초음속(파타 등)'], datasets:[{data:[30,25,15,15,15],backgroundColor:['#7f1d1d','#dc2626','#f87171','#fecaca','#991b1b'],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+
+    const c3 = document.getElementById('economyChart');
+    if(c3) new Chart(c3, { type:'bar', data:{ labels:['글로벌 유가 상승 압력','한국 무역 수지 악화','항공/해운 물류 마비','미국 내 인플레이션','한국 인플레이션 직격탄'], datasets:[{label:'경제 위협 지수',data:[95,92,85,70,90],backgroundColor:['#ef4444','#dc2626','#f87171','#fca5a5','#b91c1c'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true,max:100}},plugins:{legend:{display:false}}}});
+
+    const c4 = document.getElementById('costAsymmetryChart');
+    if(c4) new Chart(c4, { type:'bar', data:{ labels:['이란 공격 드론\n(샤헤드)','미국 요격 미사일\n(패트리어트 등)'], datasets:[{label:'1발당 비용 (만 달러)',data:[2,100],backgroundColor:['#dc2626','#3b82f6'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'만 달러',font:{size:10}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+'만 달러 (~'+(c.parsed.y*1300)+'만 원)'}}}}}});
+
+    const c5 = document.getElementById('hormuzDependencyChart');
+    if(c5) new Chart(c5, { type:'bar', data:{ labels:['중국','한국','인도','일본','EU'], datasets:[{label:'호르무즈 해협 의존도 (%)',data:[38,12,12,8,5],backgroundColor:['#1e40af','#dc2626','#6b7280','#3b82f6','#93c5fd'],borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{beginAtZero:true,max:45}},plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:function(c){if(c.label==='한국')return'석유 소비국 중 최고 수준의 위험도';return''}}}}}});
+});
+</script>
+</body>
+</html>

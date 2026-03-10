@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple in China - Interactive Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Thematic Design using CSS variables based on the book's content */
+        :root {
+            --bg-primary: #111827; /* Dark gray/blue for a tech feel */
+            --bg-secondary: #1F2937; /* Lighter dark shade for cards/sidebar */
+            --bg-tertiary: #374151; /* Hover/accent background */
+            --text-primary: #F9FAFB; /* Off-white for main text */
+            --text-secondary: #9CA3AF; /* Muted gray for meta text */
+            --accent-primary: #3B82F6; /* Professional blue for links/highlights */
+            --accent-secondary: #EF4444; /* Sharp red, alluding to China and urgency */
+            --border-color: #374151;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overscroll-behavior: none;
+        }
+
+        /* Scrollbar styling for a modern look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-primary);
+        }
+        
+        /* Main dashboard container layout */
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar navigation styling */
+        #sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            overflow-y: auto; /* Makes the entire sidebar scrollable if content overflows */
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .sidebar-header img {
+            max-width: 150px;
+            margin: 0 auto 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-header h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+        }
+
+        #chapter-navigation {
+            padding: 0 1rem 1rem;
+            list-style: none;
+        }
+        
+        #chapter-navigation li a {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #chapter-navigation li a:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        #chapter-navigation li a.active {
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .sidebar-footer {
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto; /* Pushes footer to bottom if content is short */
+        }
+
+        /* Main content area */
+        #main-content {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            margin-left: 280px;
+        }
+        
+        #content-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            z-index: 50;
+        }
+
+        #book-title-main {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        #book-meta-main {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+        
+        #current-section-title {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        #content-display {
+            padding: 1.5rem;
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+
+        /* Card styling */
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+        }
+        
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 0.75rem;
+        }
+
+        .card-header .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: var(--text-primary);
+        }
+        
+        .card-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card p, .card li {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        .card ul {
+            list-style-type: none;
+            padding-left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .card li {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .card blockquote {
+            border-left: 4px solid var(--accent-secondary);
+            padding-left: 1rem;
+            font-style: italic;
+            margin: 1rem 0;
+            color: var(--text-primary);
+        }
+        
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .keyword-tags span {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Visualization specific styles */
+        .visualization-container {
+            padding: 1rem;
+        }
+
+        .profit-share-chart {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-top: 1rem;
+            height: 150px;
+        }
+        
+        .bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bar {
+            width: 80%;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            transition: height 0.5s ease-out;
+        }
+        
+        .bar-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .bar-value {
+             font-size: 1rem;
+             font-weight: 700;
+             margin-top: 0.5rem;
+        }
+
+        .bar.market-share { background-color: var(--accent-primary); }
+        .bar.profit-share { background-color: var(--accent-secondary); }
+
+        /* Mobile specific styling */
+        #mobile-header {
+            display: none;
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 101;
+        }
+
+        #hamburger-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        
+        /* Responsive media query */
+        @media (max-width: 992px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            body.sidebar-active #sidebar {
+                transform: translateX(0);
+            }
+            body.sidebar-active #overlay {
+                display: block;
+            }
+            #main-content {
+                margin-left: 0;
+                padding-top: 5rem;
+            }
+            #content-header {
+                padding-top: 0;
+            }
+            #mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            #dashboard-container {
+                flex-direction: column;
+            }
+            #content-display {
+                grid-template-columns: 1fr; /* Stack cards on mobile */
+            }
+        }
+
+        /* Simple fade-in animation for cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile header with hamburger menu button -->
+    <header id="mobile-header">
+        <h3 class="font-bold">Apple in China</h3>
+        <button id="hamburger-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </header>
+
+    <div id="dashboard-container">
+        <!-- Sidebar for navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.imgur.com/RGwQDbN.jpeg" alt="Book Cover: Apple in China">
+            </div>
+            <ul id="chapter-navigation">
+                <!-- Navigation links will be dynamically inserted here -->
+            </ul>
+            <div class="sidebar-footer">
+                Dashboard by Kipeum
+            </div>
+        </nav>
+        
+        <!-- Main content display area -->
+        <main id="main-content">
+            <div id="content-header">
+                <h1 id="book-title-main"></h1>
+                <p id="book-meta-main"></p>
+                <h2 id="current-section-title"></h2>
+            </div>
+            <div id="content-display">
+                <!-- Content cards will be dynamically inserted here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay for mobile menu background -->
+    <div id="overlay"></div>
+
+    <script>
+        // Data: The provided JSON is embedded directly into the script with all chapters included.
+        const jsonData = {
+          "book_meta": {
+            "title": "Apple in China: The Capture of the Worlds Greatest Company",
+            "author": "Patrick McGee",
+            "publication_year": "2025",
+            "main_theme": "The book details how Apple's unprecedented growth became inextricably linked to China, creating a symbiotic yet vulnerable relationship where Apple's manufacturing prowess fueled China's industrialization, leading to significant geopolitical risks for the company."
+          },
+          "overall_summary": {
+            "abstract": "“Apple in China: The Capture of the World's Greatest Company” by Patrick McGee provides a detailed and often untold account of how Apple's growth into the world's most valuable company became inextricably linked to China. The book argues that Apple didn't just exploit Chinese labor; rather, Beijing allowed Apple to do so, in turn exploiting Apple's investments and expertise to develop its own manufacturing capabilities. McGee reveals Apple's profound, yet often hidden, role in China's industrialization through massive investments, training of millions of workers, and co-creation of sophisticated production processes, a dynamic dubbed “the Apple Squeeze”. This relationship, while leading to Apple's unprecedented scale and profitability, has simultaneously created staggering geopolitical vulnerabilities for the company due to China's authoritarian shifts and rising competitive landscape.\nThe book's methodology relies heavily on extensive interviews with over 200 sources, primarily former and current Apple employees, many of whom held senior roles, supplemented by internal documents, academic articles, and existing book-length histories. McGee's principal findings challenge conventional narratives by demonstrating the depth of Apple's operational control and technology transfer in China, which Beijing leverages for its own strategic goals like “Made in China 2025”. The implications are critical strategic risks for Apple, ranging from intense competition from resurgent Chinese brands like Huawei to the severe geopolitical vulnerability of its supply chain, particularly its reliance on TSMC in Taiwan, and potential backlash from Beijing to diversification efforts.",
+            "keywords": ["Apple", "China", "Supply Chain", "Manufacturing", "Outsourcing", "Foxconn", "Tim Cook", "Steve Jobs", "Geopolitics", "Technology Transfer", "Innovation", "Huawei", "Taiwan", "India", "Risk Management"]
+          },
+          "chapters": [
+            { "chapter_number": 1, "chapter_title": "The Brink of Bankruptcy", "summary": "This chapter details Apple's precarious financial state in the mid-1990s, leading to near-bankruptcy and the initial, reluctant shift from in-house manufacturing to outsourcing. It highlights Apple's early manufacturing efforts, the failure of its sales strategy against Microsoft Windows 95, and the critical need for a radical overhaul, setting the stage for Steve Jobs's return. The chapter also touches on IBM's successful outsourcing model for its PC, a strategy Jobs initially dismissed.", "key_arguments": ["Apple faced a “death spiral” in 1996, with cash reserves dangerously low and a $69 million loss despite record revenues, due to price cuts below cost.", "The company's board misdiagnosed the core problem as inefficiency rather than a lack of product differentiation, leading to the appointment of Gil Amelio, who focused on standardization.", "Early Apple manufacturing, from circuit boards to the Apple II, was often haphazard, involving Jobs's sister and networks of immigrant women in what amounted to “sweatshops”."], "key_takeaways_or_insights": ["Severe financial distress can be the necessary catalyst for a company to abandon long-held strategies, like in-house manufacturing, and embrace more efficient models like outsourcing.", "Correctly diagnosing the root cause of a business problem (e.g., product differentiation vs. operational inefficiency) is critical for effective leadership and turnaround."], "notable_quote": "Apple faced a 'death spiral' in 1996, with cash reserves dangerously low and a $69 million loss despite record revenues.", "keywords": ["Bankruptcy", "Gil Amelio", "Steve Jobs", "Outsourcing", "Manufacturing History", "Financial Crisis"] },
+            { "chapter_number": 2, "chapter_title": "Adventures in Outsourcing—Japan and Taiwan", "summary": "This chapter explores Apple's early, experimental outsourcing efforts, particularly with Japanese and Taiwanese companies, which proved crucial for product success when internal manufacturing capabilities fell short. The LaserWriter, made by Canon, saved the Macintosh, and Sony's production of the PowerBook 100 demonstrated the quality and expertise of Asian manufacturers. These experiences highlighted Apple's lack of in-house manufacturing competency in certain areas and initiated its learning curve in managing external production.", "key_arguments": ["The Macintosh was saved by the outsourced LaserWriter, a major Apple-designed, Apple-branded product made by Canon.", "Frustration with Apple's in-house manufacturing inefficiencies led to outsourcing the PowerBook 100 to Sony in Japan, which resulted in a product of superior quality.", "These early outsourcing efforts laid the groundwork for Apple to rely on Asian suppliers for specialized manufacturing competencies."], "key_takeaways_or_insights": ["Strategic outsourcing of key peripherals can be essential to the success of a core product.", "Partnering with specialized external manufacturers can yield superior product quality compared to struggling in-house efforts."], "notable_quote": "The Macintosh, initially hindered by insufficient memory and lack of developer support, was saved by the outsourced LaserWriter, a major Apple-designed, Apple-branded product made by Canon.", "keywords": ["Japan", "Taiwan", "LaserWriter", "PowerBook 100", "Sony", "Canon", "Outsourcing"] },
+            { "chapter_number": 3, "chapter_title": "An “Outrageous” Acquisition", "summary": "This chapter details the ongoing struggles of Apple under CEO Gil Amelio, who failed to provide a clear vision. The turning point was Apple's desperate acquisition of NeXT Computer, which brought Steve Jobs back into the company, initially as an advisor, leading to his eventual re-ascension to leadership.", "key_arguments": ["Gil Amelio's tenure was characterized by a lack of vision and an inability to rescue Apple from its 'free fall' and existential crisis.", "Jobs's NeXT Computer, despite being a financial flop, possessed a sophisticated operating system, NeXTStep, which Apple desperately needed.", "Jobs's return was hastened by Amelio's 'presentation from Hell' at MacWorld 1997."], "key_takeaways_or_insights": ["Operational focus without a clear product vision is insufficient to save a company.", "Strategic acquisitions can be about acquiring critical technology or talent, not just financial success."], "notable_quote": "Jobs's return was hastened by Amelio's 'presentation from Hell' at MacWorld 1997, where Jobs began to articulate his vision for Apple.", "keywords": ["Gil Amelio", "NeXT Computer", "Steve Jobs Return", "Financial Crisis"] },
+            { "chapter_number": 4, "chapter_title": "Columbus—A New World of Computing", "summary": "Steve Jobs, upon returning to Apple, quickly diagnosed the company's issues as a lack of focus and poor product quality. He swiftly cut the product lineup from forty to four and began a critical collaboration with designer Jony Ive on the prototype that would become the iMac, signaling a new design-first era for Apple.", "key_arguments": ["Jobs's initial diagnosis was that Apple was 'unfocused' and that 'the products suck,' leading him to drastically simplify the product roadmap.", "Jony Ive, on the verge of quitting, impressed Jobs with his innovative designs, leading to their immediate collaboration.", "The 'Think Different' advertising campaign was launched to rekindle Apple's image."], "key_takeaways_or_insights": ["Radical product line simplification is a powerful strategy to restore focus and improve quality.", "Identifying and empowering key creative talent at a critical moment can define a company's future direction."], "notable_quote": "Jobs's initial diagnosis was that Apple was 'unfocused' and that 'the products suck,' leading him to drastically simplify the product roadmap.", "keywords": ["Steve Jobs", "Jony Ive", "Product Simplification", "iMac Prototype", "Design-First"] },
+            { "chapter_number": 5, "chapter_title": "“Unmanufacturable”—The iMac", "summary": "This chapter vividly describes the intense conflict between Apple's Industrial Design (ID) team, led by Jony Ive, and the manufacturing engineers over the 'unmanufacturable' design of the iMac. The radical, egg-shaped, translucent design pushed existing tooling capabilities to their limits, causing significant delays and internal turmoil until Steve Jobs's direct intervention forced a resolution.", "key_arguments": ["Jony Ive's iMac design was deemed 'unmanufacturable' by engineers due to the limitations of plastic injection molding.", "The conflict led to a 'standstill' until Steve Jobs's 'explosive rage-fueled profanity' at the engineering team forced action.", "Crucial design tweaks by Ive's team resolved the impasse, marking a new era of ID involvement in the production process."], "key_takeaways_or_insights": ["Ambitious, boundary-pushing designs will inevitably create conflict between design and engineering teams.", "Strong executive intervention is often required to overcome internal stalemates on visionary projects."], "notable_quote": "The radical, egg-shaped, translucent design... was deemed 'unmanufacturable' by engineers.", "keywords": ["iMac Design", "Jony Ive", "Manufacturing Challenges", "Steve Jobs Intervention", "Engineering Conflict"] },
+            { "chapter_number": 6, "chapter_title": "Out of the Asian Financial Crisis—South Korea", "summary": "Despite Steve Jobs's initial preference for in-house manufacturing, the intricate iMac design and Apple's limited cash necessitated external production. LG in South Korea, desperate due to the Asian financial crisis, won the manufacturing order. This early experience highlighted the challenges of scaling production with a new supplier, requiring Apple engineers to work intensely on the ground.", "key_arguments": ["Apple was forced to outsource iMac production due to financial strain and lack of CRT manufacturing expertise.", "LG secured the contract partly due to its desperation amidst the Asian financial crisis, with its factory operating in crude conditions.", "Initial iMac models presented by Jobs were handcrafted by Apple's ID team in Korea as the factory wasn't ready."], "key_takeaways_or_insights": ["Economic downturns in other regions can create strategic opportunities to secure manufacturing partners.", "Launching a revolutionary product with a new supplier often requires embedding your own personnel on-site."], "notable_quote": "LG secured the contract partly due to its desperation amidst the Asian financial crisis, with its factory operating under a 'SURVIVE' banner.", "keywords": ["South Korea", "LG", "Asian Financial Crisis", "iMac Production", "Manufacturing Challenges"] },
+            { "chapter_number": 7, "chapter_title": "LG Goes Global—Wales and Mexico", "summary": "The iMac's success led Apple to fully embrace outsourcing, commissioning suppliers like LG to mirror its production strategy globally. However, LG's attempt to leverage its position backfired, as Apple redesigned the iMac to lower costs and reassert control over its intellectual property.", "key_arguments": ["Apple fully committed to managing outsourcers, cutting its own manufacturing jobs.", "LG struggled with hiring, turnover, and 'insane' scale demands in its Wales and Mexico plants.", "LG's attempt to exert leverage led Apple to secretly redesign the second-gen iMac, eliminating LG's strategic advantage."], "key_takeaways_or_insights": ["Never allow a single supplier to gain too much leverage; be prepared to redesign products to reassert control.", "Rapidly scaling global production with a partner can expose significant operational challenges."], "notable_quote": "LG's attempt to exert leverage... led Apple to secretly redesign the second-generation iMac, drastically reducing component costs and eliminating LG's strategic advantage.", "keywords": ["LG", "Outsourcing Expansion", "Vendor-Managed Inventory", "Intellectual Property", "Supply Chain Management"] },
+            { "chapter_number": 8, "chapter_title": "The Taishang—Taiwanese on the Mainland", "summary": "Taiwan played a pivotal role in Apple's comeback, becoming a key manufacturing base for the iBook and PowerBook. Apple invested heavily in training Taiwanese suppliers by embedding engineers to elevate their quality and push design boundaries, cultivating advanced manufacturing competencies in the region.", "key_arguments": ["Taiwan's high-tech manufacturing expertise made it a critical partner for Apple's laptops.", "Apple embedded engineers into Taiwanese suppliers to actively train workers and transfer skills, significantly improving manufacturing quality.", "The difficult-to-manufacture Titanium PowerBook pushed Apple's Product Design team to take on multiple roles beyond design."], "key_takeaways_or_insights": ["Investing heavily in training and embedding engineers with suppliers cultivates advanced manufacturing capabilities.", "A company's demanding standards can elevate the entire manufacturing ecosystem of a region."], "notable_quote": "Apple's 'penchant for complex designs and intolerance for defects' led it to embed engineers into Taiwanese suppliers, actively training workers and transferring skills.", "keywords": ["Taiwan", "iBook", "PowerBook", "Manufacturing Expertise", "Engineer Training", "Quality Standards"] },
+            { "chapter_number": 9, "chapter_title": "The Silicon Valley of Hardware—'Foxconn isn’t called ‘Fox-con’ for nothing'", "summary": "This chapter introduces Foxconn and its leader Terry Gou. It details Foxconn's unique OEM model, relentless efficiency, and vertical integration. Gou's strategy to offer cheap final assembly to control supply chains, combined with military-like discipline, enabled Apple to pursue 'unconstrained design' with China's vast labor force.", "key_arguments": ["Foxconn offered cheap final assembly and free tooling to gain control over clients' supply chains.", "Terry Gou's factories were run with 'military-like efficiency,' prioritizing machines and output over worker welfare.", "Foxconn's 'armies of affordable, available labor' in China enabled Apple to handcraft complex, automation-unfriendly products."], "key_takeaways_or_insights": ["A low-cost entry point can be a strategic tool for a supplier to gain deep control over a client's supply chain.", "Access to a massive, low-cost labor force can enable product designs that are unfeasible to automate."], "notable_quote": "Apple realized that Foxconn's 'armies of affordable, available labor' in China enabled 'unconstrained design.'", "keywords": ["Foxconn", "Terry Gou", "Vertical Integration", "China Manufacturing", "Labor Conditions", "Supply Chain Control"] },
+            { "chapter_number": 10, "chapter_title": "IBM West—The Rise of Tim Cook", "summary": "This chapter details the background and rise of Tim Cook, whose methodical, efficiency-driven approach to operations was honed during his twelve years at IBM. Cook quickly made his mark at Apple by instilling a culture of extreme precision and accountability in supply chain management. His philosophy of being 'aggressive and unreasonable' with suppliers was a key part of Apple's operational turnaround.", "key_arguments": ["Tim Cook's extensive experience at IBM in just-in-time manufacturing made him uniquely suited to transform Apple's chaotic operations.", "Cook established a culture of extreme precision, demanding granular understanding and accountability from his managers.", "His negotiation philosophy taught colleagues to be 'aggressive and unreasonable,' encouraging asking for 'the moon' from suppliers."], "key_takeaways_or_insights": ["Deep expertise in operational efficiency can be transformative when applied to a design-led environment.", "A culture of extreme data-driven accountability is essential for managing a complex global supply chain."], "notable_quote": "His negotiation philosophy, teaching colleagues to be 'aggressive and unreasonable,' encouraged asking for 'the moon' from suppliers.", "keywords": ["Tim Cook", "IBM", "Operations", "Supply Chain Management", "Efficiency", "Negotiation"] },
+            { "chapter_number": 11, "chapter_title": "Foxconn Goes Global—China, California, and the Czech Republic", "summary": "This chapter illustrates Foxconn's global expansion and its strategic willingness to work with Apple, not for immediate profit, but for invaluable 'learning' and the opportunity to absorb advanced manufacturing knowledge. Terry Gou's long-term view positioned Foxconn to become ubiquitous, with experiences in places like the Czech Republic ultimately reinforcing the labor and scrutiny advantages of manufacturing in China.", "key_arguments": ["Terry Gou saw Apple's complex designs as an 'opportunity' for learning, absorbing lessons from Apple engineers even if it meant low profits.", "Foxconn's willingness to 'do whatever it took' for Apple was driven by Gou's long-term vision of growth.", "Experiences in the Czech Republic highlighted that China offered cheaper, more efficient production with less media scrutiny."], "key_takeaways_or_insights": ["Strategic suppliers may prioritize learning over immediate profitability with an innovative client.", "Challenges with labor laws and media scrutiny in Western countries can reinforce the perceived advantages of manufacturing in China."], "notable_quote": "Terry Gou saw Apple's complex designs as an 'opportunity' for learning... even if it meant low profits.", "keywords": ["Foxconn", "Global Expansion", "Learning", "Terry Gou", "China Consolidation"] },
+            { "chapter_number": 12, "chapter_title": "A Farewell to Mactories", "summary": "This chapter describes Apple's final divestment from its own manufacturing facilities ('Mactories'), a strategy Tim Cook persuaded Steve Jobs was more efficient. The dot-com bust of 2000 and product failures like the G4 Cube solidified Apple's commitment to fully outsourcing production, accelerating the rise of Asian contract manufacturers.", "key_arguments": ["Tim Cook successfully convinced Steve Jobs of the merits of outsourcing, leading Apple to gut its remaining in-house factories.", "The dot-com crash and failures like the G4 Cube underscored the need for greater efficiency, leading to a full commitment to outsourcing.", "The shift demonstrated a divergence between corporate America's interests and Washington's, as manufacturing moved to Asia."], "key_takeaways_or_insights": ["Market downturns and product failures can be the final push needed to make a complete strategic shift.", "The corporate shift to outsourcing can create a divergence between a company's financial interests and its home country's strategic interests."], "notable_quote": "The dot-com crash in 2000, coupled with failures like the G4 Cube, triggered a dramatic stock drop... underscoring the need for greater efficiency and leading Apple to fully commit to outsourcing.", "keywords": ["Mactories", "Outsourcing", "Tim Cook", "Dot-com Bust", "Contract Manufacturing", "Knowledge Transfer"] },
+            { "chapter_number": 13, "chapter_title": "1,000 Songs—Making the iPod in Taiwan", "summary": "This chapter details the frantic, secretive development of the iPod in 2001. Tony Blevins, Apple's ruthless procurement specialist, secured the manufacturing deal with Inventec in Taiwan through aggressive negotiation tactics. The project's success hinged on key component discoveries like Toshiba's 1.8-inch hard drive and the innovative scroll wheel.", "key_arguments": ["The iPod project was conceived and executed with remarkable speed to create a superior MP3 player.", "Tony Blevins employed aggressive, 'unreasonable' negotiation tactics, forcing Inventec to sign a manufacturing contract under immense pressure.", "The iPod's design brilliance was multi-authored, combining discoveries like Toshiba's tiny hard drive, the scroll wheel, and Jony Ive's aesthetic."], "key_takeaways_or_insights": ["Breakthrough products often result from a combination of clear vision, speed in execution, and leveraging key component innovations.", "Ruthless negotiation can secure favorable manufacturing terms."], "notable_quote": "Tony Blevins employed aggressive, 'unreasonable' negotiation tactics, forcing Inventec to sign a manufacturing contract under immense pressure, securing favorable terms for Apple.", "keywords": ["iPod", "Tony Blevins", "Inventec", "Taiwan", "Negotiation", "Jony Ive"] },
+            { "chapter_number": 14, "chapter_title": "Flat-Out Cool!—Making the iMac G4 Across Asia", "summary": "This chapter recounts the arduous process of manufacturing the complex iMac G4. Its design required a fragmented supply chain across six Asian countries, leading to extreme inefficiency. A critical presentation to Steve Jobs revealed the absurdity of the assembly process, leading to a complete redesign and the decision to consolidate production in China.", "key_arguments": ["The iMac G4's complex design necessitated an inefficient, multi-country supply chain.", "A 'really fucking stupid' assembly method was scrapped after Steve Jobs's intense scrutiny, leading to a redesign.", "The high production costs led to underwhelming demand, prompting Apple to consolidate operations in China."], "key_takeaways_or_insights": ["Aesthetically ambitious designs can lead to fragmented and costly supply chains.", "Executive scrutiny can eliminate absurdly inefficient manufacturing processes.", "A critically acclaimed design may fail commercially if production costs make it too expensive."], "notable_quote": "A 'really fucking stupid' assembly method was scrapped after Steve Jobs's intense scrutiny, leading to a redesign that achieved the desired user experience.", "keywords": ["iMac G4", "Design Complexity", "Multi-country Supply Chain", "Production Efficiency", "China Consolidation"] },
+            { "chapter_number": 15, "chapter_title": "“You’re Going to Give Us Your ‘China Cost’ for This”", "summary": "This chapter highlights the iPod's financial stagnation due to its Mac-only compatibility, leading to the critical decision to expand iTunes to Windows. It also reveals manufacturing issues with partner Inventec, including quality control problems, which pushed Apple further towards China for mass production.", "key_arguments": ["The iPod's financial stagnation was due to its Mac-only exclusivity, prompting the move to make iTunes available for Windows.", "Quality control issues at Inventec revealed the limitations of the current manufacturing partnership.", "These challenges underscored that 'China was the answer' for mass quantities, and Apple began seeking a new partner."], "key_takeaways_or_insights": ["Platform exclusivity can severely limit a product's growth; expanding to other platforms can unlock a much larger market.", "Supplier limitations in quality control can necessitate a change in partners as production scales."], "notable_quote": "These manufacturing and market challenges underscored that 'China was the answer' for mass quantities, and Apple began seeking a new strategy and partner to scale iPod production.", "keywords": ["iTunes for Windows", "Manufacturing Problems", "Inventec", "China Manufacturing", "Quality Control"] },
+            { "chapter_number": 16, "chapter_title": "The Replica—Making the iPod in China", "summary": "This chapter describes Foxconn's pivotal move to secure the iPod Mini contract: it audaciousy built a high-quality replica of an uncommissioned iPod, demonstrating its ambition and reverse-engineering capacity. Terry Gou's willingness to work for 'pennies on the dollar' and invest heavily in high-precision equipment paid off, proving Foxconn was a more capable partner than Inventec.", "key_arguments": ["Foxconn, unbidden, reverse-engineered an iPod prototype and presented a high-quality replica to Apple.", "Foxconn's timing was 'impeccable' as Apple was frustrated with Inventec's limitations.", "Terry Gou's strategy focused on building a long-term relationship with Apple by investing in advanced equipment ahead of rivals."], "key_takeaways_or_insights": ["Proactively demonstrating advanced capabilities can be a powerful way for a supplier to win a contract.", "A supplier's ambition and hunger to learn can be more valuable than an incumbent's experience."], "notable_quote": "Foxconn, unbidden, reverse-engineered an iPod prototype and presented a high-quality replica to Apple, showcasing its capabilities, ambition, and willingness to learn.", "keywords": ["Foxconn", "iPod Mini", "Terry Gou", "Reverse Engineering", "China Manufacturing", "Aluminum Machining"] },
+            { "chapter_number": 17, "chapter_title": "Project Purple in Asia", "summary": "This chapter delves into the highly secretive 'Project Purple' – the iPhone initiative. Apple adopted an extreme approach to quality, abandoning traditional sampling for pervasive testing on production lines. Foxconn was chosen as the manufacturing partner for its hunger and 'do-whatever-it-takes attitude,' contrasting with more experienced cellphone manufacturers.", "key_arguments": ["The iPhone was envisioned as an 'enhanced iPod' and developed with startup-like secrecy.", "Apple adopted an unprecedented approach to quality, dedicating two-thirds of the production line to testing and validation.", "Foxconn was chosen for its 'hunger for the deal,' willingness to learn and invest, and 'do-whatever-it-takes attitude.'"], "key_takeaways_or_insights": ["For a product where reliability is paramount, abandoning traditional quality sampling for 100% on-line testing is a necessary investment.", "When choosing a manufacturing partner for a groundbreaking product, a supplier's hunger can be more important than existing expertise."], "notable_quote": "Foxconn was chosen as the iPhone's manufacturing partner due to its 'hunger for the deal,' willingness to learn and invest, and 'do-whatever-it-takes attitude.'", "keywords": ["Project Purple", "iPhone Development", "Quality Control", "RF Testing", "Foxconn Partnership", "Supplier Selection"] },
+            { "chapter_number": 18, "chapter_title": "The One Device", "summary": "This chapter corrects the Western narrative that China's role in iPhone production was limited to 'low-value assembly'. It reveals Apple's 'spectacular investments in China' in machinery and processes, demonstrating a deep, asset-light vertical integration. Apple's relentless pressure, however, squeezed Foxconn's margins.", "key_arguments": ["Western analyses wrongly underestimated China's contributions to the iPhone, focusing only on final assembly wages.", "Apple's real investments in China were in the 'machinery and processes that made it,' with engineers deeply embedded in factories.", "Apple's relationship with Foxconn was characterized by 'brutal' negotiation, with Apple squeezing Foxconn's margins by leveraging high volumes."], "key_takeaways_or_insights": ["The true value of a manufacturing location is in the co-creation of processes and capabilities.", "A company can achieve deep vertical integration without owning assets by embedding its own engineers to control manufacturing processes."], "notable_quote": "Apple's real investments in China were in the 'machinery and processes that made it,' with engineers deeply embedded in factories, building and inventing manufacturing capabilities.", "keywords": ["iPhone Launch", "China's Role", "Manufacturing Investment", "Foxconn", "Supply Chain Control", "Cost Pressure"] },
+            { "chapter_number": 19, "chapter_title": "The Apple Shock", "summary": "This chapter unveils the 'Apple Shock' – Apple's sudden ascent in supply chain rankings, which surprised experts. Apple was not merely outsourcing but practicing a form of deep vertical integration without factory ownership, embedding its engineers in suppliers' facilities to 'co-invent' new production processes and often owning the intellectual property rights to them.", "key_arguments": ["Apple's supply chain mastery was a form of deep vertical integration without factory ownership, achieving exceptional 'inventory turns.'", "Apple sent its top engineers to live in suppliers' facilities for extended periods to 'co-invent new production processes.'", "This engagement allowed Apple to 'understand manufacturing better than the manufacturers themselves' and own the IP for co-created processes."], "key_takeaways_or_insights": ["Treating inventory with extreme urgency, as if it were perishable, is key to world-class supply chain efficiency.", "Deeply embedding talent within supplier facilities allows for the co-invention of proprietary manufacturing processes.", "Owning the IP of co-created manufacturing processes provides a powerful competitive advantage."], "notable_quote": "This intensive engagement allowed Apple to 'understand manufacturing better than the manufacturers themselves' and often own the intellectual property rights to co-created processes.", "keywords": ["Supply Chain Rankings", "Vertical Integration", "Inventory Management", "Process Innovation", "Intellectual Property"] },
+            { "chapter_number": 20, "chapter_title": "The Missionary", "summary": "This chapter introduces John Ford, an Apple retail executive tasked with opening Apple's first store in China, a mission for which the company had 'no game plan'. Ford, a former Mormon missionary fluent in Mandarin, embraced the role of 'missionary' by building trust and interpreting Chinese culture for Apple, making him the unlikely point person for its retail expansion.", "key_arguments": ["Apple had given 'virtually no thought to its retail ambitions in China' and lacked a business license.", "John Ford, a former Mormon missionary and Mandarin speaker, was hired to 'figure everything out' for Apple's retail presence.", "Ford's ability to interpret Chinese culture and build trust equipped him to navigate the complex local landscape."], "key_takeaways_or_insights": ["Entering a complex new market requires leaders with deep cultural and linguistic understanding.", "Unconventional backgrounds can provide the ideal 'soft skills' for navigating bureaucratic and cultural challenges."], "notable_quote": "John Ford, a former Mormon missionary and Mandarin speaker, was hired to 'figure everything out' for Apple's retail presence in China, becoming the 'living embodiment' of hiring smart people to lead.", "keywords": ["John Ford", "Apple Store China", "Retail Expansion", "China Market Entry", "Cultural Interpretation"] },
+            { "chapter_number": 21, "chapter_title": "The Sewing Machine Repair Shop", "summary": "John Ford ingeniously navigated China's complex regulatory environment by acquiring a tiny sewing machine repair shop to obtain a transferable business license for Apple's first store in Beijing. This unconventional move circumvented channels that would have forced a local partnership. Ford also ensured Apple retained its English branding, subtly asserting its global image.", "key_arguments": ["To bypass restrictive regulations, John Ford acquired a sewing machine repair shop for its electronics retail license.", "Ford deliberately retained Apple's English branding on the store license, defying the standard practice of adopting Chinese names.", "Initial iPhone sales in China were conducted through 'gray markets' by 'yellow cows' (scalpers)."], "key_takeaways_or_insights": ["Creative solutions are often necessary to navigate complex regulatory environments.", "Maintaining a consistent global brand identity is a powerful tool for market influence.", "A large gray market indicates massive untapped demand."], "notable_quote": "To bypass restrictive regulations, John Ford and Apple's lawyer acquired a five-square-meter sewing machine repair shop, using its electronics retail license for Apple's first official store in Beijing.", "keywords": ["China Regulations", "Business License", "John Ford", "Branding", "Gray Market", "Market Entry Strategy"] },
+            { "chapter_number": 22, "chapter_title": "“A Dozen Monkeys Can Kill a Gorilla”", "summary": "This chapter highlights the 'mind-boggling' demand for iPhones in China, which Apple consistently underestimated, leading to chronic supply shortages and the proliferation of 'yellow cow' scalper networks. These scalpers demonstrated that organized human labor could be more effective than bots in exploiting distribution systems. John Ford implemented a system to manage the queues, balancing order with the scalpers' economic incentives.", "key_arguments": ["Apple's inability to accurately forecast the 'wildly off' demand for iPhones in China led to persistent shortages.", "Organized 'yellow cow' scalpers leveraged 'hordes of people' to flood Apple's systems, proving human labor could be more effective than bots.", "John Ford established a system of unwritten rules to manage the lines of scalpers at Apple Stores."], "key_takeaways_or_insights": ["Conventional forecasting models can fail completely in a new, rapidly growing market.", "Organized human labor can be more effective than automated systems at exploiting loopholes.", "Practical, on-the-ground management that works with gray market incentives can be more effective than trying to eliminate them."], "notable_quote": "Organized 'yellow cow' scalpers leveraged 'hordes of people' to flood Apple's online reservation systems and queues, effectively becoming exclusive distributors... proving human labor could be more effective than bots.", "keywords": ["iPhone Demand", "China Market", "Scalpers", "Yellow Cows", "Forecasting Challenges", "Distribution"] },
+            { "chapter_number": 23, "chapter_title": "“Fire That Motherfucker!”", "summary": "This chapter recounts a chaotic incident at Apple's Sanlitun store during the iPad 2 launch, where an altercation between store leader John Ford and a customer led to Ford's arrest and widespread negative media coverage. Steve Jobs, infuriated by the security footage, demanded Ford be fired. The event highlighted the intense pressures of the Chinese market and the challenges of dealing with organized scalper groups.", "key_arguments": ["A violent altercation during the iPad 2 launch in Beijing led to John Ford's arrest and a 'PR nightmare.'", "Steve Jobs, viewing grainy security footage, reacted with 'explosive rage' and demanded Ford's immediate firing.", "The incident revealed the dangers of dealing with 'yellow cows' linked to violent criminal organizations."], "key_takeaways_or_insights": ["High-demand product launches in chaotic markets can escalate into violent and brand-damaging incidents.", "Executive decisions made rashly on incomplete information can be detrimental to loyal employees.", "Operating in markets with powerful organized crime poses significant security and PR risks."], "notable_quote": "Steve Jobs, viewing the grainy security footage, reacted with 'explosive rage' and demanded Ford's immediate firing, despite Ron Johnson's defense of Ford's commitment.", "keywords": ["Sanlitun", "iPad 2 Launch", "John Ford", "Steve Jobs", "Scalpers", "PR Crisis"] },
+            { "chapter_number": 26, "chapter_title": "The Despot", "summary": "This chapter introduces Xi Jinping's rise to power in China in 2012 and the subsequent shift towards a more assertive authoritarian state. It highlights how Beijing's more hostile stance directly impacted Apple, beginning with the coordinated media attacks on Consumer Day 2013, revealing Apple's deep vulnerability in China. The chapter also discusses the international media scrutiny of Foxconn's labor conditions, which embarrassed Beijing.", "key_arguments": ["Xi Jinping rapidly consolidated power, shifting China towards a more assertive and authoritarian form of governance.", "A coordinated, top-down attack by state-owned media (CCTV) on Apple's warranty policies demonstrated the company's vulnerability to Beijing's whims.", "International media coverage of the Foxconn suicides and poor labor conditions not only damaged Apple's brand but also embarrassed Beijing."], "key_takeaways_or_insights": ["A shift in a host country's political leadership towards authoritarianism can dramatically increase risks for foreign companies.", "State-controlled media can be weaponized to launch coordinated attacks on foreign firms."], "notable_quote": "A coordinated, top-down attack by state-owned media (CCTV) on Apple's warranty policies on Consumer Day 2013 demonstrated the company's vulnerability to Beijing's whims.", "keywords": ["Xi Jinping", "Authoritarianism", "Consumer Day", "CCTV Attack", "Foxconn Suicides", "Supply Chain Vulnerability"] },
+            { "chapter_number": 27, "chapter_title": "The Gang of Eight", "summary": "Faced with a 'staggering vulnerability' in China, Apple formed the 'Gang of Eight' in 2013, a team of new hires and existing executives to act as Cupertino's 'eyes and ears'. Their mission was to define Apple's narrative in China, demonstrate its commitment, and find ways to 'contain its China risk' by understanding and placating authorities.", "key_arguments": ["Apple's executive leadership abruptly realized their lack of a 'government strategy' in China, leaving them exposed.", "The 'Gang of Eight' was a cross-functional team formed to develop a coherent political and communications strategy.", "The team's mission was to proactively shape Apple's narrative, emphasizing its contributions to China to build political capital."], "key_takeaways_or_insights": ["Operating in a politically complex country requires a dedicated, in-house government affairs strategy.", "Proactively communicating a company's local contributions is a critical risk management tool in authoritarian states."], "notable_quote": "Apple's executive leadership abruptly realized their lack of a 'government strategy' or 'what Apple’s story was' in China.", "keywords": ["Gang of Eight", "China Strategy", "Government Affairs", "Political Risk", "Apple Leadership"] },
+            { "chapter_number": 28, "chapter_title": "The China Whisperer", "summary": "This chapter introduces Doug Guthrie, a China expert who was instrumental to Apple's political awakening. Guthrie taught Apple's leadership about China's 'regionally decentralized authoritarian regime' (RDA) and the importance of cultural nuances like Guanxi (relationships) and Mianzi (face/prestige), which Apple had neglected.", "key_arguments": ["Doug Guthrie, a Mandarin-fluent economic sociologist, possessed a deep, nuanced understanding of China's systems.", "He taught that China operates as a 'regionally decentralized authoritarian regime' (RDA), where local officials have wide latitude.", "Guthrie argued that success required understanding local cultural norms like Guanxi and Mianzi."], "key_takeaways_or_insights": ["Deep academic expertise on a country's political and economic system is invaluable for corporate strategy.", "Ignoring crucial cultural norms like 'Guanxi' and 'Mianzi' in China is a recipe for failure."], "notable_quote": "He taught that China operates as a 'regionally decentralized authoritarian regime' (RDA), where local officials have wide latitude to incentivize businesses for growth and employment.", "keywords": ["Doug Guthrie", "RDA", "Guanxi", "Mianzi", "China Expertise", "Political Strategy", "Cultural Nuance"] },
+            { "chapter_number": 29, "chapter_title": "Xi’s “New Era”", "summary": "This chapter details the challenges Apple faced under Xi Jinping's 'New Era,' characterized by the 'Made in China 2025' plan. Apple's operations were threatened by new labor laws, and its secretive, non-JV approach was politically problematic, leaving it vulnerable to state pressure.", "key_arguments": ["Xi Jinping's 'Made in China 2025' initiative signaled a strategic shift towards technological self-sufficiency.", "New Chinese labor laws restricting temporary workers directly threatened Apple's production model.", "Apple's secretive nature and avoidance of joint ventures were politically disadvantageous."], "key_takeaways_or_insights": ["A host country's strategic industrial policies can directly threaten a foreign company's position.", "Corporate practices standard in the West can be perceived as hostile in China, creating political vulnerabilities."], "notable_quote": "China's 'CSR' (Corporate Social Responsibility) was a top-down project aligning with CCP goals, not Western bottom-up self-regulation.", "keywords": ["Made in China 2025", "Labor Laws", "Technology Transfer", "Political Pressure", "Supply Chain Risk"] },
+            { "chapter_number": 30, "chapter_title": "The Apple Squeeze", "summary": "This chapter introduces 'the Apple Squeeze,' Doug Guthrie's concept explaining how Apple maintains disproportionate profitability. The 'Squeeze' involves Apple's deep operational engagement, where its teams train Chinese partners and transfer manufacturing knowledge in exchange for 'soul-crushingly low margins' and extraordinary control, capturing the vast majority of the value created.", "key_arguments": ["Apple's immense profitability is largely attributed to 'the Apple Squeeze.'", "The 'Squeeze' involves trading manufacturing knowledge for 'soul-crushingly low margins' and the promise of incredible volumes.", "Apple exerts 'extraordinary control' over suppliers, demanding access to cost details and procuring raw materials directly."], "key_takeaways_or_insights": ["A company can achieve dominant profitability without dominant market share by controlling the value chain.", "Trading manufacturing knowledge for extremely low margins is a powerful negotiation tool."], "notable_quote": "The 'Apple Squeeze' involves Apple's engineering and operations teams rigorously training local partners... in exchange for 'soul-crushingly low margins' and the promise of incredible volumes.", "keywords": ["Apple Squeeze", "Profitability", "Supplier Control", "Margin Pressure", "Value Chain"] },
+            { "chapter_number": 31, "chapter_title": "A Marshall Plan for China", "summary": "In response to mounting pressure, Apple made an extraordinary pledge to Beijing in 2016: to invest $275 billion in China over five years. This 'Marshall Plan for China' was a strategic communication effort to make Beijing aware of the immense value Apple was already providing, thereby creating political goodwill and protection.", "key_arguments": ["Apple quietly pledged a $275 billion, five-year investment in China to top government officials in 2016 to placate Beijing.", "The pledge was framed as a transfer of 'tacit knowledge' and support for China's advanced electronics industry.", "The pledge was a 'low-ball projection' of existing investments, representing a marketing effort rather than a new concession."], "key_takeaways_or_insights": ["Large-scale investment pledges can be a powerful tool for government relations to mitigate political risk.", "Framing existing business activities as a contribution to national strategic goals can generate significant political goodwill."], "notable_quote": "This 'Marshall Plan for China' was not a concession, but rather a strategic communication effort to make Beijing aware of the immense value Apple was already providing.", "keywords": ["Marshall Plan for China", "Investment Pledge", "Government Relations", "Tacit Knowledge", "Technology Transfer"] },
+            { "chapter_number": 32, "chapter_title": "Bureaucratic Protection", "summary": "This chapter details how Apple's new political strategy aimed to achieve 'bureaucratic protection' in China through strategic investments and R&D hubs. A key move was its $1 billion investment in Didi Chuxing, which served multiple purposes: placating Beijing, gaining entry into self-driving car technology, and leveraging Didi's political connections. Apple also established R&D hubs for 'political optics' to demonstrate commitment.", "key_arguments": ["Apple's $1 billion investment in Didi Chuxing was a strategic move to gain 'bureaucratic protection.'", "The Didi investment gave Apple a 'fast track' into autonomous vehicle technology and mapping data in China.", "Apple established R&D hubs in China primarily for 'political optics' and to demonstrate commitment."], "key_takeaways_or_insights": ["Strategic investments in local tech champions can be an effective way to appease regulators.", "Investing in a local partner can provide a strategic backdoor to access restricted markets or technologies.", "R&D centers can be more valuable for political optics than for the actual research produced."], "notable_quote": "Apple established R&D hubs in China (Beijing, Shanghai, Shenzhen, Suzhou) primarily for 'political optics' and to demonstrate commitment to local innovation.", "keywords": ["Bureaucratic Protection", "Didi Chuxing", "R&D Hubs", "China Politics", "Strategic Investment", "Political Optics"] },
+            { "chapter_number": 33, "chapter_title": "Cognitive Dissonance—Supplier Responsibility", "summary": "This chapter exposes the 'cognitive dissonance' within Apple: a tension between its stated goals for supplier responsibility and the relentless demands for quality, speed, and low prices that make compliance 'nearly impossible'. This fundamental conflict, coupled with China's crackdown on labor activism, led to a continued culture where suppliers prioritize profits over compliance.", "key_arguments": ["Apple's commitment to supplier responsibility was undermined by its 'unrelenting' demands for quality, speed, and price.", "Apple's internal audits were often impossible for suppliers to comply with, especially during 'ramp' periods.", "The sidelining of a key exec and China's crackdown on labor activism showed corporate goals prioritized cost over ethics."], "key_takeaways_or_insights": ["A company suffers 'cognitive dissonance' when public ethical commitments conflict with internal profit-driven pressures.", "Without aligning procurement incentives with ethical goals, supplier responsibility programs are likely to fail."], "notable_quote": "Apple's commitment to supplier responsibility... was undermined by the company's 'unrelenting' demands for quality, speed, and price, creating 'cognitive dissonance' where ethical goals clashed with profit objectives.", "keywords": ["Supplier Responsibility", "Cognitive Dissonance", "Labor Conditions", "China Labor Crackdown", "Profit vs. Ethics"] },
+            { "chapter_number": 34, "chapter_title": "The Figurehead—Isabel Mahe", "summary": "This chapter focuses on Isabel Ge Mahe, appointed as Apple's Managing Director of Greater China. Despite her technical competence, she was largely perceived internally as a 'figurehead' due to her lack of operational authority in Apple's functional, non-geographically-decentralized management structure, leading to a lack of respect within the China team.", "key_arguments": ["Isabel Ge Mahe was appointed to a 'titular position' that did not align with Apple's functional management structure.", "Mahe's lack of direct authority over key operational teams meant she was not in the 'flow of relevant information,' making her a 'figurehead.'", "Her struggle to gain respect from engineers and out-of-touch remarks underscored a disconnect with the local team."], "key_takeaways_or_insights": ["A functional organizational structure can render high-profile country manager roles into mere figurehead positions.", "A leader without direct operational authority will struggle to command respect and influence critical decisions."], "notable_quote": "Mahe's lack of direct authority over key operational teams... meant she was not in the 'flow of relevant information' for critical decisions, making her a 'figurehead'.", "keywords": ["Isabel Mahe", "Figurehead", "Apple Management Structure", "Political Role", "Internal Perceptions"] },
+            { "chapter_number": 35, "chapter_title": "The Red Supply Chain", "summary": "This chapter details the rise of China's indigenous contract manufacturers, the 'Red Supply Chain,' including Luxshare and BYD. Apple's strategic marketing of its investments to Beijing, combined with its willingness to transfer orders, spurred these Chinese suppliers to rapidly gain sophistication, challenging the dominance of Taiwanese firms and aligning with 'Made in China 2025' goals.", "key_arguments": ["The 'Red Supply Chain' has rapidly grown in sophistication, driven by Apple's orders and technology transfer.", "Luxshare's chairwoman strategically leveraged Tim Cook's factory visit to boost Luxshare's public prestige and stock value.", "The shift towards Chinese suppliers reflects a 'geopolitical' shift aligning with Beijing's 'Made in China 2025' plan."], "key_takeaways_or_insights": ["A major client's willingness to transfer orders and technology can rapidly cultivate a sophisticated local supply chain.", "Savvy local suppliers can use a client's brand and executive visits for public relations to enhance their own prestige and market value."], "notable_quote": "The shift towards Chinese suppliers... reflects a 'geopolitical' shift aligning with Beijing's 'Made in China 2025' plan and a different incentive structure where pleasing the state is paramount.", "keywords": ["Red Supply Chain", "Luxshare", "BYD Electronic", "China Manufacturing", "Supplier Shift", "Made in China 2025"] },
+            { "chapter_number": 36, "chapter_title": "“5 Alarm Fire”", "summary": "This chapter details the '5 alarm fire' in Apple's executive ranks in late 2018 due to a dramatic shortfall in iPhone XR sales in China. Internal documents reveal panic and desperate moves to boost revenue, while Tim Cook and CFO Luca Maestri engaged in 'brazen obfuscation' during public earnings calls, misleading investors and exposing the fragility of Apple's China strategy.", "key_arguments": ["Apple faced an 'extreme problem' with iPhone XR sales in China, leading to a projected $3.5 billion revenue drop.", "Tim Cook and Luca Maestri 'brazenly obfuscated' the severity of the China sales downturn during earnings calls.", "The crisis was exacerbated by Chinese carriers refusing further iPhone XR shipments due to low customer demand."], "key_takeaways_or_insights": ["Overreliance on a single market can lead to a corporate crisis when sales suddenly collapse.", "During a crisis, there is a strong temptation for executive leadership to mislead investors.", "Channel partners can quickly amplify a sales crisis by refusing inventory."], "notable_quote": "Tim Cook and Luca Maestri 'brazenly obfuscated' the severity of the China sales downturn during earnings calls, misleading investors by downplaying XR issues.", "keywords": ["iPhone XR", "Sales Crisis", "China Market", "Tim Cook", "Earnings Call", "Obfuscation", "Investor Lawsuit"] },
+            { "chapter_number": 37, "chapter_title": "The Huawei Threat", "summary": "This chapter examines the significant competitive threat posed by Huawei, which by late 2018 was outselling Apple globally. Huawei's Mate 20 Pro directly challenged the iPhone with superior features and lower prices. Paradoxically, US sanctions against Huawei later crippled its ability to produce advanced chips, leading to a dramatic 'boon' for Apple as its market share in China nearly doubled.", "key_arguments": ["Huawei emerged as a significant threat to Apple in China, rivaling and undercutting the iPhone XR on price and features.", "Huawei's competitive pressure was an 'even larger threat' than previously understood.", "US sanctions against Huawei unexpectedly became a 'boon' for Apple, crippling Huawei's ability to compete."], "key_takeaways_or_insights": ["A strong local competitor offering superior features at a lower price can rapidly erode market share.", "Geopolitical actions, like government sanctions, can have unintended and paradoxical consequences."], "notable_quote": "US sanctions against Huawei, initiated by the Trump administration, unexpectedly became a 'boon' for Apple, crippling Huawei's ability to compete and leading to Apple's market share in China nearly doubling.", "keywords": ["Huawei Threat", "Smartphone Competition", "US Sanctions", "Trump Administration", "Geopolitical Impact"] },
+            { "chapter_number": 38, "chapter_title": "Global Pandemic", "summary": "This chapter describes the onset of the COVID-19 pandemic and China's extreme 'zero-COVID' lockdowns, which ultimately demonstrated the resilience of Apple's China-centric operations. However, Beijing's simultaneous crackdown on its own tech giants revealed the unpredictable political risks and Xi Jinping's accrued power, underscoring Apple's 'predicament'.", "key_arguments": ["Apple's China-centric supply chain 'defied dire predictions' and demonstrated resilience due to extensive prior training of suppliers.", "Apple had intentionally created 'mini-crises' for suppliers to learn problem-solving, preparing them for the pandemic.", "Beijing's crackdown on its own tech sector highlighted the unpredictable risks of operating in an authoritarian state."], "key_takeaways_or_insights": ["Long-term investment in supplier training and crisis preparedness can build a resilient supply chain.", "Proactively creating 'mini-crises' is an effective way to train partners to be self-sufficient.", "A government crackdown on other tech firms is a clear warning sign of heightened political risk."], "notable_quote": "Apple had intentionally created 'mini-crises' for suppliers to learn problem-solving, which prepared them to manage production even when Apple engineers couldn't fly in.", "keywords": ["COVID-19", "China Lockdowns", "Supply Chain Resilience", "Supplier Training", "Tech Crackdown", "Political Risk"] },
+            { "chapter_number": 39, "chapter_title": "“An Unprecedented Nightmare for Apple”", "summary": "This chapter emphasizes the 'unprecedented nightmare' Apple faces due to Xi Jinping's authoritarian consolidation and China's 'zero-COVID' policies, which exposed the severe vulnerabilities of Apple's deep entanglement with the regime. The increasing repression and government control created a 'predicament' that critics argue Tim Cook has underestimated, highlighting the divergence of Apple's interests from Washington's.", "key_arguments": ["Xi Jinping's consolidation of power signaled a regime committed to ruling for life, fundamentally changing the operating environment.", "China's 'zero-COVID' measures revealed the government's direct control over operations and information.", "Critics argue that Tim Cook has 'erred by doubling down' on China, creating a 'predicament' where Apple's interests diverge from Washington's."], "key_takeaways_or_insights": ["The consolidation of power by an authoritarian leader creates a more risky and unpredictable environment.", "Government policies can directly interfere with a company's operations and product features.", "Deep engagement with an authoritarian regime can create reputational and legacy risks for its leader."], "notable_quote": "Critics argue that Tim Cook has 'erred by doubling down' on China despite mounting evidence of repression, leading to a 'predicament' where Apple's interests diverge from Washington's and risk tarnishing Cook's legacy.", "keywords": ["Xi Jinping", "Zero-COVID", "Authoritarianism", "Geopolitical Risk", "Tim Cook Legacy", "Supply Chain Vulnerability"] },
+            { "chapter_number": 40, "chapter_title": "Plan B—Assembled in India?", "summary": "Following the Shanghai lockdown, Apple initiated plans to diversify iPhone production away from China, with India emerging as a key 'Plan B'. This shift aims to replicate China's industrial clusters in India, but experts are 'deeply divided' on its feasibility due to challenges like India's lack of a mature component supplier ecosystem, different cultural pace, and potential Chinese obstruction.", "key_arguments": ["Apple's diversification efforts shifted notably towards India after the Shanghai lockdown.", "India offers a large, cheap labor force and fewer geopolitical risks, but currently, operations are mainly final assembly reliant on Chinese components.", "Experts are 'deeply divided' on India's capacity to rival China, citing numerous significant hurdles."], "key_takeaways_or_insights": ["Geopolitical shocks are major drivers for supply chain diversification.", "Replicating a mature manufacturing ecosystem in a new country is a long and challenging process.", "A 'Plan B' location may initially be limited to final assembly, remaining dependent on the primary location for components."], "notable_quote": "Experts are 'deeply divided' on India's capacity to rival China, citing India's lack of a mature supplier ecosystem, different cultural work pace, fragmented government, and potential Chinese government interference.", "keywords": ["India Manufacturing", "Diversification", "Plan B", "Supply Chain Relocation", "China Rivalry", "Geopolitical De-risking"] },
+            { "chapter_number": 41, "chapter_title": "A Staggering Vulnerability—TSMC", "summary": "This chapter highlights Apple's decision in 2020 to move away from Intel chips and exclusively rely on TSMC in Taiwan for its 'Apple Silicon,' significantly intensifying its geopolitical vulnerabilities. With TSMC responsible for most of the world's advanced chips and Taiwan's political status disputed by China, any military action would have 'disastrous effects' on Apple and the global economy.", "key_arguments": ["Apple's decision to exclusively use TSMC in Taiwan for its custom 'Apple Silicon' chips has created a 'staggering vulnerability.'", "Taiwan's geopolitical position poses an existential threat to TSMC, which would 'go out of business on day one of the war.'", "This extreme concentration of risk has led investors like Warren Buffett to divest from TSMC and reduce their stake in Apple."], "key_takeaways_or_insights": ["Consolidating the supply of a critical component with a single supplier in a geopolitically volatile region creates a massive, potentially existential, risk.", "Technological benefits must be weighed against the geopolitical risks of sourcing.", "Geopolitical risk is a significant factor in investment decisions, even for the world's most successful companies."], "notable_quote": "Apple's decision to exclusively use TSMC in Taiwan for its custom 'Apple Silicon' chips across all products has created a 'staggering vulnerability' due to the concentration of critical chip production on one island.", "keywords": ["TSMC", "Taiwan", "Apple Silicon", "Chip Manufacturing", "Geopolitical Vulnerability", "Supply Chain Risk"] },
+            { "chapter_number": 42, "chapter_title": "Conclusion: Unwritten Legacy", "summary": "The conclusion outlines five major risks facing Apple's relationship with China: the resurgence of Huawei, potential Chinese backlash against diversification to India, the sensitivity of its services division to Chinese political influence, its lagging position in AI, and the divergence between its corporate interests and Washington's. Despite diversification efforts, Apple remains inextricably tied to China, facing an 'impossible' task of meaningful decoupling.", "key_arguments": ["Huawei's resurgence poses a significant and growing competitive threat.", "Apple's efforts to de-risk from China by moving production to India could provoke a 'backlash' from Beijing.", "Apple's lucrative services division is vulnerable to Chinese political influence.", "The 'shareholder-first capitalism' that drove Apple to China has created a divergence between corporate and national interests."], "key_takeaways_or_insights": ["Despite diversification efforts, Apple's deep entanglement with China makes meaningful decoupling within the next five years 'impossible'.", "Apple's operational successes in China have unwittingly transferred immense manufacturing knowledge, placing Apple in 'real danger.'"], "notable_quote": "Despite diversification efforts, Apple's deep entanglement with China makes meaningful decoupling within the next five years 'impossible'.", "keywords": ["Huawei", "China Risks", "Diversification", "Services Vulnerability", "AI", "Geopolitical Divergence", "Tim Cook Legacy"] }
+          ],
+          "limitations_and_future_directions": { "acknowledged_constraints": ["The book is primarily interview-based, which has subjective limitations.", "Apple's secrecy makes external research inherently challenging.", "The author acknowledges the topics are vast and the work cannot be exhaustive."], "future_research": ["Deeper investigation into the Apple-China relationship.", "Further analysis of contract manufacturing and tech supply chains.", "Expanded research on the intersection of technology and geopolitics."] },
+          "field_context": { "statement": "This book positions itself at the critical intersection of business history, international relations, and supply chain management. It moves beyond a simplistic 'Made in China' narrative to provide a deeply researched account of the co-dependent relationship between America's most valuable company and the world's rising superpower. By detailing the granular processes of knowledge transfer, operational control, and political negotiation, the book serves as a seminal case study in modern geopolitics and the strategic vulnerabilities created by globalized manufacturing. It challenges the conventional wisdom of asset-light outsourcing, revealing it as a form of deep, albeit risky, vertical integration that has fundamentally shaped the industrial capacity and technological trajectory of another nation." }
+        };
+
+        // DOM elements
+        const chapterNav = document.getElementById('chapter-navigation');
+        const contentDisplay = document.getElementById('content-display');
+        const bookTitleMain = document.getElementById('book-title-main');
+        const bookMetaMain = document.getElementById('book-meta-main');
+        const currentSectionTitle = document.getElementById('current-section-title');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const overlay = document.getElementById('overlay');
+        const sidebar = document.getElementById('sidebar');
+
+        /**
+         * Initializes the dashboard on DOM content load.
+         * Populates header, generates navigation, and displays the initial summary.
+         */
+        function initialize() {
+            // Populate main header with book metadata
+            bookTitleMain.textContent = jsonData.book_meta.title;
+            bookMetaMain.textContent = `${jsonData.book_meta.author} (${jsonData.book_meta.publication_year})`;
+            
+            // Create navigation links
+            createNavigation();
+
+            // Display the overall summary by default
+            displayContent('overall_summary');
+            setActiveLink('overall_summary');
+        }
+
+        /**
+         * Creates and appends navigation links to the sidebar.
+         */
+        function createNavigation() {
+            // Add link for Overall Summary
+            let summaryLink = `<li><a href="#" data-id="overall_summary">Overall Summary</a></li>`;
+            
+            // Add links for special sections
+            let specialSections = `
+                <li><a href="#" data-id="field_context">Field Context</a></li>
+                <li><a href="#" data-id="limitations">Limitations & Future Directions</a></li>
+            `;
+            
+            // Add links for each chapter
+            const chapterLinks = jsonData.chapters.map(chapter => `
+                <li><a href="#" data-id="${chapter.chapter_number}">Ch. ${chapter.chapter_number}: ${chapter.chapter_title}</a></li>
+            `).join('');
+
+            chapterNav.innerHTML = summaryLink + chapterLinks + specialSections;
+        }
+
+        /**
+         * Displays the content for a given section ID.
+         * @param {string} id - The ID of the section to display (e.g., 'overall_summary' or chapter number).
+         */
+        function displayContent(id) {
+            contentDisplay.innerHTML = ''; // Clear previous content
+            
+            let data, title;
+
+            if (id === 'overall_summary') {
+                data = jsonData.overall_summary;
+                title = "Overall Summary";
+                currentSectionTitle.textContent = title;
+                contentDisplay.appendChild(createCard('Abstract', data.abstract, 'full-width', 'book'));
+                contentDisplay.appendChild(createCard('Keywords', createKeywords(data.keywords), 'full-width', 'tag'));
+            } else if (id === 'limitations') {
+                data = jsonData.limitations_and_future_directions;
+                title = "Limitations & Future Directions";
+                currentSectionTitle.textContent = title;
+                contentDisplay.appendChild(createCard('Acknowledged Constraints', createList(data.acknowledged_constraints), 'full-width', 'alert-triangle'));
+                contentDisplay.appendChild(createCard('Future Research', createList(data.future_research), 'full-width', 'search'));
+            } else if (id === 'field_context') {
+                data = jsonData.field_context;
+                title = "Field Context";
+                currentSectionTitle.textContent = title;
+                contentDisplay.appendChild(createCard('Position Within the Field', data.statement, 'full-width', 'globe'));
+            } else {
+                const chapter = jsonData.chapters.find(c => c.chapter_number == id);
+                if (chapter) {
+                    title = `Chapter ${chapter.chapter_number}: ${chapter.chapter_title}`;
+                    currentSectionTitle.textContent = title;
+
+                    contentDisplay.appendChild(createCard('Chapter Summary', chapter.summary, 'full-width', 'align-left'));
+                    contentDisplay.appendChild(createCard('Key Arguments', createList(chapter.key_arguments), '', 'bar-chart-2'));
+                    contentDisplay.appendChild(createCard('Key Takeaways', createList(chapter.key_takeaways_or_insights), '', 'key'));
+                    contentDisplay.appendChild(createCard('Notable Quote', `<blockquote>${chapter.notable_quote}</blockquote>`, '', 'message-square'));
+                    contentDisplay.appendChild(createCard('Keywords', createKeywords(chapter.keywords), 'full-width', 'tag'));
+
+                    // Conditional Visualization
+                    if (chapter.chapter_number === 30) { // "The Apple Squeeze"
+                        contentDisplay.appendChild(createProfitShareVisualization());
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Helper function to create a styled card element.
+         * @param {string} title - The title of the card.
+         * @param {string} content - The HTML content for the card.
+         * @param {string} extraClass - Additional CSS classes for the card.
+         * @param {string} iconName - Feather icon name.
+         * @returns {HTMLElement} The created card element.
+         */
+        function createCard(title, content, extraClass = '', iconName = 'file-text') {
+            const card = document.createElement('div');
+            card.className = `card ${extraClass}`;
+            
+            // Icon colors based on title
+            const iconBgColor = title.includes('Quote') || title.includes('Constraints') ? 'bg-red-500' : 'bg-blue-500';
+
+            card.innerHTML = `
+                <div class="card-header">
+                     <div class="icon ${iconBgColor}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-${iconName}"><title>${title}</title><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                     </div>
+                    <h4>${title}</h4>
+                </div>
+                <div class="card-content">${content}</div>
+            `;
+            // Simple dynamic icon replacement
+            if (iconName !== 'file-text') {
+                 card.querySelector('svg').outerHTML = getIconSVG(iconName, title);
+            }
+            return card;
+        }
+
+        /**
+         * Creates a custom visualization for "The Apple Squeeze" chapter.
+         * @returns {HTMLElement} The visualization card element.
+         */
+        function createProfitShareVisualization() {
+            const vizCard = document.createElement('div');
+            vizCard.className = 'card full-width';
+            vizCard.innerHTML = `
+                <div class="card-header">
+                    <div class="icon bg-blue-500">${getIconSVG('pie-chart', 'Visualization')}</div>
+                    <h4>Visualization: The Apple Squeeze</h4>
+                </div>
+                <div class="visualization-container">
+                    <p class="text-sm text-gray-400 mb-4">Apple captures a disproportionate share of industry profits relative to its market share.</p>
+                    <div class="profit-share-chart">
+                        <div class="bar-container">
+                            <div class="bar-value text-blue-400">&lt;20%</div>
+                            <div class="bar market-share" style="height: 20%;" title="Market Share"></div>
+                            <div class="bar-label">Market Share</div>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-value text-red-400">&gt;80%</div>
+                            <div class="bar profit-share" style="height: 85%;" title="Profit Share"></div>
+                            <div class="bar-label">Profit Share</div>
+                        </div>
+                    </div>
+                </div>`;
+            return vizCard;
+        }
+
+        // --- Helper functions for content generation ---
+        function createList(items) {
+            return `<ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        }
+
+        function createKeywords(keywords) {
+            return `<div class="keyword-tags">${keywords.map(kw => `<span>${kw}</span>`).join('')}</div>`;
+        }
+
+        /**
+         * Sets the 'active' class on the current navigation link.
+         * @param {string} id - The ID of the active section.
+         */
+        function setActiveLink(id) {
+            document.querySelectorAll('#chapter-navigation a').forEach(a => {
+                a.classList.remove('active');
+                if (a.dataset.id === id) {
+                    a.classList.add('active');
+                }
+            });
+        }
+        
+        /**
+         * Handles click events on the navigation menu.
+         * @param {Event} e - The click event.
+         */
+        function handleNavClick(e) {
+            e.preventDefault();
+            const link = e.target.closest('a');
+            if (link && chapterNav.contains(link)) {
+                const id = link.dataset.id;
+                displayContent(id);
+                setActiveLink(id);
+                // Close sidebar on mobile after clicking a link
+                if (window.innerWidth <= 992) {
+                    document.body.classList.remove('sidebar-active');
+                }
+            }
+        }
+        
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', initialize);
+        chapterNav.addEventListener('click', handleNavClick);
+        
+        hamburgerBtn.addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-active');
+        });
+
+        overlay.addEventListener('click', () => {
+            document.body.classList.remove('sidebar-active');
+        });
+
+        // --- Icon SVG Generator ---
+        function getIconSVG(name, title) {
+            const icons = {
+                'book': `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>`,
+                'tag': `<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>`,
+                'align-left': `<line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line>`,
+                'bar-chart-2': `<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>`,
+                'key': `<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>`,
+                'message-square': `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>`,
+                'alert-triangle': `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>`,
+                'search': `<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>`,
+                'globe': `<circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>`,
+                'pie-chart': `<path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>`
+            };
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>${title}</title>${icons[name] || ''}</svg>`;
+        }
+
+    </script>
+</body>
+</html>
+
+

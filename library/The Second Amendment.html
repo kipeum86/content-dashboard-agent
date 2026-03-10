@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Second Amendment: A Biography - Dashboard</title>
+    <!-- Importing Fonts for Thematic Consistency -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* * THEME CONFIGURATION
+         * Theme: Historical Legal (Navy, Parchment, Crimson)
+         * Fonts: Merriweather (Serif) for headers, Roboto (Sans) for UI/Body
+         */
+        :root {
+            --primary-color: #1a2c42; /* Deep Navy - Represents Law/Federal */
+            --secondary-color: #8c2f2f; /* Muted Crimson - Represents Conflict/History */
+            --accent-color: #d4af37; /* Gold - Classic book binding feel */
+            --bg-color: #f9f7f2; /* Light Parchment */
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-light: #546e7a;
+            
+            /* Sidebar width fixed at 300px */
+            --sidebar-width: 300px; 
+            --transition-speed: 0.3s;
+            --font-heading: 'Merriweather', serif;
+            --font-body: 'Roboto', sans-serif;
+        }
+
+        /* RESET & BASE STYLES */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll, handle inside containers */
+        }
+
+        /* LAYOUT CONTAINER */
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* MOBILE HEADER */
+        #mobile-header {
+            display: none; /* Hidden on desktop */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--primary-color);
+            color: white;
+            z-index: 20;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #hamburger-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        #mobile-title {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform var(--transition-speed) ease;
+            z-index: 30;
+            box-shadow: 8px 0 25px rgba(0,0,0,0.2);
+            /* Enable scrolling on the entire sidebar to "unfix" the header */
+            overflow-y: auto; 
+            flex-shrink: 0; 
+        }
+
+        .sidebar-header {
+            padding: 0;
+            background-color: rgba(0,0,0,0.2);
+            text-align: center;
+            /* No sticky positioning here allows it to scroll up */
+        }
+
+        .book-cover-container {
+            width: 100%;
+            /* Adjusted height proportionally to the new width */
+            height: 210px; 
+            overflow: hidden;
+            background-color: #0d1621;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .book-cover-img {
+            max-width: 85%;
+            max-height: 100%;
+            object-fit: contain; 
+            opacity: 1; 
+            transition: transform 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        
+        .book-cover-container:hover .book-cover-img {
+            transform: scale(1.02); 
+        }
+
+        /* NAVIGATION */
+        #chapter-navigation {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        #chapter-navigation li {
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            /* Adjusted padding for narrower width */
+            padding: 14px 25px; 
+            text-align: left;
+            background: none;
+            border: none;
+            color: #bdc3c7;
+            cursor: pointer;
+            font-family: var(--font-body);
+            /* Slightly reduced font size to fit narrower width */
+            font-size: 1rem; 
+            transition: all 0.2s;
+            border-left: 6px solid transparent; 
+            line-height: 1.5;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.08);
+            color: #fff;
+            padding-left: 30px; 
+        }
+
+        .nav-btn.active {
+            background-color: rgba(255,255,255,0.12);
+            color: #fff;
+            border-left-color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #95a5a6;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background-color: rgba(0,0,0,0.15);
+            /* Footer will now scroll with content */
+            margin-top: auto; 
+        }
+
+        /* MAIN CONTENT */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            /* UPDATED: Changed from hidden to auto to allow entire area to scroll */
+            overflow-y: auto;
+            background: linear-gradient(135deg, #f9f7f2 0%, #efede6 100%);
+            /* Ensure content area works even with large sidebar */
+            min-width: 0; 
+        }
+
+        #content-header {
+            padding: 50px 60px 30px 60px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            background-color: rgba(255,255,255,0.4); 
+        }
+
+        #book-title-main {
+            font-family: var(--font-heading);
+            font-size: 2.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        #book-meta-main {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            font-style: italic;
+            margin-bottom: 25px;
+        }
+
+        #current-section-title {
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-weight: 700;
+        }
+
+        /* CONTENT DISPLAY AREA */
+        #content-display {
+            /* UPDATED: Removed internal scrolling so it flows within main-content */
+            padding: 40px 60px 80px 60px;
+            scroll-behavior: smooth;
+        }
+
+        /* OVERLAY for Mobile */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 25;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed);
+        }
+
+        #overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* CARD STYLING */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.07);
+            border-top: 6px solid var(--primary-color);
+            animation: fadeIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transition: transform 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px); 
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.6rem; 
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .card-text {
+            line-height: 1.8; 
+            color: #34495e;
+            font-size: 1.1rem; 
+        }
+
+        /* LIST STYLES */
+        .styled-list {
+            list-style: none;
+        }
+
+        .styled-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .styled-list li::before {
+            content: "•";
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 1.3em;
+            position: absolute;
+            left: 0;
+            top: -3px;
+        }
+
+        /* QUOTE BOX */
+        .quote-box {
+            background-color: #f4f6f7;
+            border-left: 8px solid var(--accent-color);
+            padding: 30px;
+            font-family: var(--font-heading);
+            font-style: italic;
+            font-size: 1.35rem; 
+            color: var(--primary-color);
+            margin: 35px 0;
+            border-radius: 0 10px 10px 0;
+            line-height: 1.6;
+        }
+
+        /* KEYWORD TAGS */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .tag {
+            background-color: #ecf0f1;
+            color: var(--text-light);
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .tag:hover {
+            background-color: #dfe6e9;
+            color: var(--primary-color);
+        }
+
+        /* CUSTOM VISUALIZATIONS */
+        
+        /* 1. Timeline CSS (Horizontal) */
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 50px 0 30px 0;
+            padding: 0 20px;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #dcdde1;
+            z-index: 1;
+        }
+        .timeline-node {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20%;
+        }
+        .timeline-dot {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-color);
+            border: 5px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .timeline-node:hover .timeline-dot {
+            transform: scale(1.2);
+            background: var(--secondary-color);
+        }
+        .timeline-date {
+            margin-top: 15px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--secondary-color);
+        }
+        .timeline-label {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            color: var(--text-light);
+            line-height: 1.3;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE MEDIA QUERIES */
+        @media (max-width: 1200px) {
+            #content-header {
+                padding: 40px;
+            }
+            #content-display {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            #mobile-header {
+                display: flex;
+            }
+
+            #sidebar {
+                position: fixed;
+                left: calc(-1 * var(--sidebar-width)); 
+                height: 100%;
+                top: 0; 
+                width: var(--sidebar-width);
+                max-width: 85vw;
+                overflow-y: auto; 
+            }
+
+            #sidebar.active {
+                transform: translateX(var(--sidebar-width)); 
+            }
+            
+            @media (max-width: 450px) {
+                 #sidebar.active {
+                    transform: translateX(100%);
+                 }
+                 #sidebar {
+                    width: 100%;
+                    max-width: 100%;
+                    left: -100%; /* Ensure full width sidebar is hidden */
+                 }
+            }
+
+            #main-content {
+                padding-top: 60px; /* Space for mobile header */
+            }
+
+            #content-header {
+                padding: 30px 25px;
+            }
+
+            #content-display {
+                padding: 25px;
+            }
+
+            #book-title-main {
+                font-size: 2rem;
+            }
+
+            .timeline-container {
+                flex-direction: column;
+                padding-left: 20px;
+                margin-top: 30px;
+            }
+            .timeline-line {
+                width: 4px;
+                height: 100%;
+                left: 36px;
+                top: 0;
+            }
+            .timeline-node {
+                flex-direction: row;
+                width: 100%;
+                margin-bottom: 30px;
+                align-items: flex-start;
+            }
+            .timeline-dot {
+                margin-top: 2px;
+            }
+            .timeline-date {
+                margin-top: 6px;
+                margin-left: 20px;
+                width: 70px;
+                font-size: 1rem;
+            }
+            .timeline-label {
+                margin-top: 6px;
+                margin-left: 10px;
+                text-align: left;
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Header -->
+    <header id="mobile-header">
+        <button id="hamburger-btn">☰</button>
+        <div id="mobile-title">The Second Amendment</div>
+    </header>
+
+    <!-- Overlay for Sidebar -->
+    <div id="overlay"></div>
+
+    <div id="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <div class="book-cover-container">
+                    <img src="https://imgur.com/j0ruhYc.jpg" alt="Book Cover" class="book-cover-img">
+                </div>
+                <!-- Removed 'A Biography' title display -->
+            </div>
+            <ul id="chapter-navigation">
+                <!-- Javascript will populate this -->
+            </ul>
+            <div class="sidebar-footer">
+                Dashboard by Kipeum
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <header id="content-header">
+                <h1 id="book-title-main">Loading...</h1>
+                <p id="book-meta-main">...</p>
+                <h2 id="current-section-title">Overview</h2>
+            </header>
+
+            <div id="content-display">
+                <!-- Dynamic Content Loads Here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 1. DATA INJECTION
+        const jsonData = {
+  "book_meta": {
+    "title": "The Second Amendment: A Biography",
+    "author": "Michael Waldman",
+    "publication_year": "2014",
+    "main_theme": "The evolution of the Second Amendment from a collective civic duty to a celebrated individual right."
+  },
+  "overall_summary": {
+    "abstract": "This book provides a biography of the Second Amendment, tracing its evolution from a provision ensuring the security of state militias in the eighteenth century to a celebrated individual right to own firearms in the twenty-first century. The author argues that for two centuries, the amendment was understood by judges and scholars to refer to the civic duty of serving in a 'well regulated militia,' rather than a private right to self-defense. The text details how a concerted campaign by the National Rifle Association (NRA) and the rise of the legal theory of 'originalism' transformed the amendment's meaning, culminating in the Supreme Court's 2008 Heller decision. Waldman ultimately suggests that constitutional rights are shaped as much by political advocacy and public sentiment as by the text itself, warning against judicial overreach in policy matters like gun control.",
+    "keywords": [
+      "Second Amendment",
+      "Militia",
+      "District of Columbia v. Heller",
+      "Originalism",
+      "NRA",
+      "Gun Control",
+      "Constitutional Law"
+    ]
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "chapter_title": "Patriots’ Day",
+      "summary": "This chapter recounts the events of Lexington and Concord to illustrate the pivotal role of militias in the American Revolution. It establishes that the 'well regulated militia' was a government-organized entity rooted in civic duty, rather than a disorganized collection of individuals acting alone.",
+      "key_arguments": [
+        "The Revolutionary militia was a well-organized military force integrated into colonial government, distinct from the modern image of solitary individuals defending their homes.",
+        "To the colonists, the militia represented a virtuous, egalitarian alternative to a 'standing army,' which was viewed as a tool of tyranny and oppression.",
+        "Bearing arms was viewed less as a right and more as a mandatory civic duty for the community's defense, with laws requiring white men to own and maintain military weaponry."
+      ],
+      "key_takeaways_or_insights": [
+        "The historical context of the Second Amendment is a world where gun ownership was a government-mandated burden for collective security, not just a personal choice.",
+        "The 'Minute Man' ideal obscures the reality that militias were often regulated, compulsory, and ineffective without government structure."
+      ],
+      "notable_quote": "The historical context of the Second Amendment is a world where gun ownership was a government-mandated burden for collective security, not just a personal choice.",
+      "keywords": ["Militia", "Standing Army", "Lexington and Concord", "Civic Duty"]
+    },
+    {
+      "chapter_number": 2,
+      "chapter_title": "Ratification",
+      "summary": "This chapter covers the drafting and ratification of the Constitution, highlighting the intense debate between Federalists and Anti-Federalists over federal military power. It explains how the fear of a national standing army destroying state militias drove the demand for what became the Second Amendment.",
+      "key_arguments": [
+        "The Constitution was a radical shift that transferred military authority from the states to the national government, sparking Anti-Federalist fears that Congress would disarm state militias.",
+        "The debate focused on the distribution of military power between state and federal governments, with almost no mention of an individual right to own guns for personal self-defense.",
+        "Gun regulations were common in the Founding Era, including loyalty oaths, registration, and prohibitions on firing guns in cities, contradicting the idea of an unregulated right."
+      ],
+      "key_takeaways_or_insights": [
+        "The Framers did not distinguish between military and civilian small arms because the technology of the time (muskets) served both purposes equally.",
+        "The push for a Bill of Rights was largely a political strategy to ensure ratification by alleviating fears of centralized tyranny, rather than a philosophical crusade for individual gun rights."
+      ],
+      "notable_quote": "The push for a Bill of Rights was largely a political strategy to ensure ratification by alleviating fears of centralized tyranny, rather than a philosophical crusade for individual gun rights.",
+      "keywords": ["Anti-Federalists", "Ratification", "Federal Power", "Bill of Rights"]
+    },
+    {
+      "chapter_number": 3,
+      "chapter_title": "The Tub to the Whale",
+      "summary": "James Madison drafts the Bill of Rights to fulfill a campaign promise and quell public anxiety without altering the Constitution's structure. The Second Amendment emerges as a political compromise—a 'tub to the whale'—to distract opponents while preserving federal authority.",
+      "key_arguments": [
+        "Madison originally opposed a Bill of Rights but drafted one to prevent a second constitutional convention that might strip the federal government of its power to tax and raise armies.",
+        "The drafting debates focused entirely on military issues, such as the conscientious objector clause (which was later removed), confirming the amendment’s military purpose.",
+        "The amendment was designed to reassure states that their militias would be preserved, not to grant individuals a right to own weapons separate from militia service."
+      ],
+      "key_takeaways_or_insights": [
+        "The 'right of the people' was used by the Framers to refer to the body politic or the militia, distinct from individual persons.",
+        "Linguistic analysis of the era shows that the phrase 'bear arms' had an overwhelmingly military meaning."
+      ],
+      "notable_quote": "The Second Amendment emerges as a political compromise—a 'tub to the whale'—to distract opponents while preserving federal authority.",
+      "keywords": ["James Madison", "Conscientious Objector", "Political Compromise"]
+    },
+    {
+      "chapter_number": 4,
+      "chapter_title": "Arkansas Toothpicks & The 14th Amendment",
+      "summary": "This chapter traces the decline of the militia system and the transformation of gun rights through the Civil War and Reconstruction. It argues that the Fourteenth Amendment introduced a new context for gun ownership focused on the protection of freed slaves from racial violence.",
+      "key_arguments": [
+        "As the militia system crumbled, the Supreme Court ruled in the 19th century (e.g., Cruikshank) that the Second Amendment did not apply to the states and restricted only Congress.",
+        "The Fourteenth Amendment aimed to secure the 'privileges and immunities' of citizens, which some framers believed included the right to bear arms for self-defense against groups like the KKK.",
+        "Gun control laws proliferated in the 19th century, particularly in the 'Wild West,' where towns like Dodge City strictly prohibited carrying firearms."
+      ],
+      "key_takeaways_or_insights": [
+        "The modern concept of an individual right to bear arms for self-defense has roots in the Reconstruction era's racial conflict, not the Second Amendment's original militia focus.",
+        "The Supreme Court historically viewed the Second Amendment as a collective right related to militia service until very recently."
+      ],
+      "notable_quote": "The modern concept of an individual right to bear arms for self-defense has roots in the Reconstruction era's racial conflict, not the Second Amendment's original militia focus.",
+      "keywords": ["Fourteenth Amendment", "Reconstruction", "Cruikshank", "Wild West"]
+    },
+    {
+      "chapter_number": 5,
+      "chapter_title": "Revolt at Cincinnati",
+      "summary": "This chapter documents the transformation of the National Rifle Association (NRA) from a marksmanship and safety organization into a hardline political lobby. The 'Revolt at Cincinnati' in 1977 marked a pivotal shift toward Second Amendment fundamentalism.",
+      "key_arguments": [
+        "For much of its history, the NRA supported gun control measures, including the National Firearms Act of 1934 and the Gun Control Act of 1968.",
+        "A radical faction took over the NRA in 1977, changing its focus from sports and hunting to a dogmatic defense of an individual right to own guns.",
+        "The NRA aligned itself with the rising conservative movement and the Republican Party, turning gun ownership into a potent wedge issue in the 'culture wars'."
+      ],
+      "key_takeaways_or_insights": [
+        "The modern political power of the gun rights movement is a relatively recent phenomenon, born of organizational changes in the late 1970s.",
+        "The NRA explicitly altered its message to frame gun ownership as a 'civil right' and a check against government tyranny."
+      ],
+      "notable_quote": "The NRA explicitly altered its message to frame gun ownership as a 'civil right' and a check against government tyranny.",
+      "keywords": ["NRA", "Revolt at Cincinnati", "Culture Wars", "Wedge Issue"]
+    },
+    {
+      "chapter_number": 6,
+      "chapter_title": "Contest for the Constitution",
+      "summary": "Waldman details the rise of the conservative legal movement and the doctrine of 'originalism,' which provided the intellectual framework for reinterpreting the Second Amendment. Justice Antonin Scalia is highlighted as a central figure in this jurisprudential shift.",
+      "key_arguments": [
+        "Conservative legal scholars and the Federalist Society promoted 'originalism' to counter liberal judicial activism, eventually using it to advance their own political goals.",
+        "A wave of revisionist law review articles, often funded by the NRA, created a new 'Standard Model' asserting the Second Amendment guaranteed an individual right.",
+        "Justice Scalia’s brand of originalism focuses on 'original public meaning' but is criticized for being selective and ignoring historical context."
+      ],
+      "key_takeaways_or_insights": [
+        "The shift in constitutional interpretation was driven by a coordinated campaign of scholarship and judicial appointments.",
+        "'Law office history'—plucking quotes out of context—played a major role in building the legal case for individual gun rights."
+      ],
+      "notable_quote": "A wave of revisionist law review articles, often funded by the NRA, created a new 'Standard Model' asserting the Second Amendment guaranteed an individual right.",
+      "keywords": ["Originalism", "Justice Scalia", "Federalist Society"]
+    },
+    {
+      "chapter_number": 7,
+      "chapter_title": "The Road to Heller",
+      "summary": "This chapter analyzes the landmark District of Columbia v. Heller case, where the Supreme Court affirmed an individual right to own a handgun. It critiques Scalia’s majority opinion for disregarding the amendment's preamble and overturning centuries of precedent.",
+      "key_arguments": [
+        "The Heller decision was the culmination of a decades-long political and legal campaign to change public and judicial perception of the Second Amendment.",
+        "Scalia’s opinion effectively removed the 'militia' clause from the amendment, focusing exclusively on the 'operative clause' to find an individual right.",
+        "Despite declaring a broad right, the opinion seemingly arbitrarily listed acceptable regulations (e.g., bans on felons), revealing a pragmatic rather than purely originalist approach."
+      ],
+      "key_takeaways_or_insights": [
+        "Heller represents 'living constitutionalism' in conservative garb, as it updated the law to reflect modern public sentiment rather than 1789 realities.",
+        "The decision transformed the debate from policy and safety to a clash over constitutional absolutes."
+      ],
+      "notable_quote": "Heller represents 'living constitutionalism' in conservative garb, as it updated the law to reflect modern public sentiment rather than 1789 realities.",
+      "keywords": ["Heller", "Justice Scalia", "Judicial Activism", "Operative Clause"]
+    },
+    {
+      "chapter_number": 8,
+      "chapter_title": "From Heller to Sandy Hook",
+      "summary": "This chapter examines the legal and political aftermath of Heller, including the McDonald decision applying the right to the states. It discusses how lower courts have generally upheld gun regulations and how the political landscape shifted after the Newtown massacre.",
+      "key_arguments": [
+        "In the wake of Heller, lower courts have mostly applied 'intermediate scrutiny,' upholding the vast majority of gun control laws as serving an important government interest.",
+        "The McDonald decision incorporated the Second Amendment against the states, completing the legal revolution but leaving room for regulation.",
+        "The response to the Sandy Hook shooting highlighted the deep cultural polarization, with the NRA advocating for more guns (armed guards) as the solution to violence."
+      ],
+      "key_takeaways_or_insights": [
+        "While Heller established a right, it has not yet resulted in the widespread striking down of gun safety laws, as courts balance rights against public safety.",
+        "The invocation of 'fundamental rights' in states like Louisiana threatens to complicate standard criminal justice enforcement."
+      ],
+      "notable_quote": "While Heller established a right, it has not yet resulted in the widespread striking down of gun safety laws, as courts balance rights against public safety.",
+      "keywords": ["McDonald v. Chicago", "Sandy Hook", "Intermediate Scrutiny"]
+    },
+    {
+      "chapter_number": 9,
+      "chapter_title": "Flying Blind",
+      "summary": "Waldman discusses the practical difficulties of making gun policy in an era of constitutional litigation and limited data. He highlights the decline in gun ownership rates alongside the rise in total weapons and the legislative barriers to research.",
+      "key_arguments": [
+        "Gun ownership is concentrating in fewer hands, yet the political intensity of gun owners remains high compared to the broader public.",
+        "Congressional restrictions (the Dickey Amendment) have stifled public health research on gun violence, leaving policymakers and courts without necessary data.",
+        "The threat of constitutional litigation may deter local governments from experimenting with innovative safety measures like smart guns or microstamping."
+      ],
+      "key_takeaways_or_insights": [
+        "Effective gun control may depend more on policing strategies and enforcement of existing laws than on new legislation that risks constitutional challenge.",
+        "The gun debate is driven more by conflicting cultural worldviews (individualism vs. community) than by empirical evidence."
+      ],
+      "notable_quote": "Congressional restrictions have stifled public health research on gun violence, leaving policymakers and courts without necessary data.",
+      "keywords": ["Gun Research", "Dickey Amendment", "Public Health", "Data Void"]
+    },
+    {
+      "chapter_number": 10,
+      "chapter_title": "Conclusion: “The Right of the People”",
+      "summary": "The conclusion synthesizes the book’s findings, arguing against the rigidity of originalism and advocating for judicial restraint. Waldman asserts that the 'right of the people' should be interpreted as the democratic community's right to enact safety laws through the political process.",
+      "key_arguments": [
+        "Originalism is untenable because the world of the Founders—characterized by universal militia service and distinct military needs—no longer exists.",
+        "The Supreme Court should exercise judicial restraint and allow the political process to resolve complex social issues like gun violence.",
+        "Constitutional law is ultimately shaped by public engagement; progressive change requires mobilizing public sentiment just as the gun lobby did."
+      ],
+      "key_takeaways_or_insights": [
+        "The most authentic reading of 'the right of the people' is the collective right to self-governance and the ability to enact laws for public safety.",
+        "A 'living Constitution' approach is more honest and effective for addressing modern problems than trying to divine the intent of 18th-century writers."
+      ],
+      "notable_quote": "A 'living Constitution' approach is more honest and effective for addressing modern problems than trying to divine the intent of 18th-century writers.",
+      "keywords": ["Judicial Restraint", "Living Constitution", "Public Sentiment"]
+    }
+  ],
+  "limitations_and_future_directions": {
+    "acknowledged_constraints": [
+      "Original intent difficult to ascertain (Founder disagreements).",
+      "Scarcity of peer-reviewed data due to CDC funding ban.",
+      "Incomplete research on early American gun law 'tradition'."
+    ],
+    "future_research": [
+      "Rigorous public health research into violence prevention.",
+      "Deeper historical research into early American regulations.",
+      "Analysis of policing strategies within constitutional framework."
+    ]
+  },
+  "field_context": {
+    "statement": "This book is a significant contribution to Constitutional Law and Legal History. It challenges the 'Standard Model' promoted by conservative scholars, arguing instead that the individual right to bear arms is a modern legal construct. Waldman situates the Heller decision within a context of political advocacy, offering a critique of Originalism as a judicial methodology."
+  }
+};
+
+        // 2. DOM ELEMENTS
+        const bookTitleMain = document.getElementById('book-title-main');
+        const bookMetaMain = document.getElementById('book-meta-main');
+        const currentSectionTitle = document.getElementById('current-section-title');
+        const contentDisplay = document.getElementById('content-display');
+        const navList = document.getElementById('chapter-navigation');
+        const mainContent = document.getElementById('main-content');
+        
+        // Mobile UI Elements
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // 3. CORE FUNCTIONS
+
+        function initialize() {
+            // Set Header Info
+            bookTitleMain.textContent = jsonData.book_meta.title;
+            bookMetaMain.textContent = `${jsonData.book_meta.author} (${jsonData.book_meta.publication_year})`;
+            
+            // Build Navigation
+            // 1. Overall Summary
+            addNavItem('Overview', 'overall_summary', true);
+            
+            // 2. Chapters
+            jsonData.chapters.forEach(chapter => {
+                addNavItem(`Ch ${chapter.chapter_number}: ${chapter.chapter_title}`, `chapter_${chapter.chapter_number}`);
+            });
+
+            // 3. Limitations & Context
+            addNavItem('Limitations & Future', 'limitations');
+            addNavItem('Field Context', 'context');
+
+            // Load Default Content
+            displayContent('overall_summary');
+        }
+
+        function addNavItem(text, id, isActive = false) {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.className = isActive ? 'nav-btn active' : 'nav-btn';
+            btn.textContent = text;
+            btn.dataset.target = id;
+            
+            btn.addEventListener('click', (e) => {
+                // Remove active class from all
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                // Add to clicked
+                e.target.classList.add('active');
+                // Display content
+                displayContent(id);
+                // Close sidebar on mobile
+                closeSidebar();
+            });
+
+            li.appendChild(btn);
+            navList.appendChild(li);
+        }
+
+        function displayContent(id) {
+            // Scroll to top of main content area
+            mainContent.scrollTop = 0;
+            contentDisplay.innerHTML = ''; // Clear current
+
+            if (id === 'overall_summary') {
+                currentSectionTitle.textContent = "Book Overview";
+                renderOverallSummary();
+            } else if (id.startsWith('chapter_')) {
+                const chapterNum = parseInt(id.split('_')[1]);
+                const chapter = jsonData.chapters.find(c => c.chapter_number === chapterNum);
+                currentSectionTitle.textContent = `Chapter ${chapterNum}: ${chapter.chapter_title}`;
+                renderChapter(chapter);
+            } else if (id === 'limitations') {
+                currentSectionTitle.textContent = "Limitations & Future Directions";
+                renderLimitations();
+            } else if (id === 'context') {
+                currentSectionTitle.textContent = "Field Context";
+                renderContext();
+            }
+        }
+
+        // 4. RENDERING FUNCTIONS
+
+        function renderOverallSummary() {
+            const data = jsonData.overall_summary;
+            
+            // Abstract Card
+            const abstractCard = createCard('Abstract', data.abstract);
+            
+            // Keywords
+            const kwContainer = document.createElement('div');
+            kwContainer.className = 'tag-container';
+            data.keywords.forEach(kw => {
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.textContent = kw;
+                kwContainer.appendChild(tag);
+            });
+            abstractCard.appendChild(kwContainer);
+            contentDisplay.appendChild(abstractCard);
+
+            // Custom Visualization: Timeline
+            const timelineHTML = `
+                <div class="card-title">Historical Evolution Timeline</div>
+                <div class="timeline-container">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">1791</div>
+                        <div class="timeline-label">2nd Amendment Ratified (Civic Duty)</div>
+                    </div>
+                    
+                    <div class="timeline-node">
+                        <div class="timeline-dot" style="background:var(--secondary-color)"></div>
+                        <div class="timeline-date">1934</div>
+                        <div class="timeline-label">National Firearms Act (NRA Support)</div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="timeline-dot" style="background:var(--secondary-color)"></div>
+                        <div class="timeline-date">1977</div>
+                        <div class="timeline-label">NRA "Revolt at Cincinnati"</div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="timeline-dot" style="background:var(--secondary-color)"></div>
+                        <div class="timeline-date">2008</div>
+                        <div class="timeline-label">Heller Decision (Individual Right)</div>
+                    </div>
+
+                     <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">2012</div>
+                        <div class="timeline-label">Sandy Hook</div>
+                    </div>
+                </div>
+            `;
+            const timelineCard = document.createElement('div');
+            timelineCard.className = 'content-card';
+            timelineCard.innerHTML = timelineHTML;
+            contentDisplay.appendChild(timelineCard);
+        }
+
+        function renderChapter(chapter) {
+            // Summary Card
+            contentDisplay.appendChild(createCard('Summary', chapter.summary));
+
+            // Quote Card
+            if (chapter.notable_quote) {
+                const quoteDiv = document.createElement('div');
+                quoteDiv.className = 'quote-box';
+                quoteDiv.textContent = `"${chapter.notable_quote}"`;
+                contentDisplay.appendChild(quoteDiv);
+            }
+
+            // Arguments and Takeaways in a 2-column layout for larger screens?
+            // Keeping it stacked for simplicity in this constrained view
+            
+            // Arguments
+            const argsCard = document.createElement('div');
+            argsCard.className = 'content-card';
+            argsCard.innerHTML = `<div class="card-title">Key Arguments</div>`;
+            const argsList = document.createElement('ul');
+            argsList.className = 'styled-list';
+            chapter.key_arguments.forEach(arg => {
+                const li = document.createElement('li');
+                li.textContent = arg;
+                argsList.appendChild(li);
+            });
+            argsCard.appendChild(argsList);
+            contentDisplay.appendChild(argsCard);
+
+            // Takeaways (Visual difference)
+            const takeCard = document.createElement('div');
+            takeCard.className = 'content-card';
+            takeCard.style.borderTopColor = 'var(--secondary-color)'; // Red top border
+            takeCard.innerHTML = `<div class="card-title" style="color:var(--secondary-color)">Insights & Takeaways</div>`;
+            const takeList = document.createElement('ul');
+            takeList.className = 'styled-list';
+            chapter.key_takeaways_or_insights.forEach(take => {
+                const li = document.createElement('li');
+                li.textContent = take;
+                takeList.appendChild(li);
+            });
+            takeCard.appendChild(takeList);
+            contentDisplay.appendChild(takeCard);
+        }
+
+        function renderLimitations() {
+            const data = jsonData.limitations_and_future_directions;
+            
+            // Constraints
+            const conCard = document.createElement('div');
+            conCard.className = 'content-card';
+            conCard.innerHTML = `<div class="card-title">Acknowledged Constraints</div>`;
+            const conList = document.createElement('ul');
+            conList.className = 'styled-list';
+            data.acknowledged_constraints.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                conList.appendChild(li);
+            });
+            conCard.appendChild(conList);
+            contentDisplay.appendChild(conCard);
+
+            // Future Research
+            const futCard = document.createElement('div');
+            futCard.className = 'content-card';
+            futCard.innerHTML = `<div class="card-title">Future Research Directions</div>`;
+            const futList = document.createElement('ul');
+            futList.className = 'styled-list';
+            data.future_research.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                futList.appendChild(li);
+            });
+            futCard.appendChild(futList);
+            contentDisplay.appendChild(futCard);
+        }
+
+        function renderContext() {
+            contentDisplay.appendChild(createCard('Field Context', jsonData.field_context.statement));
+        }
+
+        // Helper to create basic text cards
+        function createCard(title, text) {
+            const card = document.createElement('div');
+            card.className = 'content-card';
+            card.innerHTML = `
+                <div class="card-title">${title}</div>
+                <div class="card-text">${text}</div>
+            `;
+            return card;
+        }
+
+        // 5. MOBILE INTERACTION
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        hamburgerBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // INITIALIZE APP
+        document.addEventListener('DOMContentLoaded', initialize);
+
+    </script>
+</body>
+</html>

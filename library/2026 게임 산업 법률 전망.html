@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 게임 산업 법률 트렌드 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5; /* Professional Blue Background */
+            color: #172b4d;
+            line-height: 1.6;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            width: 100%;
+        }
+        .kpi-card {
+            background-color: white;
+            border-left: 5px solid #0052cc;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link {
+            transition: all 0.2s ease;
+            color: #42526e;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #0052cc;
+            color: white;
+            font-weight: 600;
+        }
+        .content-section {
+            scroll-margin-top: 20px;
+        }
+        .pill-button {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #dfe1e6;
+        }
+        .pill-button.active {
+            background-color: #0052cc;
+            color: white;
+            border-color: #0052cc;
+        }
+        .legal-alert {
+            background-color: #fff0f0;
+            border-left: 4px solid #de350b;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .info-box {
+            background-color: #f4f5f7;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+        }
+        /* Custom Scrollbar for Sidebar */
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        #sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #c1c7d0;
+            border-radius: 3px;
+        }
+        .trend-item {
+            transition: background-color 0.2s;
+        }
+        .trend-item:hover {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen flex flex-col md:flex-row">
+        
+        <!-- Mobile Header -->
+        <div class="md:hidden flex justify-between items-center p-4 bg-white sticky top-0 z-20 shadow-sm border-b border-gray-200">
+            <h1 class="text-lg font-bold text-blue-900">Law Trends 2026</h1>
+            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white border-r border-gray-200 w-64 space-y-4 py-7 px-2 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out z-30 shadow-lg md:h-screen md:overflow-y-auto">
+            <div class="px-4 mb-4">
+                <h2 class="text-2xl font-bold text-blue-900 tracking-tight">Legal Insight<br><span class="text-blue-600 text-lg">Gaming 2026</span></h2>
+            </div>
+            <nav id="main-nav" class="space-y-1">
+                <a href="#overview" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">📊 Overview</a>
+                <a href="#ai-regulation" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🤖 1. AI & Copyright</a>
+                <a href="#platforms" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">⚖️ 2. Platforms & Market</a>
+                <a href="#consumer" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🛡️ 3. Consumer Law</a>
+                <a href="#lootbox" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🎁 4. Loot Boxes & Eco</a>
+                <a href="#ip-clones" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">©️ 5. IP & Clones</a>
+                <a href="#youth" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🚸 6. Youth Protection</a>
+                <a href="#security" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🔒 7. Data & Security</a>
+                <a href="#strategy" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🚀 Strategy</a>
+                <a href="#top10" class="nav-link block px-4 py-2.5 rounded-md text-sm font-medium">🏆 Top 10 List</a>
+            </nav>
+            <div class="px-4 mt-8">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <p class="text-xs text-blue-800 font-semibold">Hot Topics</p>
+                    <p class="text-xs text-blue-600 mt-1">Digital Fairness Act<br>Cyber Resilience Act<br>KOSA (US)</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-10 md:ml-64">
+            
+            <!-- Overview Section -->
+            <section id="overview" class="content-section mb-16 pt-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-start mb-8 gap-4">
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-bold text-gray-900 leading-tight">2026 게임 산업 법률 전망</h1>
+                        <p class="text-gray-700 mt-3 leading-relaxed">
+                            본 콘텐츠는 <strong>Dr. Andreas Lober (ADVANT Beiten)</strong>의 2026년 1월 2일자 <span class="italic">GamesIndustry.biz</span> 칼럼 내용을 심층 재구성한 것입니다.
+                            <br><span class="text-gray-500 text-sm">2026년은 규제 준수(Compliance)가 게임 디자인과 비즈니스 모델을 결정하는 해가 될 것입니다. 10대 핵심 트렌드와 3가지 신규 리스크를 상세히 분석합니다.</span>
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-start md:items-end gap-3 mt-2 md:mt-0 flex-shrink-0">
+                        <div class="bg-white px-3 py-1.5 rounded-full border border-gray-300 text-xs font-medium text-gray-500 shadow-sm">
+                            Data Source: ADVANT Beiten 2026 Outlook
+                        </div>
+                        <a href="https://www.gamesindustry.biz/games-industry-legal-trends-to-watch-in-2026" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-[#0052cc] hover:bg-[#0043a6] text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 group">
+                            원문 칼럼 보러가기
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Trend Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">2026 Legal Trend Forecast (Importance Shift)</h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. AI Regulation Section (Trend 1) -->
+            <section id="ai-regulation" class="content-section mb-16">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🤖</span>
+                    <h2 class="text-2xl font-bold text-gray-900">1. AI 및 저작권 분쟁 (Artificial Intelligence)</h2>
+                </div>
+                <p class="text-gray-700 mb-6 leading-relaxed">
+                    2025년 법원은 AI 학습과 저작권에 대해 상반된 판결을 내놓으며 혼란을 가중시켰습니다. 2026년에는 게임사들이 자체 생성형 AI를 구축함에 따라, <strong>'학습 데이터의 적법성'</strong>과 <strong>'외부 AI로부터 자사 IP 보호'</strong>라는 두 가지 과제에 동시에 직면하게 될 것입니다.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Case Study Left -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-red-700 mb-3">🚨 GEMA vs OpenAI (뮌헨 지방법원)</h3>
+                        <div class="text-sm text-gray-700 space-y-3">
+                            <p><strong>판결 요지:</strong> 법원은 OpenAI의 모델이 GEMA 회원의 가사를 무단으로 복제하여 학습하고, 사용자 프롬프트에 따라 이를 재생성했다고 인정했습니다. 이는 단순한 데이터 분석을 넘어선 저작권 침해 행위입니다.</p>
+                            <p><strong>주요 시사점:</strong> '텍스트 형태'의 권리 유보(Opt-out) 표시는 불충분하다는 것이 함부르크 법원의 입장입니다. 게임사는 자사 IP가 AI 학습에 쓰이지 않도록 <strong>'기계 판독 가능한(Machine-readable)'</strong> 기술적 조치(예: robots.txt 등)를 반드시 취해야 합니다.</p>
+                        </div>
+                    </div>
+                    <!-- Case Study Right -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-blue-700 mb-3">🛡️ Meta 데이터 학습 (쾰른 고등법원)</h3>
+                        <div class="text-sm text-gray-700 space-y-3">
+                            <p><strong>판결 요지:</strong> Meta가 Facebook 사용자 데이터를 AI 학습에 활용하는 것은 기업의 <strong>'정당한 이익(Legitimate Interest)'</strong>에 해당한다고 판결했습니다. 단, 이는 사용자에게 투명하게 고지하고 명확한 거부권(Opt-out)을 보장했을 때만 유효합니다.</p>
+                            <p><strong>글로벌 리스크:</strong> 독일 법원의 판단과 달리, 브라질(ANPD) 등 타 규제 기관은 이를 불허하며 즉각적인 학습 중단을 명령했습니다. 글로벌 서비스 시 가장 엄격한 개인정보보호 기준을 따라야 하는 파편화된 규제 환경이 조성되었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 info-box">
+                    <h4 class="font-bold text-indigo-900 text-sm mb-2">🔭 2026 Outlook: 창작과 표절의 경계</h4>
+                    <p class="text-sm text-indigo-800 leading-relaxed">
+                        엘론 머스크가 X 기반의 AI 게임 출시를 예고하는 등 AI 게임 개발이 가속화되고 있습니다. 향후 법적 분쟁의 핵심은 기존 명작 게임을 AI가 학습하여 만든 결과물이 <strong>'영감(Inspired by)'인지 '표절(Copy)'인지</strong>를 가리는 데 집중될 것입니다. 또한 EU AI Act에 따른 투명성 의무 준수는 선택이 아닌 필수입니다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 2. Platforms & Market (Trend 2, 7) -->
+            <section id="platforms" class="content-section mb-16">
+                 <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">⚖️</span>
+                    <h2 class="text-2xl font-bold text-gray-900">2. 온라인 플랫폼 규제 & 시장 지배력</h2>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+                    <div class="flex border-b border-gray-200">
+                        <button class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-50 hover:bg-white border-r border-gray-200 active-tab" onclick="switchPlatformTab(this, 'dsa')">DSA (플랫폼 규제)</button>
+                        <button class="flex-1 py-4 text-center font-bold text-gray-500 hover:bg-gray-50" onclick="switchPlatformTab(this, 'dma')">DMA (시장 지배력)</button>
+                    </div>
+                    
+                    <!-- DSA Content -->
+                    <div id="dsa-content" class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">디지털 서비스법 (DSA): 2026년은 집행의 해</h3>
+                        <p class="text-sm text-gray-600 mb-4">DSA는 더 이상 선언적인 법안이 아닙니다. X(구 트위터)에 대한 첫 과징금 부과(2025년 말)는 규제 당국이 실제 행동에 나섰음을 의미합니다.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-3">
+                            <li><strong>공개적 성적표 (Transparency Reports):</strong> 2026년 2월 말까지 모든 플랫폼은 투명성 보고서를 공개해야 합니다. 어떤 기업이 미성년자 보호 및 불법 콘텐츠 대응에 소홀했는지 대중에게 낱낱이 공개될 것입니다.</li>
+                            <li><strong>게임사로의 확장:</strong> 규제의 칼날은 소셜 미디어를 넘어 인기 온라인 게임으로 향하고 있습니다. 특히 2025년 7월 발표된 '미성년자 보호 가이드라인' 준수 여부가 핵심 감시 대상입니다.</li>
+                        </ul>
+                    </div>
+
+                    <!-- DMA Content -->
+                    <div id="dma-content" class="p-6 hidden">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">디지털 시장법 (DMA): 끝나지 않는 앱 마켓 전쟁</h3>
+                        <p class="text-sm text-gray-600 mb-4">애플과 구글의 독점적 지위에 대한 도전은 2026년에도 계속됩니다. 규제 당국과 개발자 연합의 압박 수위는 최고조에 달할 것입니다.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-3">
+                            <li><strong>역대급 과징금 (Apple):</strong> 2025년 4월, 반독점 행위(Anti-steering, 외부 결제 유도 금지)로 5억 유로의 과징금이 부과되었습니다. 이는 시작에 불과합니다.</li>
+                            <li><strong>Epic Games 승소의 의미:</strong> 미국 항소법원은 애플의 27% 수수료 부과와 외부 결제 링크 제한이 기존 금지명령 위반이라고 판결했습니다. 이는 외부 결제 시스템이 실질적으로 작동할 수 있는 길을 열어준 판결입니다.</li>
+                            <li><strong>지속적 저항:</strong> '앱 공정성 연대(Coalition for App Fairness)'는 애플의 새로운 '핵심 기술 수수료(Core Technology Fee)' 또한 DMA 위반이라며 추가 조치를 요구하고 있습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Consumer Law (Trend 3, 5) -->
+            <section id="consumer" class="content-section mb-16">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🛡️</span>
+                    <h2 class="text-2xl font-bold text-gray-900">3. 소비자 보호 및 철회권 (Consumer Law)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">디지털 공정성법 (Digital Fairness Act)의 위협</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            Riot Games 법률 부사장이 <strong>"F2P(Free-to-Play) 게임 디자인의 근간을 뒤흔들 것"</strong>이라고 경고한 법안입니다. 단순히 환불을 해주는 차원을 넘어, 게임의 설계 단계부터 규제가 개입합니다.
+                        </p>
+                        <div class="bg-red-50 p-4 rounded border border-red-100 text-sm">
+                            <strong class="block text-red-800 mb-2">🚫 3대 금지 타겟:</strong>
+                            <ol class="list-decimal list-inside text-red-700 space-y-1">
+                                <li><strong>다크 패턴 (Dark Patterns):</strong> 사용자의 착각을 유도하는 UI 디자인 금지.</li>
+                                <li><strong>중독성 디자인 (Addictive Design):</strong> 무한 스크롤, 강박적 접속 유도 기능 제한.</li>
+                                <li><strong>Pay-to-Win:</strong> 과금을 통해 불공정한 경쟁 우위를 제공하는 시스템 제재 가능성.</li>
+                            </ol>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-4"><strong>📅 2026년 6월 19일:</strong> 모든 게임 및 앱에 '구독 취소 버튼'을 가입 버튼만큼 찾기 쉽게 배치해야 하는 의무가 발효됩니다.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">철회권 (Right of Withdrawal)의 확장</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            CPC(소비자 보호 네트워크)의 새로운 원칙(Key Principles)은 디지털 재화에 대해서도 강력한 소비자 권리를 요구하고 있습니다.
+                        </p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-3">
+                            <li><strong>미사용 가상 화폐 환불:</strong> 게임 내 재화(보석, 코인 등)를 구매했더라도, 이를 사용하지 않았다면 14일 이내에 현금으로 환불해줘야 한다는 압박이 거셉니다.</li>
+                            <li><strong>데이터 지불 시 철회권:</strong> 금전적 대가 없이 개인정보 제공만으로 게임을 이용하는 경우에도, 계약 철회권이 적용되어야 한다는 논의가 진행 중입니다.</li>
+                            <li><strong>서비스 종료(Sunsetting) 리스크:</strong> 미완성 게임 출시보다 더 큰 문제는 게임 서비스 종료 시입니다. 소비자가 구매한 디지털 자산에 대한 보상 방안 없이 서비스를 종료할 경우 집단 소송의 대상이 될 수 있습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Loot Boxes & Economy (Trend 4, New Trend) -->
+            <section id="lootbox" class="content-section mb-16">
+                 <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🎁</span>
+                    <h2 class="text-2xl font-bold text-gray-900">4. 루트박스 규제 & 게임 내 경제</h2>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">글로벌 규제 히트맵: 파편화된 리스크</h3>
+                    <p class="text-sm text-gray-600 mb-4">국가별로 규제 수위가 달라 글로벌 원빌드 전략 수정이 불가피합니다. 특히 브라질과 호주의 변화에 주목해야 합니다.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <span class="block text-xl mb-1">🇧🇷 브라질</span>
+                            <span class="text-sm font-bold text-red-700">미성년자 대상 전면 금지 (2026)</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">거대 시장인 브라질에서의 금지는 단순한 경고가 아닙니다. 시장 철수보다는 미성년자 계정에 대해 루트박스 기능을 완전히 제거하는 별도 빌드 개발이 필요할 것입니다.</p>
+                        </div>
+                        <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                            <span class="block text-xl mb-1">🇦🇺 호주</span>
+                            <span class="text-sm font-bold text-orange-700">최소 '15세 이용가' 의무화</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">확률형 아이템이 포함된 게임은 무조건 성인 등급에 준하는 등급을 받게 되어, 모객 범위가 대폭 축소될 위험이 있습니다.</p>
+                        </div>
+                         <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <span class="block text-xl mb-1">🇩🇪 독일</span>
+                            <span class="text-sm font-bold text-yellow-700">도박성 규명 및 18금 추진</span>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">연방상원이 루트박스를 '도박'으로 간주해야 한다는 결의안을 채택했습니다. 이는 18세 이상 이용가 등급 분류로 이어질 수 있는 강력한 신호입니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">💎 게임 내 경제 (Ingame Economics) - New Trend</h3>
+                    <p class="text-sm text-gray-700 mb-3 leading-relaxed">
+                        Roblox, Fortnite, Counter-Strike 등 주요 게임들이 경제 시스템을 대대적으로 개편하고 있습니다. 이는 단순한 밸런스 패치가 아닙니다.
+                    </p>
+                    <p class="text-sm text-gray-600 leading-relaxed italic border-l-4 border-gray-300 pl-3">
+                        "개발자는 과연 게임 세계의 신(Gods)인가?" - Richard Bartle
+                    </p>
+                    <p class="text-sm text-gray-700 mt-2 leading-relaxed">
+                        플랫폼이 일방적으로 경제 규칙을 변경하여 유저 자산 가치가 폭락할 경우(예: CS2 아이템 시장 붕괴), 이는 <strong>소비자 재산권 침해</strong> 및 <strong>시장 지배력 남용</strong> 법적 쟁점으로 비화될 가능성이 매우 높습니다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 5. IP & Clones (Trend 6) -->
+            <section id="ip-clones" class="content-section mb-16">
+                 <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">©️</span>
+                    <h2 class="text-2xl font-bold text-gray-900">5. IP 분쟁 & 클론 (Clones)</h2>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">클론 앱의 종말? (Trader Status)</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            그동안 익명성 뒤에 숨어있던 '짝퉁 게임(Copycat)' 개발자들이 설 곳을 잃고 있습니다. Apple(2025년 2월)과 Google(11월)이 EU DSA 준수를 위해 <strong>'개발자 연락처 및 신원 공개'</strong>를 의무화했기 때문입니다.
+                        </p>
+                        <p class="text-sm text-gray-700 font-semibold">검증된 신원 정보 없이는 앱 등록 및 노출 자체가 불가능해지며, 이는 IP 보호의 가장 강력한 방어막이 되고 있습니다.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">봇(Bot) & 치트 소송의 진화</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            IP 분쟁은 이제 게임 플레이의 공정성을 넘어 '경제적 사기' 대응으로 확대되고 있습니다.
+                        </p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Epic Games 사례:</strong> Fortnite Creative에서 봇을 이용해 '가짜 참여(Fake Engagement)'를 만들어 수익을 편취하려던 봇 개발자를 제소했습니다.</li>
+                            <li><strong>Sony vs Datel 판결:</strong> 독일 대법원은 단순한 메모리(RAM) 변조가 저작권 침해는 아니라고 판결했지만, <strong>EULA 위반</strong> 및 <strong>부정경쟁방지법</strong>을 통한 제재 수단은 여전히 유효함을 확인했습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Youth Protection (Trend 8) -->
+            <section id="youth" class="content-section mb-16">
+                 <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🚸</span>
+                    <h2 class="text-2xl font-bold text-gray-900">6. 청소년 보호 규제 확산 (Youth Protection)</h2>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+                    <h3 class="text-lg font-bold text-red-700 mb-3">호주발 SNS 금지법의 전이 효과 (Spillover Risk)</h3>
+                    <p class="text-sm text-gray-700 mb-4 leading-relaxed">
+                        호주가 제정한 '16세 미만 SNS 금지법'은 전 세계 규제 당국의 롤모델이 되고 있습니다. 문제는 <strong>채팅, UGC, 친구 맺기 기능이 있는 게임(Roblox, Fortnite 등)</strong>을 SNS와 동일하게 취급하려는 움직임입니다.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                            <span class="block font-bold text-gray-800 text-sm mb-2">🇺🇸 미국 KOSA (Kids Online Safety Act)</span>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                온라인 플랫폼에 미성년자에 대한 <strong>'주의 의무(Duty of Care)'</strong>를 법적으로 부과합니다. 무한 스크롤, 자동 재생 등 '중독성 기능'을 미성년자에게는 기본적으로 비활성화해야 하며, 이를 위반하여 정신적 해를 끼칠 경우 법적 책임을 져야 합니다.
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                            <span class="block font-bold text-gray-800 text-sm mb-2">🇪🇺 EU EUDI 지갑 & 이중 익명성</span>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                '이중 익명성(Double Anonymity)' 기술이 표준이 될 전망입니다. 제3자 인증 기관이 성인 여부만 확인하고, 게임사는 유저의 실제 신분증 정보를 저장하지 못하게 하는 방식입니다. 이는 개인정보 수집을 최소화하면서 연령 확인을 의무화하는 강력한 수단입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Data & Security & Esports (Trend 9, 10, New Trend) -->
+            <section id="security" class="content-section mb-16">
+                 <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🔒</span>
+                    <h2 class="text-2xl font-bold text-gray-900">7. 데이터 보호 & 보안 & 이스포츠</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Data Protection -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">데이터 보호: 싱글 게임도 예외 없음</h3>
+                        <p class="text-sm text-gray-600 mb-2 leading-relaxed">
+                            개인정보보호 활동가 Max Schrems의 단체 <strong>noyb가 Ubisoft를 제소</strong>한 사건은 시사하는 바가 큽니다. 네트워크 플레이가 없는 싱글 플레이어 게임(Far Cry Primal)이라도, 백그라운드에서 유저 데이터를 수집(Telemetry)한다면 GDPR 위반이라는 주장입니다. 이는 업계의 관행인 '데이터 기반 개발'에 제동을 걸 수 있습니다.
+                        </p>
+                    </div>
+
+                    <!-- Cybersecurity -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">사이버 복원력법 (CRA): 2026년은 준비의 해</h3>
+                        <p class="text-sm text-gray-600 mb-2 leading-relaxed">
+                            EU의 사이버 복원력법(Cyber Resilience Act)이 다가옵니다. 디지털 요소가 포함된 모든 제품은 시장 출시 전 엄격한 보안 요건을 충족해야 합니다. <strong>패치 다운로드를 위해 네트워크에 연결되는 싱글 게임</strong>은 물론, <strong>'얼리 액세스(Early Access)' 게임</strong>도 예외 없이 규제 대상에 포함될 가능성이 높습니다.
+                        </p>
+                    </div>
+
+                    <!-- Esports -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">이스포츠 청렴성 (Integrity) 강화</h3>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Valve의 강경 대응:</strong> CS2, Dota 2 토너먼트에서 스킨 도박 사이트 등의 스폰서십을 전면 금지했습니다. 이는 이스포츠 생태계의 자정 작용을 위한 조치이나, 팀들의 수익 모델에는 타격이 될 수 있습니다.</li>
+                            <li><strong>CS2 시장 붕괴:</strong> 아이템 업그레이드 계약 허용 업데이트 직후 가치가 폭락하며 패닉 셀링이 발생했습니다. 이는 게임 내 경제 정책이 유저 자산에 미치는 영향을 보여주는 대표적 사례입니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Outlook Strategy -->
+            <section id="strategy" class="content-section mb-16">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">🔭 2026 전략적 제언 (Strategic Outlook)</h2>
+                
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none bg-blue-50/50">
+                            <span class="font-bold text-blue-900">1. 소비자 보호 르네상스 대비 (Compliance First)</span>
+                            <span class="transform transition-transform duration-200 rotate-180">▼</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4 text-sm text-gray-700 border-t border-gray-100 pt-3 leading-relaxed">
+                            <p>단순한 규제 준수를 넘어선 '설계 혁신'이 필요합니다. 2026년 시행될 <strong>디지털 공정성법(Digital Fairness Act)</strong>은 다크 패턴, 중독성 디자인, 불투명한 확률형 아이템을 정조준하고 있습니다. 특히 6월 19일부터 의무화되는 <strong>'구독 취소 버튼'</strong> 배치와 <strong>미사용 가상 화폐 환불</strong> 가능성에 대비하여, F2P 게임의 수익 모델(BM)과 UI/UX를 소비자 권리 중심으로 근본적으로 재설계해야 합니다.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none bg-blue-50/50">
+                            <span class="font-bold text-blue-900">2. AI 거버넌스 및 IP 전략 재수립</span>
+                            <span class="transform transition-transform duration-200 rotate-180">▼</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4 text-sm text-gray-700 border-t border-gray-100 pt-3 leading-relaxed">
+                            <p>두 가지 트랙의 전략이 필요합니다. 첫째, <strong>방어(Defense)</strong> 측면에서는 자사 IP가 타사 AI 학습에 무단 도용되지 않도록 <strong>'기계 판독 가능한(robots.txt 등)' 권리 유보 조치</strong>를 즉각 시행해야 합니다. 둘째, <strong>활용(Offense)</strong> 측면에서는 자체 생성형 AI 도입 시 학습 데이터의 저작권 적법성을 철저히 검증하여, 향후 발생할 수 있는 '표절 시비'와 법적 리스크를 원천 차단해야 합니다.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none bg-blue-50/50">
+                            <span class="font-bold text-blue-900">3. 청소년 보호와 소셜 기능의 분리</span>
+                            <span class="transform transition-transform duration-200 rotate-180">▼</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4 text-sm text-gray-700 border-t border-gray-100 pt-3 leading-relaxed">
+                            <p>게임 내 커뮤니티 기능(채팅, 길드 등)이 SNS 규제의 직접적인 타겟이 되고 있습니다. 호주와 EU의 규제 흐름에 맞춰, 미성년자 유저에 대해서는 소셜 기능을 제한하거나 <strong>'이중 익명성(Double Anonymity)'</strong> 기반의 안전한 연령 확인 솔루션을 선제적으로 도입해야 합니다. 이는 규제 리스크를 줄일 뿐만 아니라, '안전한 게임 환경'이라는 브랜드 신뢰도를 높이는 기회가 될 것입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top 10 List Section -->
+            <section id="top10" class="content-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">🏆 2026 Top 10 Legal Trends</h2>
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <p class="text-gray-600 mb-6 text-sm">How will their importance develop compared to 2025?</p>
+                    <div class="space-y-0 divide-y divide-gray-100">
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">1.</span>
+                                <span class="font-medium text-gray-900">AI (Artificial Intelligence)</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full">(=) 유지</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md bg-blue-50/50">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-blue-300 w-6">2.</span>
+                                <span class="font-bold text-blue-900">Consumer protection</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-blue-700 bg-blue-100 rounded-full flex items-center gap-1">
+                                (UP) 상승 ▲
+                            </span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md bg-blue-50/50">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-blue-300 w-6">3.</span>
+                                <span class="font-bold text-blue-900">Product and cyber security</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-blue-700 bg-blue-100 rounded-full flex items-center gap-1">
+                                (UP) 상승 ▲
+                            </span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">4.</span>
+                                <span class="font-medium text-gray-900">Youth protection beyond blood and violence</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full">(=) 유지</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">5.</span>
+                                <span class="font-medium text-gray-500">Online platform regulation</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-400 bg-gray-50 rounded-full">(DOWN) 하락 ▼</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">6.</span>
+                                <span class="font-medium text-gray-900">Clones and other IP disputes</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full">(=) 유지</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">7.</span>
+                                <span class="font-medium text-gray-500">Lootboxes</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-400 bg-gray-50 rounded-full">(DOWN) 하락 ▼</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">8.</span>
+                                <span class="font-medium text-gray-900">Data protection</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full">(=) 유지</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">9.</span>
+                                <span class="font-medium text-gray-500">Market dominance</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-400 bg-gray-50 rounded-full">(DOWN) 하락 ▼</span>
+                        </div>
+                        <div class="trend-item flex items-center justify-between p-3 rounded-md">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold text-gray-400 w-6">10.</span>
+                                <span class="font-medium text-gray-900">Esports</span>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full">(=) 유지</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Chart Configuration
+        const ctx = document.getElementById('trendChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['소비자 보호', '보안/CRA', '청소년/SNS', 'AI 규제', 'IP/클론', '이스포츠', '플랫폼 규제', '시장 지배력'],
+                    datasets: [{
+                        label: '2026 트렌드 중요도 전망',
+                        data: [9, 8.5, 8, 7, 6, 5, 4, 3], 
+                        backgroundColor: [
+                            '#0052cc', '#0052cc', '#0052cc', 
+                            '#6554c0', '#6554c0', '#6554c0', 
+                            '#a1bdd9', '#a1bdd9'
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Accordion Logic
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        accordionItems.forEach(item => {
+            const button = item.querySelector('button');
+            const content = item.querySelector('.accordion-content');
+            const arrow = item.querySelector('span:last-child');
+
+            button.addEventListener('click', () => {
+                const isHidden = content.classList.contains('hidden');
+                if (isHidden) {
+                    content.classList.remove('hidden');
+                    arrow.classList.add('rotate-180');
+                } else {
+                    content.classList.add('hidden');
+                    arrow.classList.remove('rotate-180');
+                }
+            });
+        });
+
+        // Mobile Menu
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+        if (mobileMenuButton && sidebar) {
+            mobileMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && !sidebar.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
+        }
+        
+        // Window Global Functions for Tabs
+        window.switchPlatformTab = function(btn, tabId) {
+            // Remove active style from all buttons
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('bg-gray-50', 'text-gray-700', 'border-r');
+                b.classList.add('text-gray-500', 'hover:bg-gray-50');
+            });
+            // Add active style to clicked button
+            btn.classList.remove('text-gray-500', 'hover:bg-gray-50');
+            btn.classList.add('bg-gray-50', 'text-gray-700', 'border-r');
+            
+            // Hide all content
+            document.getElementById('dsa-content').classList.add('hidden');
+            document.getElementById('dma-content').classList.add('hidden');
+            
+            // Show target content
+            document.getElementById(tabId + '-content').classList.remove('hidden');
+        };
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blind Robbery | Book Dashboard</title>
+    <style>
+        /* --- THEMATIC DESIGN & VARIABLES --- */
+        /* This theme reflects the book's serious tone about economics and finance. */
+        /* A dark background with gold accents represents the contrast between */
+        /* "bad" paper money and "good" gold money, a central theme of the book. */
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2c2c2c;
+            --sidebar-bg: #212121;
+            --accent-color: #d4af37; /* Gold accent for headings and highlights */
+            --accent-hover: #e7c56e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #444;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --font-primary: 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+            --font-secondary: 'Georgia', 'Times New Roman', serif;
+        }
+
+        /* --- GENERAL STYLES & RESETS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-hover);
+        }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        #dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        #sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 1000;
+            overflow-y: auto; /* Allow the entire sidebar to scroll if content overflows */
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-header img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            object-fit: cover;
+        }
+
+        .sidebar-header h3 {
+            color: var(--text-secondary);
+            font-family: var(--font-secondary);
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        #chapter-navigation {
+            list-style-type: none;
+            flex-grow: 1;
+            /* overflow-y: auto; */ /* Removed to allow entire sidebar to scroll */
+            padding: 10px 0;
+        }
+
+        #chapter-navigation li {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease-in-out;
+            color: var(--text-secondary);
+        }
+
+        #chapter-navigation li:hover {
+            background-color: var(--secondary-bg);
+            color: var(--accent-hover);
+            border-left-color: var(--accent-hover);
+        }
+
+        #chapter-navigation li.active {
+            background-color: var(--secondary-bg);
+            color: var(--accent-color);
+            font-weight: bold;
+            border-left-color: var(--accent-color);
+        }
+        
+        .sidebar-footer {
+            padding: 15px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        #main-content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 280px; /* Offset for sidebar */
+        }
+        
+        #content-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        #book-title-main {
+            font-family: var(--font-secondary);
+            color: var(--accent-color);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        #book-meta-main {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        #current-section-title {
+            font-family: var(--font-secondary);
+            font-size: 1.8rem;
+            margin-top: 20px;
+            color: var(--text-primary);
+        }
+
+        #content-display {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        /* --- CARD STYLING --- */
+        .content-card {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            grid-column: span 1; /* Default span */
+        }
+
+        .content-card.full-width {
+            grid-column: 1 / -1; /* Make card span full width */
+        }
+
+        .content-card h4 {
+            font-family: var(--font-secondary);
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .content-card p {
+            margin-bottom: 10px;
+        }
+        
+        .content-card ul, .content-card ol {
+            padding-left: 20px;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style-type: none;
+            padding: 0 !important;
+        }
+
+        .keyword-list li {
+            background-color: var(--primary-bg);
+            color: var(--accent-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        blockquote {
+            font-family: var(--font-secondary);
+            font-style: italic;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 20px;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* --- VISUALIZATIONS STYLING --- */
+        .visualization-container {
+            padding: 20px;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .cantillon-effect-viz, .boom-bust-viz {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        .viz-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        .viz-box {
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-align: center;
+            width: 80%;
+            box-shadow: 0 1px 4px var(--shadow-color);
+        }
+        .viz-arrow {
+            font-size: 2rem;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+        .boom-bust-path {
+            width: 100%;
+            height: 100px;
+            background:
+                radial-gradient(circle at 0 100%, rgba(212,175,55,0) 14px, var(--accent-color) 15px, rgba(212,175,55,0) 16px) 0 0,
+                radial-gradient(circle at 100% 100%, rgba(212,175,55,0) 14px, var(--accent-color) 15px, rgba(212,175,55,0) 16px) 100% 0,
+                radial-gradient(circle at 100% 0, rgba(212,175,55,0) 14px, var(--accent-color) 15px, rgba(212,175,55,0) 16px) 100% 100%,
+                radial-gradient(circle at 0 0, rgba(212,175,55,0) 14px, var(--accent-color) 15px, rgba(212,175,55,0) 16px) 0 100%;
+            background-repeat: no-repeat;
+            background-size: 50% 50%;
+            position: relative;
+        }
+        .boom-bust-path::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            border-top: 1px dashed var(--text-secondary);
+        }
+        .boom-bust-text {
+            position: absolute;
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            background: var(--primary-bg);
+            border-radius: 4px;
+        }
+        #boom-text { top: 0; left: 25%; transform: translateX(-50%); }
+        #bust-text { bottom: 0; left: 75%; transform: translateX(-50%); }
+        
+        /* --- MOBILE & RESPONSIVE DESIGN --- */
+        #mobile-header {
+            display: none; /* Hidden on desktop */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--sidebar-bg);
+            padding: 10px 15px;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        
+        #hamburger-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        }
+
+        @media (max-width: 992px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            
+            #sidebar.visible {
+                transform: translateX(0);
+                box-shadow: 5px 0 15px var(--shadow-color);
+            }
+            
+            #main-content {
+                margin-left: 0;
+                padding-top: 80px; /* Space for mobile header */
+            }
+            
+            #mobile-header {
+                display: flex;
+                align-items: center;
+            }
+            
+            #book-title-main { font-size: 1.8rem; }
+            #current-section-title { font-size: 1.5rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Mobile-specific header with hamburger button -->
+    <header id="mobile-header">
+        <button id="hamburger-btn" aria-label="Open navigation menu">&#9776;</button>
+    </header>
+    <div id="overlay"></div>
+
+    <div id="dashboard-container">
+        <!-- Sidebar for Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.imgur.com/aeN7yzS.jpg" alt="Book Cover for Blind Robbery">
+                <h3>Blind Robbery!</h3>
+            </div>
+            <ul id="chapter-navigation">
+                <!-- Navigation links will be dynamically inserted here by JavaScript -->
+            </ul>
+            <div class="sidebar-footer">
+                Dashboard by Kipeum
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <header id="content-header">
+                <h1 id="book-title-main"></h1>
+                <p id="book-meta-main"></p>
+                <h2 id="current-section-title"></h2>
+            </header>
+            <div id="content-display">
+                <!-- Dynamic content cards will be rendered here by JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA SOURCE ---
+        // The structured JSON summary of the book is embedded here.
+        const jsonData = {
+          "book_meta": {
+            "title": "BLIND ROBBERY! How the Fed, Banks and Government Steal Our Money",
+            "author": "Andreas Marquart, Philipp Bagus",
+            "publication_year": 2016,
+            "main_theme": "The state's monopoly on fiat money creation, facilitated by central and commercial banks, is a form of systemic theft that causes economic instability, social injustice, and moral decay."
+          },
+          "overall_summary": {
+            "abstract": "In \"Blind Robbery!\", Philipp Bagus and Andreas Marquart present a concise introduction to the Austrian School of Economics, arguing that the modern financial system is a 'rigged game' orchestrated by governments and banks. The book's central objective is to demystify money, banking, and inflation for a general audience, revealing how state-controlled fiat currency and fractional reserve banking are the root causes of economic instability, wealth inequality, and the erosion of societal values. Using simple narratives and historical context, the authors contrast 'good money' (like gold, which emerges from the free market) with 'bad money' (unbacked paper currency), demonstrating how the latter enables a continuous and hidden redistribution of wealth from the productive public to the politically connected elite.\n\nThe methodology relies on logical deduction and common sense rather than complex mathematical models, critiquing mainstream economic theories for obscuring these fundamental truths. The principal finding is that the state's money monopoly allows for the financing of ever-expanding welfare states and wars without direct taxation, fostering dependency and expanding government power. The authors conclude that this inherently unstable system is destined for collapse, either through hyperinflation or other painful debt-resolution measures, and issue a call to action for readers to understand and challenge this system to restore freedom and prosperity.",
+            "keywords": [
+              "Austrian School of Economics",
+              "Fiat Money",
+              "Fractional Reserve Banking",
+              "Inflation",
+              "Central Banking",
+              "Wealth Redistribution",
+              "State Intervention"
+            ]
+          },
+          "chapters": [
+            {
+              "chapter_number": 1,
+              "chapter_title": "Why money does not need the state",
+              "summary": "This chapter challenges the common belief that money requires state control, arguing instead that money spontaneously arises from market interactions as a superior means of exchange, exemplified by gold. It distinguishes between \"good money\" (commodity money like gold, which retains value) and \"bad money\" (state-controlled paper money, which constantly loses purchasing power), asserting that the state's monopoly on money is detrimental.",
+              "key_arguments": [
+                "Money was not invented by the state but emerged organically from market participants seeking more efficient means of exchange.",
+                "\"Good money,\" such as gold, is characterized by inherent value, scarcity, and durability, ensuring its stability.",
+                "\"Bad money\" (modern fiat paper money) is not backed by physical assets and is susceptible to continuous loss of purchasing power.",
+                "The state's monopoly on money creation leads to inefficiency and a hidden tax through inflation.",
+                "An economy does not need a continually increasing money supply to grow; productivity gains in a stable money system would naturally lead to falling prices."
+              ],
+              "key_takeaways_or_insights": [
+                "The market is capable of producing sound money without government intervention.",
+                "Fiat currency is designed to lose value over time, unlike commodity money like gold.",
+                "Central bank inflation targets are policies of currency devaluation.",
+                "In a healthy, productive economy, prices should naturally fall, benefiting consumers."
+              ],
+              "notable_quote": "The history of government management of money has, except for a few short happy periods, been one of incessant fraud and deception.",
+              "keywords": ["market monetary system", "commodity money", "fiat money", "purchasing power", "state monopoly"]
+            },
+            {
+              "chapter_number": 2,
+              "chapter_title": "Who is allowed to create money and who is not",
+              "summary": "This chapter explains how money is produced in both market-based and state-controlled systems, revealing that in the modern era, money is created \"out of thin air\" by fractional reserve banks and central banks. It likens this process to fraud, facilitated by an \"unholy alliance\" between the state and the banking system, which grants banks the legal privilege to expand the money supply through credit, benefiting politicians who seek to finance expenditures without direct taxation.",
+              "key_arguments": [
+                "In a free market, money is produced through labor-intensive processes (e.g., gold prospecting), naturally limiting its supply.",
+                "Fractional reserve banking enables banks to loan out funds they do not physically possess, thereby creating new money \"out of nothing\".",
+                "The state monopolizes money creation by legally permitting fractional reserve lending and establishing central banks as lenders of last resort.",
+                "This state-bank alliance allows governments to finance expenses without unpopular tax increases, through the less visible mechanism of money creation.",
+                "The abandonment of the gold standard removed natural constraints on money creation, enabling an almost unlimited expansion of the money supply."
+              ],
+              "key_takeaways_or_insights": [
+                "The majority of new money is created by commercial banks when they issue loans, not by a central government printing press.",
+                "Central banks exist to protect the banking system from the consequences of its own inherent instability (fractional reserves).",
+                "Government deficit spending is often financed by newly created money, acting as a hidden tax on currency holders."
+              ],
+              "notable_quote": "It is a fable that governments interfered with banking in order to restrict the issue of fiduciary media [bank notes] and to prevent credit expansion. The idea that guided governments was, on the contrary, the lust for inflation and credit expansion.",
+              "keywords": ["money creation", "fractional reserve banking", "central bank", "monetization of debt", "gold standard"]
+            },
+            {
+              "chapter_number": 3,
+              "chapter_title": "Why our current money creates social injustice",
+              "summary": "The chapter redefines inflation as an expansion of the money supply, arguing that rising prices are a symptom, not the cause. It introduces the \"Cantillon Effect,\" explaining how new money disproportionately benefits those who receive it first (governments, banks, large corporations) by allowing them to purchase goods at uninflated prices, while later recipients (wage earners, retirees) suffer from rising prices and a consequent redistribution of wealth from lower to upper income classes.",
+              "key_arguments": [
+                "The true definition of inflation is an increase in the money supply; rising prices are just a consequence.",
+                "The Cantillon Effect describes how new money enters the economy at specific points, benefiting the first recipients at the expense of later ones.",
+                "This process systematically redistributes wealth upwards, making the rich richer and the poor poorer.",
+                "The state's monetary monopoly exacerbates social inequality by favoring its clientele (banks, large corporations) with early access to new credit.",
+                "Without massive money printing, technological advances would have led to falling prices, increasing everyone's purchasing power."
+              ],
+              "key_takeaways_or_insights": [
+                "Inflation is a policy of wealth transfer, not a natural economic phenomenon.",
+                "The widening wealth gap is a direct consequence of the inflationary monetary system.",
+                "Your wages not keeping up with the cost of living is a direct result of the Cantillon Effect."
+              ],
+              "notable_quote": "Every change in the money relation alters — apart from its effects upon deferred payments — the conditions of the individual members of society. Some become richer, some poorer.",
+              "keywords": ["inflation", "Cantillon Effect", "wealth redistribution", "social injustice", "purchasing power"]
+            },
+            {
+              "chapter_number": 4,
+              "chapter_title": "Why government money ruins us economically",
+              "summary": "This chapter illustrates how the artificial creation of money and the manipulation of interest rates by central banks lead to unsustainable economic booms and \"malinvestments\". Unlike investments backed by real savings, these credit-fueled projects misallocate scarce resources, resulting in inevitable busts, increased unemployment, and a net reduction in societal wealth.",
+              "key_arguments": [
+                "True economic growth is predicated on real savings, not on money creation.",
+                "The natural rate of interest is a crucial market signal that coordinates saving and investment.",
+                "Artificially lowering interest rates through money creation distorts this signal, leading to widespread 'malinvestments'.",
+                "These malinvestments create an artificial boom that must inevitably end in a bust as resources are revealed to be too scarce.",
+                "Recessions are the market's necessary correction process to liquidate the errors made during the artificial boom."
+              ],
+              "key_takeaways_or_insights": [
+                "Economic recessions are the hangover from the cheap credit party sponsored by central banks.",
+                "You cannot create genuine prosperity by printing money, only an illusion of it.",
+                "Low interest rates are often a sign of market manipulation that will lead to future economic pain.",
+                "Bailing out failed businesses prevents capital from being reallocated to more productive uses, harming long-term growth."
+              ],
+              "notable_quote": "The whole entrepreneurial class is, as it were, in the position of a master-builder whose task it is to erect a building out of a limited supply of building materials. If this man overestimates the quantity of the available materials, he drafts a plan for the execution of which the means at his disposal are not sufficient.",
+              "keywords": ["economic boom", "economic bust", "malinvestment", "interest rate manipulation", "real savings"]
+            },
+            {
+              "chapter_number": 5,
+              "chapter_title": "How the state exploits you with inflation",
+              "summary": "This chapter details how the state leverages its money monopoly and inflationary policies to finance ever-increasing expenditures, particularly the welfare state, without relying on unpopular taxes. It explains how governments manipulate official inflation statistics to obscure the true loss of purchasing power, and how progressive income taxes automatically increase state revenue during inflation, creating a system of \"collective corruption\" that benefits the state at the expense of its citizens.",
+              "key_arguments": [
+                "Inflation serves as a hidden 'inflation tax' to fund state expenditures.",
+                "Official inflation statistics (like the CPI) are manipulated to understate the real cost of living.",
+                "Progressive income taxes and 'bracket creep' automatically increase the state's tax revenue as nominal wages rise with inflation.",
+                "The state funnels citizen savings into government debt, obscuring the true cost of its waste.",
+                "This system creates widespread dependency on state benefits, solidifying state power through 'collective corruption'."
+              ],
+              "key_takeaways_or_insights": [
+                "The modern welfare state is financed by the hidden tax of inflation.",
+                "Official inflation figures are a political tool, not an accurate reflection of your cost of living.",
+                "Inflation is a double tax: it devalues your money and increases your income tax burden simultaneously."
+              ],
+              "notable_quote": "Thanks to the unlimited power of the central bank to print money, states are able to amass ever greater mountains of debt. They are able to wage hot and cold wars that they would otherwise be unable to finance.",
+              "keywords": ["inflation tax", "welfare state", "government debt", "CPI", "bracket creep"]
+            },
+             {
+              "chapter_number": 6,
+              "chapter_title": "What inflation does to people",
+              "summary": "This chapter examines the profound social and cultural impact of state-controlled paper money and inflation, contrasting it with a 'good money' system where long-term planning, saving, and family values are fostered. It argues that the debt-driven economy created by bad money leads to a short-term, materialistic mindset, weakens family structures, increases dependence on the state, and erodes traditional virtues like thrift and personal responsibility.",
+              "key_arguments": [
+                "Sound money encourages a low time preference (saving, long-term planning), while inflationary money encourages a high time preference (debt, immediate consumption).",
+                "Financial pressure from inflation forces both parents to work, weakening family bonds and increasing state influence over children.",
+                "The welfare state, funded by inflation, replaces the traditional support functions of family and community.",
+                "The debt-based economy creates constant stress, anxiety, and a short-term, materialistic focus.",
+                "Business ethics decline as connections to the source of cheap credit become more important than creating long-term value."
+              ],
+              "key_takeaways_or_insights": [
+                "The nature of a society's money shapes its culture and values.",
+                "The modern 'live for today' mindset is a rational response to a monetary system that punishes saving.",
+                "The decline of the traditional family is deeply connected to the rise of the inflationary welfare state."
+              ],
+              "notable_quote": "In short: bad money makes people increasingly dependent, adolescent, socially isolated, torn from their roots, careless, unscrupulous, egotistical, materialistic, superficial, stressed, and depressed.",
+              "keywords": ["social effects", "time preference", "debt economy", "family structure", "materialism"]
+            },
+            {
+              "chapter_number": 7,
+              "chapter_title": "What happens when the state intervenes in everything",
+              "summary": "This chapter posits that state intervention is inherently counterproductive and leads to an escalating 'spiral of interventions' that ultimately results in socialism. Using historical examples like the fall of the Roman Empire, it demonstrates how initial interventions create new problems requiring further controls, thereby distorting markets, wasting resources, and eroding individual freedom, with the state's control of money being the most foundational intervention.",
+              "key_arguments": [
+                "State interventionism is based on the 'fatal conceit' that planners know better than the market.",
+                "An initial intervention creates unintended consequences that justify further interventions, leading to an 'interventionist spiral'.",
+                "The fall of the Roman Empire serves as a historical lesson in how welfare spending, currency debasement, and price controls destroy an economy.",
+                "Socialism is the logical endpoint of interventionism, but it fails because economic calculation is impossible without market prices.",
+                "Politicians blame the market for crises caused by their own prior interventions."
+              ],
+              "key_takeaways_or_insights": [
+                "Government is almost always the cause of, not the solution to, economic problems.",
+                "Be wary of any single government intervention, as it will inevitably lead to more.",
+                "History shows that ever-increasing state control and welfare spending lead to economic ruin."
+              ],
+              "notable_quote": "The idea that there is a third system between socialism and capitalism... a system as far away from socialism as it is from capitalism but that retains the advantages and avoids the disadvantages of each — is pure nonsense.",
+              "keywords": ["state interventionism", "interventionist spiral", "socialism", "economic calculation", "Roman Empire"]
+            },
+            {
+              "chapter_number": 8,
+              "chapter_title": "How it will all end",
+              "summary": "This chapter asserts that the current paper money system is fundamentally unsustainable and will inevitably collapse. It argues that continuous bailouts and artificial suppression of interest rates merely delay the reckoning, exacerbating bad debt. The authors outline various painful outcomes—such as hyperinflation, debt haircuts, currency reforms, or wealth taxes—all of which reveal the hidden losses and ultimately burden taxpayers and savers.",
+              "key_arguments": [
+                "The paper money system has caused extensive, often hidden, damage to real wealth through malinvestments.",
+                "Bailouts do not eliminate losses; they merely shift bad private debt onto the public, increasing systemic risk.",
+                "Much of today's paper wealth is an illusion not backed by real productive capacity.",
+                "Central banks are trapped: they must keep printing money to prevent collapse, but this path leads to hyperinflation.",
+                "The end will come through a painful debt resolution: hyperinflation, state default, wealth taxes, currency reform, or a 'bail-in'."
+              ],
+              "key_takeaways_or_insights": [
+                "The current global financial system is insolvent; its collapse is a matter of 'when,' not 'if.'",
+                "Your paper assets are claims on a system drowning in bad debt and are not as safe as you think.",
+                "Be prepared for governments to resort to overt wealth confiscation when covert methods like inflation are no longer sufficient."
+              ],
+              "notable_quote": "The day of reckoning will come sooner or later. Savers and retirees will notice at some point that the real value of their assets is lower than they had thought it would be.",
+              "keywords": ["economic collapse", "debt crisis", "malinvestment", "wealth tax", "currency reform", "hyperinflation"]
+            },
+            {
+              "chapter_number": 9,
+              "chapter_title": "Why you have not heard of this before",
+              "summary": "This chapter explains why the ideas of the Austrian School of Economics are largely unknown to the public. It attributes this to a deliberate effort by the state and its allies in the financial and academic sectors, who benefit from the existing monetary monopoly. They use propaganda and control over education to promote 'bad doctrines' and blame capitalism for problems caused by state intervention, thereby maintaining their power. The authors conclude by urging readers to spread these 'better ideas' to foster a movement towards monetary reform.",
+              "key_arguments": [
+                "Prevailing economic theories are a form of propaganda designed to justify state power.",
+                "The state and banking system have a vested interest in suppressing the truth about money.",
+                "The Austrian School's ideas are a direct threat to the power of the political and financial elite.",
+                "Politicians use demagoguery to create scapegoats ('greedy capitalists') for the failures of their own policies.",
+                "Change can only be achieved through education and the grassroots spread of 'better ideas' to overcome state propaganda."
+              ],
+              "key_takeaways_or_insights": [
+                "The economic consensus presented in media and universities is heavily biased in favor of the state.",
+                "Your ignorance about the monetary system is by design, not by accident.",
+                "Challenging the state's money monopoly is the most crucial battle for freedom and prosperity.",
+                "You have a role to play by educating yourself and sharing what you've learned."
+              ],
+              "notable_quote": "Whether one likes it or not, it is a fact that the main issues of present-day politics are purely economic and cannot be understood without a grasp of economic theory.",
+              "keywords": ["Austrian School of Economics", "propaganda", "state control", "mainstream economics", "war of ideas"]
+            }
+          ],
+          "limitations_and_future_directions": {
+            "acknowledged_constraints": [
+              "Pervasive public ignorance regarding the complex and intentionally obscured monetary system.",
+              "The deeply entrenched interests of politicians, central bankers, and mainstream economists who benefit from the current system.",
+              "The state's monopoly is backed by coercive force and control over education and public discourse.",
+              "'Collective corruption'—where much of the population supports state actions out of fear of immediate personal losses."
+            ],
+            "future_research": [
+              "The primary direction is to enlighten a critical mass of people about the injustice of the current monetary system.",
+              "Readers are called upon to actively spread the teachings of the Austrian School of Economics.",
+              "The ultimate goal is to generate sufficient public pressure to remove the state's money monopoly.",
+              "This process is framed as a 'war of ideas' where public opinion, informed by economic understanding, will be decisive."
+            ]
+          },
+          "field_context": {
+            "statement": "This book serves as a popular and accessible introduction to the monetary theory of the Austrian School of Economics, a heterodox school of thought that stands in stark opposition to mainstream Keynesian and Monetarist paradigms. It channels the foundational ideas of Ludwig von Mises's \"The Theory of Money and Credit\" and F.A. Hayek's Nobel Prize-winning work on business cycles into a modern polemic. The book's core argument—that central banking and fiat currency are the primary sources of economic instability and social injustice—is a hallmark of the Austrian tradition. It explicitly positions itself as an intellectual antidote to contemporary statist economic analyses, such as that of Thomas Piketty, by arguing that the observed rise in inequality is a feature of state intervention in money, not of free-market capitalism."
+          }
+        };
+
+        // --- DOM ELEMENT REFERENCES ---
+        const sidebar = document.getElementById('sidebar');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const overlay = document.getElementById('overlay');
+        const chapterNav = document.getElementById('chapter-navigation');
+        const mainContent = document.getElementById('main-content');
+        const contentDisplay = document.getElementById('content-display');
+
+        // --- CORE APPLICATION LOGIC ---
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        /**
+         * Initializes the dashboard on page load.
+         * Populates header, generates navigation, and displays the initial summary.
+         */
+        function initialize() {
+            // 1. Populate the main header with book metadata
+            document.getElementById('book-title-main').textContent = jsonData.book_meta.title;
+            document.getElementById('book-meta-main').textContent = `${jsonData.book_meta.author} (${jsonData.book_meta.publication_year})`;
+
+            // 2. Generate navigation links dynamically
+            generateNavigation();
+
+            // 3. Display the overall summary by default
+            displayContent('overall_summary');
+
+            // 4. Set up all event listeners
+            setupEventListeners();
+        }
+
+        /**
+         * Creates and appends navigation links to the sidebar.
+         */
+        function generateNavigation() {
+            chapterNav.innerHTML = ''; // Clear existing nav
+            const navFragment = document.createDocumentFragment();
+
+            // Helper to create list items
+            const createNavItem = (id, text, title = '') => {
+                const li = document.createElement('li');
+                li.dataset.id = id;
+                li.textContent = text;
+                if (title) li.title = title;
+                return li;
+            };
+            
+            // Add sections in the correct order
+            navFragment.appendChild(createNavItem('overall_summary', 'Overall Summary'));
+            
+            jsonData.chapters.forEach(ch => {
+                navFragment.appendChild(createNavItem(
+                    ch.chapter_number, 
+                    `Chapter ${ch.chapter_number}`,
+                    `Chapter ${ch.chapter_number}: ${ch.chapter_title}`
+                ));
+            });
+            
+            navFragment.appendChild(createNavItem('limitations_and_future_directions', 'Limitations & Future Directions'));
+            navFragment.appendChild(createNavItem('field_context', 'Field Context'));
+            
+            chapterNav.appendChild(navFragment);
+        }
+
+        /**
+         * Sets up event listeners for navigation and mobile menu.
+         */
+        function setupEventListeners() {
+            // Use event delegation for efficient navigation clicks
+            chapterNav.addEventListener('click', (e) => {
+                if (e.target && e.target.nodeName === 'LI') {
+                    const sectionId = e.target.dataset.id;
+                    displayContent(sectionId);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 992) {
+                        toggleSidebar(false);
+                    }
+                }
+            });
+
+            // Mobile menu controls
+            hamburgerBtn.addEventListener('click', () => toggleSidebar(true));
+            overlay.addEventListener('click', () => toggleSidebar(false));
+        }
+
+        /**
+         * Displays the content for a given section ID.
+         * @param {string} id - The ID of the section to display (e.g., 'overall_summary', '1').
+         */
+        function displayContent(id) {
+            contentDisplay.innerHTML = ''; // Clear previous content
+            
+            let data, title;
+            const contentFragment = document.createDocumentFragment();
+
+            if (id === 'overall_summary') {
+                data = jsonData.overall_summary;
+                title = 'Overall Summary';
+                contentFragment.appendChild(createCard('Abstract', data.abstract, 'full-width'));
+                contentFragment.appendChild(createCard('Keywords', data.keywords, 'full-width'));
+            } else if (id === 'limitations_and_future_directions') {
+                data = jsonData.limitations_and_future_directions;
+                title = 'Limitations & Future Directions';
+                contentFragment.appendChild(createCard('Acknowledged Constraints', data.acknowledged_constraints));
+                contentFragment.appendChild(createCard('Future Research Directions', data.future_research));
+            } else if (id === 'field_context') {
+                data = jsonData.field_context;
+                title = 'Field Context';
+                contentFragment.appendChild(createCard('Position within the Field', data.statement, 'full-width'));
+            } else { // It's a chapter
+                const chapterId = parseInt(id, 10);
+                data = jsonData.chapters.find(ch => ch.chapter_number === chapterId);
+                if (data) {
+                    title = `Chapter ${data.chapter_number}: ${data.chapter_title}`;
+                    contentFragment.appendChild(createCard('Chapter Summary', data.summary, 'full-width'));
+                    contentFragment.appendChild(createCard('Key Arguments', data.key_arguments));
+                    contentFragment.appendChild(createCard('Key Takeaways / Insights', data.key_takeaways_or_insights));
+                    contentFragment.appendChild(createCard('Notable Quote', data.notable_quote, 'full-width'));
+
+                    // Add a custom visualization for specific chapters
+                    if (chapterId === 3) {
+                         contentFragment.appendChild(createCantillonViz());
+                    }
+                    if (chapterId === 4) {
+                        contentFragment.appendChild(createBoomBustViz());
+                    }
+                }
+            }
+
+            // Update header title and apply content
+            document.getElementById('current-section-title').textContent = title;
+            contentDisplay.appendChild(contentFragment);
+
+            // Update active state in navigation
+            updateActiveNav(id);
+        }
+
+        /**
+         * Helper function to create a content card element.
+         * @param {string} title - The title of the card.
+         * @param {string|string[]} content - The content (string or array of strings).
+         * @param {string} [className=''] - Optional additional class for the card.
+         * @returns {HTMLElement} The created card element.
+         */
+        function createCard(title, content, className = '') {
+            const card = document.createElement('div');
+            card.className = `content-card ${className}`.trim();
+
+            const cardTitle = document.createElement('h4');
+            cardTitle.textContent = title;
+            card.appendChild(cardTitle);
+
+            if (Array.isArray(content)) {
+                // Special handling for keywords
+                if (title.toLowerCase().includes('keywords')) {
+                    const list = document.createElement('ul');
+                    list.className = 'keyword-list';
+                    content.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        list.appendChild(li);
+                    });
+                    card.appendChild(list);
+                } else {
+                    const list = document.createElement('ul');
+                    content.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        list.appendChild(li);
+                    });
+                    card.appendChild(list);
+                }
+            } else if (title.toLowerCase().includes('quote')) {
+                 const blockquote = document.createElement('blockquote');
+                 blockquote.textContent = content;
+                 card.appendChild(blockquote);
+            }
+             else {
+                content.split('\n\n').forEach(paragraph => {
+                    if (paragraph) {
+                        const p = document.createElement('p');
+                        p.textContent = paragraph;
+                        card.appendChild(p);
+                    }
+                });
+            }
+            return card;
+        }
+
+        /**
+         * Creates a visualization for the Cantillon Effect (Chapter 3).
+         * @returns {HTMLElement} The visualization card element.
+         */
+        function createCantillonViz() {
+            const card = document.createElement('div');
+            card.className = 'content-card full-width';
+            card.innerHTML = `
+                <h4>Visualization: The Cantillon Effect</h4>
+                <div class="visualization-container">
+                    <p class="viz-label">New money is created and enters the economy at specific points, benefiting first-recipients before prices adjust for everyone else.</p>
+                    <div class="cantillon-effect-viz">
+                        <div class="viz-box"><strong>Source: Central Bank / Government</strong><br><small>(New Money Creation)</small></div>
+                        <div class="viz-arrow">&darr;</div>
+                        <div class="viz-box"><strong>First Recipients: Banks, Large Corporations, Government Contractors</strong><br><small>(Benefit: Purchase assets/goods at old, lower prices)</small></div>
+                        <div class="viz-arrow">&darr;</div>
+                        <div class="viz-box"><strong>Later Recipients: General Public, Wage Earners, Retirees</strong><br><small>(Harm: Face new, higher prices before their income rises)</small></div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        /**
+         * Creates a visualization for the Boom-Bust Cycle (Chapter 4).
+         * @returns {HTMLElement} The visualization card element.
+         */
+        function createBoomBustViz() {
+            const card = document.createElement('div');
+            card.className = 'content-card full-width';
+            card.innerHTML = `
+                <h4>Visualization: Austrian Business Cycle Theory</h4>
+                <div class="visualization-container">
+                    <p class="viz-label">Artificially low interest rates from credit expansion lead to an unsustainable boom and an inevitable bust.</p>
+                    <div class="boom-bust-viz">
+                        <div class="boom-bust-path">
+                           <span id="boom-text" class="boom-bust-text"><strong>Artificial Boom</strong><br>Malinvestments</span>
+                           <span id="bust-text" class="boom-bust-text"><strong>Inevitable Bust</strong><br>Correction</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        /**
+         * Toggles the sidebar visibility for mobile view.
+         * @param {boolean} show - Whether to show or hide the sidebar.
+         */
+        function toggleSidebar(show) {
+            if (show) {
+                sidebar.classList.add('visible');
+                overlay.style.display = 'block';
+            } else {
+                sidebar.classList.remove('visible');
+                overlay.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Updates the active link in the sidebar navigation.
+         * @param {string} id - The ID of the currently active section.
+         */
+        function updateActiveNav(id) {
+            const navLinks = chapterNav.querySelectorAll('li');
+            navLinks.forEach(link => {
+                if (link.dataset.id === id) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
+

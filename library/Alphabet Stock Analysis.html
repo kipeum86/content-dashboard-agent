@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet (GOOGL) Investment Analysis Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
+        @keyframes pulse-price{0%,100%{opacity:1}50%{opacity:.7}}
+        @keyframes grad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        .pulse-price{animation:pulse-price 2s ease-in-out infinite}
+        .grad-ani{background-size:200% 200%;animation:grad 4s ease infinite}
+        .card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s}
+        .card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+        .stat-card{border-left:4px solid}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#4285f455;border-radius:3px}
+    </style>
+    <script>
+        tailwind.config={theme:{extend:{colors:{
+            g:{blue:'#4285F4',red:'#EA4335',yellow:'#FBBC05',green:'#34A853'},
+            gb:{50:'#eef3fc',100:'#d4e2f9',200:'#a8c5f3',300:'#7ca8ed',400:'#4285F4',500:'#3367d6',600:'#2a56b0',700:'#1e3f80',800:'#142a55',900:'#0d1b38'}
+        }}}}
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- HEADER -->
+    <header class="relative overflow-hidden" style="background:linear-gradient(135deg,#0d1b38 0%,#1e3f80 30%,#2a56b0 60%,#3367d6 100%)">
+        <div class="absolute inset-0 opacity-5" style="background-image:url('data:image/svg+xml,%3Csvg width=60 height=60 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ccircle cx=30 cy=30 r=1.5 fill=%22%23fff%22/%3E%3C/svg%3E')"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#4285F4,#34A853,#FBBC05,#EA4335)">
+                            <i class="fa-brands fa-google text-2xl text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">Alphabet Inc.</h1>
+                            <p class="text-blue-200 text-sm font-medium">NASDAQ: GOOGL · Class A</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mt-4">
+                        <span class="text-4xl font-extrabold text-white pulse-price">$302.85</span>
+                        <span class="bg-red-500/25 text-red-200 px-3 py-1 rounded-full text-sm font-semibold">
+                            <i class="fa-solid fa-caret-down mr-1"></i>-0.16%
+                        </span>
+                    </div>
+                    <p class="text-blue-200/60 text-xs mt-1">Feb 19, 2026 · Prev Close $303.33</p>
+                </div>
+                <div class="flex flex-col gap-2 text-right">
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                        <span class="text-blue-200/60">Market Cap</span>
+                        <span class="text-white font-semibold">$3.67T</span>
+                        <span class="text-blue-200/60">Beta</span>
+                        <span class="text-white font-semibold">1.15</span>
+                        <span class="text-blue-200/60">52-Wk Range</span>
+                        <span class="text-white font-semibold">$140.53 – $349.00</span>
+                        <span class="text-blue-200/60">Employees</span>
+                        <span class="text-white font-semibold">190,820</span>
+                    </div>
+                    <div class="flex gap-2 mt-3 justify-end">
+                        <a href="https://finance.yahoo.com/quote/GOOGL" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-chart-line mr-1"></i>Yahoo</a>
+                        <a href="https://abc.xyz/investor/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-building mr-1"></i>IR</a>
+                        <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001652044" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-file-alt mr-1"></i>SEC</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+        <!-- DCF / VALUATION -->
+        <section class="rounded-2xl overflow-hidden grad-ani" style="background:linear-gradient(135deg,#0d1b38,#1e3f80,#2a56b0,#142a55)">
+            <div class="p-6 sm:p-8">
+                <h2 class="text-lg font-bold text-blue-200 mb-1"><i class="fa-solid fa-bullseye mr-2"></i>Scenario Valuation (12-Month Targets)</h2>
+                <p class="text-blue-200/50 text-xs mb-6">Based on AI monetization trajectory, Cloud growth, and CapEx return profile</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center border border-red-400/30">
+                        <p class="text-red-300 text-sm font-semibold mb-1">Bear Case</p>
+                        <p class="text-3xl font-extrabold text-white">$240</p>
+                        <p class="text-red-300 text-sm mt-1"><i class="fa-solid fa-arrow-down mr-1"></i>-20.8%</p>
+                        <p class="text-blue-200/40 text-xs mt-2">CapEx overshoot / Search share loss / DOJ remedy</p>
+                    </div>
+                    <div class="bg-white/15 backdrop-blur-sm rounded-xl p-5 text-center border-2 border-blue-300/50 scale-105">
+                        <p class="text-blue-200 text-sm font-semibold mb-1">Base Case</p>
+                        <p class="text-4xl font-extrabold text-white">$360</p>
+                        <p class="text-green-300 text-sm mt-1"><i class="fa-solid fa-arrow-up mr-1"></i>+18.9%</p>
+                        <p class="text-blue-200/40 text-xs mt-2">Consensus growth / Cloud 30%+ / Stable margins</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center border border-green-400/30">
+                        <p class="text-green-300 text-sm font-semibold mb-1">Bull Case</p>
+                        <p class="text-3xl font-extrabold text-white">$420</p>
+                        <p class="text-green-300 text-sm mt-1"><i class="fa-solid fa-arrow-up mr-1"></i>+38.7%</p>
+                        <p class="text-blue-200/40 text-xs mt-2">AI monetization inflection / Waymo value unlock</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI HIGHLIGHTS -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card p-5 stat-card" style="border-left-color:#4285F4">
+                <p class="text-xs text-gray-500 mb-1">FY2025 Revenue</p>
+                <p class="text-2xl font-bold text-gb-700">$402.8B</p>
+                <p class="text-xs text-green-600 mt-1"><i class="fa-solid fa-arrow-up"></i> +15% YoY</p>
+            </div>
+            <div class="card p-5 stat-card" style="border-left-color:#34A853">
+                <p class="text-xs text-gray-500 mb-1">Cloud ARR</p>
+                <p class="text-2xl font-bold text-gb-700">$70B+</p>
+                <p class="text-xs text-green-600 mt-1"><i class="fa-solid fa-arrow-up"></i> Q4 Rev +48% YoY</p>
+            </div>
+            <div class="card p-5 stat-card" style="border-left-color:#FBBC05">
+                <p class="text-xs text-gray-500 mb-1">Gemini MAU</p>
+                <p class="text-2xl font-bold text-gb-700">750M</p>
+                <p class="text-xs text-green-600 mt-1"><i class="fa-solid fa-arrow-up"></i> from 650M in Q3</p>
+            </div>
+            <div class="card p-5 stat-card" style="border-left-color:#EA4335">
+                <p class="text-xs text-gray-500 mb-1">2026 CapEx Guide</p>
+                <p class="text-2xl font-bold text-gb-700">$175-185B</p>
+                <p class="text-xs text-yellow-600 mt-1"><i class="fa-solid fa-exclamation-triangle"></i> ~2x vs 2025</p>
+            </div>
+        </section>
+
+        <!-- INVESTMENT THESIS -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-scale-balanced mr-2 text-gb-400"></i>Investment Thesis & Variant View</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-6 border-l-4 border-green-500">
+                    <h3 class="text-lg font-bold text-green-700 mb-3"><i class="fa-solid fa-arrow-trend-up mr-2"></i>Strengths / Bull Case</h3>
+                    <div class="space-y-3 text-sm text-gray-700">
+                        <div class="bg-green-50 rounded-lg p-3">
+                            <p class="font-semibold text-green-800 mb-1">🔥 Variant View: What the Market Is Missing</p>
+                            <p>The market is fixated on the $175-185B CapEx number, creating a "spending too much" narrative. But Cloud backlog reached $240B (55% QoQ, 2x YoY) — implying committed future revenue that dwarfs the investment. GenAI revenue grew ~400% YoY in Q4. Alphabet is building a physical moat in AI compute that competitors cannot easily replicate.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">☁️ Cloud Inflection — The Profit Machine</p>
+                            <p>Cloud operating margin hit 30.1% (from 17.5% a year ago). Revenue growing 48% YoY with $240B backlog. Deals over $1B in 2025 surpassed previous 3 years combined. 14 product lines each exceeding $1B ARR.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">🤖 AI Monetization Already Working</p>
+                            <p>Gemini 3 Pro — fastest model adoption in company history. 10B+ tokens/minute via API. Serving costs down 78% in 2025. AI Max driving measurable advertiser ROI (L'Oreal +23% DTC revenue). 325M paid subscriptions.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">🚗 Waymo: Hidden Asset</p>
+                            <p>$16B investment round (mostly Alphabet-funded). Operating in 6 cities, ~$10M/week revenue. Valuation increasingly tangible — potential future spin-off/IPO catalyst.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6 border-l-4 border-red-500">
+                    <h3 class="text-lg font-bold text-red-700 mb-3"><i class="fa-solid fa-arrow-trend-down mr-2"></i>Risks / Bear Case</h3>
+                    <div class="space-y-3 text-sm text-gray-700">
+                        <div class="bg-red-50 rounded-lg p-3">
+                            <p class="font-semibold text-red-800 mb-1">⚠️ Key Risk: CapEx Overshoot — FCF Compression</p>
+                            <p>2026 CapEx of $175-185B is ~2x the $91.4B spent in 2025. If utilization lags or AI demand softens, this could compress FCF by $40-60B, creating significant multiple contraction. ROI on this infrastructure is unproven at this scale.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">⚖️ DOJ Antitrust — Structural Remedy</p>
+                            <p>Ongoing search antitrust case with potential Chrome divestiture as a remedy. Could fundamentally alter default search distribution. Estimated revenue-at-risk: $15-20B in distribution-dependent search revenue.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">🔍 AI Search Disruption</p>
+                            <p>OpenAI, Perplexity, and emerging AI-native search alternatives gaining traction. If AI Overviews cannibalize high-margin traditional search ads without equivalent monetization, Search margins could compress 300-500bps.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">📉 Valuation Stretched</p>
+                            <p>Forward P/E ~28x is well above historical 5-year average of ~23x. At current multiples, significant negative earnings revisions from CapEx-driven margin pressure could trigger 15-20% correction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VALUATION METRICS -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-calculator mr-2 text-gb-400"></i>Valuation Metrics</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="card p-4 stat-card" style="border-left-color:#4285F4">
+                    <p class="text-xs text-gray-500">P/E (TTM)</p>
+                    <p class="text-xl font-bold">28.0x</p>
+                    <p class="text-xs text-yellow-600">5Y Avg: ~23x</p>
+                </div>
+                <div class="card p-4 stat-card" style="border-left-color:#34A853">
+                    <p class="text-xs text-gray-500">Forward P/E</p>
+                    <p class="text-xl font-bold">26.2x</p>
+                    <p class="text-xs text-gray-400">2026E EPS $11.55</p>
+                </div>
+                <div class="card p-4 stat-card" style="border-left-color:#FBBC05">
+                    <p class="text-xs text-gray-500">P/S (TTM)</p>
+                    <p class="text-xl font-bold">9.2x</p>
+                    <p class="text-xs text-gray-400">Sector Avg ~7x</p>
+                </div>
+                <div class="card p-4 stat-card" style="border-left-color:#EA4335">
+                    <p class="text-xs text-gray-500">EV/EBITDA</p>
+                    <p class="text-xl font-bold">20.8x</p>
+                    <p class="text-xs text-gray-400">EBITDA $153.9B</p>
+                </div>
+                <div class="card p-4 stat-card" style="border-left-color:#4285F4">
+                    <p class="text-xs text-gray-500">Div Yield</p>
+                    <p class="text-xl font-bold">0.27%</p>
+                    <p class="text-xs text-gray-400">Initiated 2024</p>
+                </div>
+                <div class="card p-4 stat-card" style="border-left-color:#34A853">
+                    <p class="text-xs text-gray-500">ROE (FY25)</p>
+                    <p class="text-xl font-bold text-green-600">~35%</p>
+                    <p class="text-xs text-green-600">Strong</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PEER COMPARISON -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-users mr-2 text-gb-400"></i>Peer Comparison</h2>
+            <div class="card overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gb-50 text-gray-600 text-xs uppercase">
+                            <th class="text-left p-4 font-semibold">Company</th>
+                            <th class="text-right p-4 font-semibold">Mkt Cap</th>
+                            <th class="text-right p-4 font-semibold">Revenue (FY)</th>
+                            <th class="text-right p-4 font-semibold">Rev Growth</th>
+                            <th class="text-right p-4 font-semibold">Op Margin</th>
+                            <th class="text-right p-4 font-semibold">P/E</th>
+                            <th class="text-right p-4 font-semibold">EV/EBITDA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-blue-50/60 border-b font-semibold">
+                            <td class="p-4"><span class="text-gb-600">★ Alphabet (GOOGL)</span></td>
+                            <td class="text-right p-4">$3.67T</td>
+                            <td class="text-right p-4">$402.8B</td>
+                            <td class="text-right p-4 text-green-600">+15%</td>
+                            <td class="text-right p-4">32.0%</td>
+                            <td class="text-right p-4">28.0x</td>
+                            <td class="text-right p-4">20.8x</td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">Microsoft (MSFT)</td>
+                            <td class="text-right p-4">$3.05T</td>
+                            <td class="text-right p-4">$262B</td>
+                            <td class="text-right p-4 text-green-600">+16%</td>
+                            <td class="text-right p-4">44.6%</td>
+                            <td class="text-right p-4">33.5x</td>
+                            <td class="text-right p-4">24.1x</td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">Meta (META)</td>
+                            <td class="text-right p-4">$1.72T</td>
+                            <td class="text-right p-4">$164.5B</td>
+                            <td class="text-right p-4 text-green-600">+22%</td>
+                            <td class="text-right p-4">41.8%</td>
+                            <td class="text-right p-4">24.2x</td>
+                            <td class="text-right p-4">16.8x</td>
+                        </tr>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">Amazon (AMZN)</td>
+                            <td class="text-right p-4">$2.34T</td>
+                            <td class="text-right p-4">$638B</td>
+                            <td class="text-right p-4 text-green-600">+11%</td>
+                            <td class="text-right p-4">11.2%</td>
+                            <td class="text-right p-4">36.5x</td>
+                            <td class="text-right p-4">18.5x</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4">Apple (AAPL)</td>
+                            <td class="text-right p-4">$3.73T</td>
+                            <td class="text-right p-4">$391B</td>
+                            <td class="text-right p-4 text-green-600">+4%</td>
+                            <td class="text-right p-4">33.5%</td>
+                            <td class="text-right p-4">36.8x</td>
+                            <td class="text-right p-4">28.2x</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ANALYST TARGETS -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-bullhorn mr-2 text-gb-400"></i>Analyst Price Targets</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="card p-5 text-center">
+                    <p class="text-xs text-gray-500 mb-1">Consensus Average</p>
+                    <p class="text-3xl font-bold text-gb-600">$359</p>
+                    <p class="text-sm text-green-500 mt-1">+18.5% upside</p>
+                </div>
+                <div class="card p-5 text-center">
+                    <p class="text-xs text-gray-500 mb-1">Street High</p>
+                    <p class="text-3xl font-bold text-green-600">$420</p>
+                    <p class="text-sm text-green-500 mt-1">+38.7% upside</p>
+                </div>
+                <div class="card p-5 text-center">
+                    <p class="text-xs text-gray-500 mb-1">Street Low</p>
+                    <p class="text-3xl font-bold text-red-600">$190</p>
+                    <p class="text-sm text-red-500 mt-1">-37.3% downside</p>
+                </div>
+            </div>
+            <div class="card p-5 mt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-semibold">Rating Distribution</span>
+                    <span class="text-xs text-gray-400">44 analysts (StockAnalysis) / 32 analysts (TipRanks)</span>
+                </div>
+                <div class="flex h-6 rounded-full overflow-hidden">
+                    <div class="bg-green-600" style="width:78%" title="Buy"></div>
+                    <div class="bg-yellow-500" style="width:22%" title="Hold"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                    <span class="text-green-600 font-semibold">Buy/Strong Buy: 25+ (78%)</span>
+                    <span class="text-yellow-600 font-semibold">Hold: 7 (22%)</span>
+                    <span class="text-gray-400">Sell: 0 (0%)</span>
+                </div>
+                <div class="mt-3 p-3 bg-blue-50 rounded-lg text-xs text-gray-600">
+                    <p><strong>Recent upgrades:</strong> DZ Bank → Strong Buy (Feb 17). Tigress Financial raised PT to $415 from $280. Wedbush raised PT to $370 from $360. Post-Q4 earnings, most analysts raised targets citing Cloud acceleration and AI monetization. Morningstar fair value: $221 (considers stock overvalued).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHARTS -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-chart-bar mr-2 text-gb-400"></i>Financial Charts</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Annual Revenue & Operating Income ($B)</h3>
+                    <canvas id="revenueChart" height="200"></canvas>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Segment Revenue — Q4 2025 ($B)</h3>
+                    <canvas id="segmentChart" height="200"></canvas>
+                </div>
+            </div>
+            <div class="card p-5 mt-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Stock Price vs Analyst Targets (52-Week)</h3>
+                <canvas id="priceChart" height="180"></canvas>
+            </div>
+        </section>
+
+        <!-- FINANCIAL DETAIL -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-file-invoice-dollar mr-2 text-gb-400"></i>Financial Detail Analysis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-gb-600 mb-3"><i class="fa-solid fa-chart-line mr-2"></i>Revenue Growth</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-500">FY25 Revenue</span><span class="font-semibold">$402.8B</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">YoY Growth</span><span class="font-semibold text-green-600">+15%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">2026E Consensus</span><span class="font-semibold">$467.9B (+16%)</span></div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-gb-600 mb-3"><i class="fa-solid fa-percentage mr-2"></i>Profitability</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-500">Op Margin (FY25)</span><span class="font-semibold">32.0%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">Net Income (FY25)</span><span class="font-semibold">$132.2B</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">EPS (FY25)</span><span class="font-semibold">$10.81 (+34%)</span></div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-gb-600 mb-3"><i class="fa-solid fa-coins mr-2"></i>Cash Flow & CapEx</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-500">2025 CapEx</span><span class="font-semibold">$91.4B</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">2026E CapEx</span><span class="font-semibold text-yellow-600">$175-185B</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">Debt Issuance</span><span class="font-semibold">$24.8B (Nov '25)</span></div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-gb-600 mb-3"><i class="fa-solid fa-shield-halved mr-2"></i>Balance Sheet</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-500">Cloud Backlog</span><span class="font-semibold text-green-600">$240B</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">Paid Subs</span><span class="font-semibold">325M</span></div>
+                        <div class="flex justify-between"><span class="text-gray-500">Buybacks</span><span class="font-semibold text-green-600">Active</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-5 mt-4 bg-gb-50 border border-gb-200">
+                <p class="text-sm text-gray-700"><strong>💡 Key Insight:</strong> Alphabet's FY2025 was a landmark year — first to exceed $400B in revenue, Cloud reached a $70B+ ARR with 30% margins, and Gemini AI scaled to 750M MAU. The core debate is now about capital efficiency: with 2026 CapEx nearly doubling to $175-185B, investors must assess whether the $240B Cloud backlog and 400% GenAI revenue growth justify this unprecedented infrastructure buildout. Near-term FCF compression is inevitable, but the long-term thesis rests on Alphabet owning the full AI stack from custom silicon (TPUs) to applications (Search, YouTube, Cloud).</p>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO STRATEGY -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-chess-knight mr-2 text-gb-400"></i>Portfolio Strategy & Execution</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-6">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4">Scenario Positioning</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <p class="font-bold text-green-700">🐂 Bull (Probability 35%)</p>
+                            <p class="text-gray-600 mt-1">Cloud sustains 40%+ growth, AI monetization inflects across Search & YouTube, Waymo IPO explored. Target $420. Add on dips below $290.</p>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <p class="font-bold text-blue-700">📊 Base (Probability 45%)</p>
+                            <p class="text-gray-600 mt-1">Revenue grows ~16% in 2026, Cloud margins stabilize ~28-30%, CapEx concerns partially offset by backlog conversion. Target $360. Hold position.</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-4">
+                            <p class="font-bold text-red-700">🐻 Bear (Probability 20%)</p>
+                            <p class="text-gray-600 mt-1">CapEx ROI disappoints, DOJ forces Chrome divestiture, AI search disruption accelerates. Target $240. Trim above $340.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4">Execution Guidelines</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center gap-3 p-3 bg-gb-50 rounded-lg">
+                            <div class="w-10 h-10 bg-gb-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-thumbs-up text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700">Rating: Buy</p>
+                                <p class="text-gray-500 text-xs">Consensus Strong Buy, ~19% upside to avg PT</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700">Horizon: 12–24 months</p>
+                                <p class="text-gray-500 text-xs">Through CapEx ramp and Cloud backlog conversion</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-balance-scale text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-700">Risk/Reward: -21% / +39%</p>
+                                <p class="text-gray-500 text-xs">Asymmetric upside with manageable downside</p>
+                            </div>
+                        </div>
+                        <div class="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <p class="font-bold text-blue-800 text-xs mb-2">📋 Key Monitoring Points</p>
+                            <ul class="text-xs text-gray-600 space-y-1">
+                                <li>• 4/28 — Q1 2026 Earnings (first quarter with elevated CapEx)</li>
+                                <li>• Cloud growth rate sustainability (watch for deceleration below 35%)</li>
+                                <li>• DOJ antitrust remedy decision timeline (H2 2026)</li>
+                                <li>• Gemini 3 adoption metrics & AI search monetization data</li>
+                                <li>• FCF trajectory — critical to monitor quarterly vs CapEx burn</li>
+                                <li>• YouTube TV & subscription growth (325M paid subs baseline)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-400 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div>
+                    <p class="text-xs mb-2"><strong class="text-gray-300">Disclaimer:</strong> This dashboard is for informational purposes only and does not constitute investment advice, a recommendation, or solicitation to buy or sell securities. All investment decisions should be made based on your own research and risk tolerance. Past performance does not guarantee future results.</p>
+                    <p class="text-xs">Last Updated: February 19, 2026 · Price: $302.85 (GOOGL)</p>
+                </div>
+                <div class="text-xs text-right">
+                    <p>Sources: Alphabet Q4 2025 Earnings Release, SEC Filings,</p>
+                    <p>Morningstar, TipRanks, StockAnalysis, TradingView, CNBC</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const gBlue='rgba(66,133,244,', gRed='rgba(234,67,53,', gYellow='rgba(251,188,5,', gGreen='rgba(52,168,83,';
+
+        // Revenue & Op Income
+        new Chart(document.getElementById('revenueChart').getContext('2d'),{
+            type:'bar',
+            data:{
+                labels:['2021','2022','2023','2024','2025'],
+                datasets:[
+                    {label:'Revenue ($B)',data:[257.6,283.0,307.4,350.0,402.8],backgroundColor:gBlue+'0.55)',borderColor:gBlue+'1)',borderWidth:1,borderRadius:6,order:2},
+                    {label:'Op Income ($B)',type:'line',data:[78.7,74.8,84.3,112.4,129.0],borderColor:gGreen+'1)',backgroundColor:gGreen+'0.1)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:gGreen+'1)',fill:false,order:1}
+                ]
+            },
+            options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true}}},scales:{y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},callback:v=>'$'+v+'B'}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+        });
+
+        // Segment Revenue Q4 2025
+        new Chart(document.getElementById('segmentChart').getContext('2d'),{
+            type:'bar',
+            data:{
+                labels:['Search','YouTube Ads','Subs/Platforms','Network','Cloud','Other Bets'],
+                datasets:[{
+                    label:'Q4 2025 Revenue ($B)',
+                    data:[63.1,11.4,13.6,7.8,17.7,0.37],
+                    backgroundColor:[gBlue+'0.7)',gRed+'0.7)',gYellow+'0.7)',gBlue+'0.35)',gGreen+'0.7)','rgba(156,163,175,0.5)'],
+                    borderColor:[gBlue+'1)',gRed+'1)',gYellow+'1)',gBlue+'0.6)',gGreen+'1)','rgba(156,163,175,0.8)'],
+                    borderWidth:1,borderRadius:6
+                }]
+            },
+            options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},callback:v=>'$'+v+'B'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+        });
+
+        // Price Chart
+        const pLabels=['Mar 25','May 25','Jul 25','Sep 25','Nov 25','Jan 26','Feb 26'];
+        new Chart(document.getElementById('priceChart').getContext('2d'),{
+            type:'line',
+            data:{
+                labels:pLabels,
+                datasets:[
+                    {label:'GOOGL Price',data:[155,168,188,165,190,343,302.85],borderColor:gBlue+'1)',backgroundColor:gBlue+'0.06)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:gBlue+'1)',fill:true,tension:.3},
+                    {label:'Bull Target ($420)',data:[420,420,420,420,420,420,420],borderColor:gGreen+'0.5)',borderWidth:1.5,borderDash:[8,4],pointRadius:0,fill:false},
+                    {label:'Consensus ($359)',data:[359,359,359,359,359,359,359],borderColor:gYellow+'0.6)',borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false},
+                    {label:'Bear Target ($240)',data:[240,240,240,240,240,240,240],borderColor:gRed+'0.5)',borderWidth:1.5,borderDash:[8,4],pointRadius:0,fill:false}
+                ]
+            },
+            options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},usePointStyle:true}}},scales:{y:{min:100,max:450,grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},callback:v=>'$'+v}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Year in Tech, 2026 - Interactive Dashboard</title>
+    <style>
+        /* ------------------------------------------------------------------
+           CSS VARIABLES & RESET
+           Theme: Professional Forest (Deep Green-Black & Sage)
+           ------------------------------------------------------------------ */
+        :root {
+            /* Colors */
+            --bg-dark: #111413;       /* Deep Green-Black - Very subtle warm dark */
+            --bg-card: #1c2420;       /* Dark Moss/Charcoal for cards */
+            --bg-sidebar: #0b0d0c;    /* Darkest tone for sidebar */
+            
+            --text-main: #edf2f0;     /* Soft White with tiny green hint */
+            --text-muted: #8b9e94;    /* Muted Sage Grey for secondary text */
+            
+            /* Accents - Greenish, Professional tones */
+            --accent-primary: #56b58e; /* Sage/Emerald Green - Calm & Professional */
+            --accent-secondary: #3d6e5a; /* Darker Green for headers/borders */
+            --accent-glow: rgba(86, 181, 142, 0.15); /* Soft green glow */
+            
+            --border-color: #2a3630;  /* Subtle green-tinted border */
+
+            /* Spacing */
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 2rem;
+
+            /* Typography */
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden; /* Main scroll handles content */
+        }
+
+        /* ------------------------------------------------------------------
+           LAYOUT STRUCTURE
+           ------------------------------------------------------------------ */
+        #dashboard-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            
+            /* UPDATED: Changed from flex column to block with overflow to unfix header */
+            display: block; 
+            height: 100vh;
+            overflow-y: auto; /* Enable scrolling for the entire sidebar including header */
+            
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        /* Custom Scrollbar for Sidebar & Main Content */
+        #sidebar::-webkit-scrollbar,
+        #main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        #sidebar::-webkit-scrollbar-thumb,
+        #main-content::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .sidebar-header {
+            padding: var(--space-md);
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .book-cover {
+            width: 100%;
+            max-width: 180px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: var(--space-sm);
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+            /* REMOVED filter to show original green color */
+        }
+
+        .sidebar-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        #chapter-navigation {
+            /* UPDATED: Removed flex-grow/overflow to allow natural height in parent scroll */
+            list-style: none;
+            padding: var(--space-md);
+        }
+
+        #chapter-navigation li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn.active {
+            background-color: var(--accent-glow);
+            border-color: var(--accent-secondary);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: var(--space-md);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            /* Footer will now naturally flow at the bottom of the list */
+        }
+
+        /* Main Content Area */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            /* UPDATED: Allow main content container to scroll */
+            overflow-y: auto; 
+            position: relative;
+        }
+
+        /* Mobile Header (Hidden on Desktop) */
+        #mobile-header {
+            display: none;
+            padding: var(--space-md);
+            background-color: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #hamburger-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Content Header */
+        #content-header {
+            padding: var(--space-lg);
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border-color);
+            /* This will now scroll with the rest of the content */
+        }
+
+        #book-title-main {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+            /* Updated Gradient: Soft White to Sage Green */
+            background: linear-gradient(90deg, #edf2f0, #56b58e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #book-meta-main {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+        }
+
+        #current-section-title {
+            font-size: 1.4rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* Content Display Area */
+        #content-display {
+            /* UPDATED: Removed overflow-y: auto to prevent nested scrolling */
+            /* flex-grow: 1; */
+            padding: var(--space-lg);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ------------------------------------------------------------------
+           COMPONENT STYLING (Cards, Lists, Visuals)
+           ------------------------------------------------------------------ */
+        .content-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-md);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: var(--space-sm);
+        }
+
+        .card-text {
+            color: var(--text-main);
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: var(--space-md);
+        }
+
+        .badge {
+            background-color: rgba(86, 181, 142, 0.1);
+            color: var(--accent-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(86, 181, 142, 0.2);
+        }
+
+        .quote-box {
+            border-left: 3px solid var(--accent-primary);
+            background: linear-gradient(90deg, rgba(86, 181, 142, 0.05), transparent);
+            padding: var(--space-md);
+            font-style: italic;
+            color: var(--text-main);
+            margin: var(--space-md) 0;
+            font-size: 1.05rem;
+            opacity: 0.95;
+        }
+
+        .list-group {
+            list-style: none;
+        }
+
+        .list-item {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+            opacity: 0.85;
+        }
+
+        .list-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        /* ------------------------------------------------------------------
+           CUSTOM CSS VISUALIZATIONS
+           ------------------------------------------------------------------ */
+        
+        /* 1. Timeline Visualization */
+        .timeline-container {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 20px;
+            border-left: 2px solid var(--border-color);
+        }
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px; 
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bg-card);
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+        }
+        .timeline-title {
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 2. Grid for "Future Research" or "Constraints" */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+        @media (max-width: 768px) { .grid-2-col { grid-template-columns: 1fr; } }
+        
+        .grid-item {
+            background: rgba(255,255,255,0.02);
+            padding: var(--space-md);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ------------------------------------------------------------------
+           RESPONSIVE DESIGN (Mobile)
+           ------------------------------------------------------------------ */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 90;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        @media (max-width: 992px) {
+            #sidebar {
+                position: fixed;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #mobile-header {
+                display: flex;
+            }
+
+            #content-display {
+                padding: var(--space-md);
+            }
+            
+            #content-header {
+                padding: var(--space-md);
+            }
+            
+            #book-title-main { font-size: 1.4rem; }
+            #current-section-title { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dashboard-container">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <!-- Book Cover Image -->
+                <img src="https://imgur.com/PiNm3R1.jpg" alt="Book Cover" class="book-cover">
+                <div class="sidebar-title">Tech 2026 Dashboard</div>
+            </div>
+            <ul id="chapter-navigation">
+                <!-- Javascript will populate this -->
+            </ul>
+            <div class="sidebar-footer">
+                Dashboard by Kipeum<br>
+                Source: HBR 2026
+            </div>
+        </nav>
+
+        <!-- Overlay for Mobile -->
+        <div id="overlay"></div>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <header id="mobile-header">
+                <div style="font-weight:bold; color:var(--accent-primary);">HBR 2026</div>
+                <button id="hamburger-btn">☰</button>
+            </header>
+
+            <header id="content-header">
+                <h1 id="book-title-main"></h1>
+                <p id="book-meta-main"></p>
+                <h2 id="current-section-title"></h2>
+            </header>
+
+            <div id="content-display">
+                <!-- Javascript will render content here -->
+            </div>
+        </main>
+    </div>
+
+<script>
+    /**
+     * ------------------------------------------------------------------
+     * DATA SOURCE
+     * ------------------------------------------------------------------
+     */
+    const jsonData = {
+      "book_meta": {
+        "title": "The Year in Tech, 2026",
+        "author": "Harvard Business Review",
+        "publication_year": "2025",
+        "main_theme": "Navigating the 'messy middle' of technological disruption through infrastructure, ethical norms, and strategic management of agentic and living intelligence."
+      },
+      "overall_summary": {
+        "abstract": "The sources describe a transitional era labeled the \"messy middle\" of technological disruption, where foundational innovations such as agentic artificial intelligence, blockchain-backed accountability, and \"living intelligence\" are beginning to reshape the business landscape. This collection argues that successful navigation of these shifts requires moving beyond viewing innovation as a singular act; instead, leaders must embrace a collective responsibility to build necessary infrastructure, establish new ethical norms, and manage the \"shadows\" of technology, such as surging environmental footprints and aggregated cyber risks. The book's overarching objective is to provide a strategic guide for decision-makers to identify the cost convergence windows of slow-developing technologies and to reconcile divergent expert perspectives on the future of work.",
+        "keywords": [
+          "Messy Middle of Disruption",
+          "Living Intelligence",
+          "Explainable Cyber Risk",
+          "Agentic AI",
+          "Blockchain Accountability",
+          "Cost Convergence",
+          "Future of Work"
+        ]
+      },
+      "chapters": [
+        {
+          "chapter_number": 0,
+          "chapter_title": "Introduction: The Messy Middle of Disruptive Change",
+          "summary": "Author Scott D. Anthony uses the historical transition to the automobile era to illustrate that technological adoption is often a \"battle for the soul\" of society involving conflicting norms and safety concerns. He posits that the current state of technology is similarly chaotic, requiring leaders to cut through the noise by understanding four repeating historical patterns of disruption.",
+          "key_arguments": [
+            "Innovation is a collective responsibility, where even lone visionaries like Gutenberg or Ford relied on complex ecosystems of partners, infrastructure, and societal enablers to succeed.",
+            "While broad trends are predictably unpredictable, the specific paths to success often involve unique surprises, such as McDonald's discovering that real estate leasing was more profitable than selling hamburgers.",
+            "True transformation requires patient perseverance, as adoption curves that appear rapid (like ChatGPT) are often the result of decades of background development.",
+            "Every disruption casts a shadow of negative consequences, such as environmental damage or cyber vulnerabilities, which must be addressed to prevent a societal backlash."
+          ],
+          "key_takeaways_or_insights": [
+            "Focus on building or leveraging the necessary ecosystem and infrastructure rather than just the core technology.",
+            "Anticipate and manage the 'shadows' (negative externalities) of innovation early to avoid regulatory or societal backlash."
+          ],
+          "notable_quote": "Technological adoption is often a \"battle for the soul\" of society involving conflicting norms and safety concerns.",
+          "keywords": [
+            "Technological turbulence",
+            "Historical patterns",
+            "System-level enablers"
+          ]
+        },
+        {
+          "chapter_number": 1,
+          "chapter_title": "What Is Agentic AI, and How Will It Change Work?",
+          "summary": "This chapter explores the leap from generative models to agentic AI, which consists of proactive systems capable of achieving complex goals autonomously without constant human prompts. These agents shift AI’s role from content creation to strategic execution and supercharged reasoning.",
+          "key_arguments": [
+            "Agentic AI enables extreme workforce specialization by performing granular tasks—such as information retrieval and workflow generation—allowing human-machine teams to function with the efficiency of a highly divided labor force.",
+            "These systems enhance innovation through rapid experimentation, exemplified by the ChemCrow agent planning new repellent synthesis or SciAgent identifying novel biomaterials.",
+            "The cognitive reasoning of agents reduces \"hallucinations\" and increases trustworthiness by sifting information sources for quality, such as prioritizing a firm’s CRM data over scattered emails."
+          ],
+          "key_takeaways_or_insights": [
+            "Managers must implement \"scaffolding\"—a learning science technique where AI is given exposure to real-world tasks with safeguards that are progressively withdrawn as the system's performance is validated.",
+            "Use SMART goals (specific, measurable, achievable, relevant, time-bound) to provide agents with the organizational and market context they lack."
+          ],
+          "notable_quote": "These agents shift AI’s role from content creation to strategic execution and supercharged reasoning.",
+          "keywords": [
+            "Agentic AI",
+            "Scaffolding",
+            "Workforce specialization"
+          ]
+        },
+        {
+          "chapter_number": 2,
+          "chapter_title": "Using Blockchain to Build Customer Trust in AI",
+          "summary": "Using FICO as a case study, the authors demonstrate how a private blockchain can solve the \"black box\" trust problem in AI by creating an immutable audit trail of the entire development lifecycle. This methodology ensures that every model released adheres to strict Responsible AI standards.",
+          "key_arguments": [
+            "Blockchain records every incremental decision, including variable selection, training data, and ethics testing, which prevents \"maverick\" scientists from releasing unverified experiments.",
+            "Implementing this system reduced model support issues and recalls by over 90% at FICO, significantly lowering the opportunity costs of unused AI assets.",
+            "Success is dependent on an organization-first approach, where corporate standards for interpretability and regulatory compliance are established before the technology is deployed."
+          ],
+          "key_takeaways_or_insights": [
+            "Prioritize a frictionless user interface (UI) that integrates into data scientists' daily workflows, focusing on intellectual engagement rather than cumbersome oversight.",
+            "Actively monitor alternate storage for large AI assets using hashes and checksums to ensure the data referenced on the blockchain remains uncorrupted."
+          ],
+          "notable_quote": "Blockchain can solve the \"black box\" trust problem in AI by creating an immutable audit trail.",
+          "keywords": [
+            "Immutable audit trail",
+            "Responsible AI",
+            "FICO"
+          ]
+        },
+        {
+          "chapter_number": 3,
+          "chapter_title": "Why Isn’t Health Care More Personalized?",
+          "summary": "Despite having ubiquitous electronic health records (EHRs), healthcare lags in personalization due to unnecessary testing and \"cookie-cutter\" after-visit instructions. The authors argue for smart process automation to use patient data to create responsive, highly tailored care pathways.",
+          "key_arguments": [
+            "Research shows that nearly 70% of pre-surgical tests are unnecessary because results are either already on file or the orders are overly conservative.",
+            "Modularization of complex care pathways into smaller, flexible units allows for \"mass personalization,\" making it easier to update recommendations based on new research or specific patient social determinants, like lack of transportation.",
+            "AI can act as an autonomous agent to coordinate social services, predict when well-managed patients might regress, and suggest lifestyle changes based on complex variable interactions."
+          ],
+          "key_takeaways_or_insights": [
+            "Start with high-volume, high-impact processes such as appointment scheduling or discharge planning, where minute-by-minute management can prevent bed backups and extra hospital nights.",
+            "Invest in consistent data collection to build clean datasets, as many current AI models struggle with predictions based on years of unreliable, inconsistent records."
+          ],
+          "notable_quote": "Modularization of complex care pathways into smaller, flexible units allows for \"mass personalization\".",
+          "keywords": [
+            "Modular care pathways",
+            "Smart process automation",
+            "EHR utilization"
+          ]
+        },
+        {
+          "chapter_number": 4,
+          "chapter_title": "Why \"Living Intelligence\" Is the Next Big Thing",
+          "summary": "Futurist Amy Webb argues that AI is only one part of a convergence between advanced sensors and biotechnology called \"living intelligence\". This new reality will see the rise of systems that don't just generate text, but proactively sense and evolve within their environments.",
+          "key_arguments": [
+            "Sensors are the next general-purpose technology, feeding AI engines with real-time data from everything from water meters (Xylem) to injected nanobots that monitor internal health.",
+            "We are moving from LLMs to Large Action Models (LAMs), which will evolve into Personal Large Action Models (PLAMs) capable of negotiating deals and optimizing purchases without direct human engagement.",
+            "The intersection of bioengineering and AI is creating \"organoid intelligence\" (OI), where lab-grown tissues like \"DishBrain\" (1 million brain cells) can be programmed to play video games or act as biological computers."
+          ],
+          "key_takeaways_or_insights": [
+            "Leaders should ask \"What if?\" questions to imagine scenarios such as \"health assurance\" subscriptions or outcome-based pricing models driven by real-time sensor data.",
+            "Prepare for policy uncertainty by monitoring the patchwork of regulations emerging around biological and digital convergence."
+          ],
+          "notable_quote": "We are moving from LLMs to Large Action Models (LAMs), which will evolve into Personal Large Action Models.",
+          "keywords": [
+            "Living intelligence",
+            "LAMs",
+            "Organoid intelligence"
+          ]
+        },
+        {
+          "chapter_number": 5,
+          "chapter_title": "What the CrowdStrike Glitch Can Teach Us About Cyber Risk",
+          "summary": "The 2024 CrowdStrike outage, affecting 8.5 million systems and costing over $5 billion, highlights the critical danger of aggregated cyber risk. The incident exposed major gaps in how organizations manage digital dependencies and vendor accountability.",
+          "key_arguments": [
+            "The industry lacks structured methods for \"explainable cyber risk management,\" meaning decisions to apply updates are often based on local assessments rather than end-to-end business risk.",
+            "Software updates are not zero-risk; their implementation should be a business-risk-aligned decision that balances the risk of a faulty update against the risk of remaining vulnerable to an attack.",
+            "Accountability boundaries are currently ambiguous, as seen in the legal disputes between Delta, CrowdStrike, and Microsoft regarding contractual liability caps and recovery assistance."
+          ],
+          "key_takeaways_or_insights": [
+            "Perform \"what-if\" impact analyses to determine the potential downstream consequences of a cyber event at any supply-chain partner.",
+            "Establish clear business resiliency objectives that map cyber events directly to specific business outcomes and prioritize recovery speed over simple mitigation."
+          ],
+          "notable_quote": "Software updates are not zero-risk; their implementation should be a business-risk-aligned decision.",
+          "keywords": [
+            "Aggregated cyber risk",
+            "Business resiliency",
+            "Explainable risk management"
+          ]
+        },
+        {
+          "chapter_number": 6,
+          "chapter_title": "Data Cooperatives Are the Next Frontier of Labor Relations",
+          "summary": "This chapter discusses the rising tension between white-collar workers and AI, suggesting that data cooperatives—modeled after labor unions—can help workers control and monetize the data they generate. This shifts the focus from automation as a job-killer to a model where workers are compensated for preventing AI \"model decay\".",
+          "key_arguments": [
+            "AI models suffer from performance degradation over time as human preferences and social contexts change, making fresh human data a critical and indispensable factor of production.",
+            "Data cooperatives allow individuals to pool their digital footprints, giving them the bargaining power to monetize insights in privacy-preserving ways that are currently siloed within single companies.",
+            "Initiatives like the Workers’ Algorithm Observatory at Princeton allow workers to crowdsource data to investigate the systems that determine their pay and schedules."
+          ],
+          "key_takeaways_or_insights": [
+            "Organizations should incorporate data rights clauses into employment contracts now to stay ahead of labor issues and attract top talent.",
+            "Implement data literacy programs to help employees understand how their daily problem-solving activities generate the valuable data AI needs to remain accurate."
+          ],
+          "notable_quote": "Fresh human data is a critical and indispensable factor of production.",
+          "keywords": [
+            "Data cooperatives",
+            "Model decay",
+            "Labor bargaining power"
+          ]
+        },
+        {
+          "chapter_number": 7,
+          "chapter_title": "What DeepSeek Signals About Where AI Is Headed",
+          "summary": "The launch of DeepSeek R1 in 2025 signaled a shift toward reasoning-based AI models that prioritize methodical problem-solving over simple pattern recognition. The chapter highlights how algorithmic efficiency and open-source models are reshaping the AI competitive landscape.",
+          "key_arguments": [
+            "Reasoning models rely on reinforcement learning (RL) to break down tasks—much like a human using a pencil and pad to solve a math problem—allowing for more autonomous agency.",
+            "Inference costs (the cost of using AI after training) are falling dramatically, which will drive massive enterprise adoption in a manner similar to Moore’s Law in semiconductors.",
+            "Silicon scarcity in China has inadvertently driven algorithmic innovation, pushing researchers to achieve frontier-level performance using far less compute power and energy than Western counterparts."
+          ],
+          "key_takeaways_or_insights": [
+            "Prepare for a surge in enterprise AI adoption as inference costs plummet, allowing for broader deployment of reasoning agents.",
+            "Look for efficiency gains in reasoning models that achieve high performance with less compute."
+          ],
+          "notable_quote": "Reasoning models rely on reinforcement learning to break down tasks—much like a human using a pencil and pad.",
+          "keywords": [
+            "Reasoning models",
+            "Reinforcement learning",
+            "Inference costs"
+          ]
+        },
+        {
+          "chapter_number": 8,
+          "chapter_title": "How Companies Can Mitigate AI’s Growing Environmental Footprint",
+          "summary": "AI compute power is expected to increase tenfold by 2026, leading to a 160% surge in power demand by 2030. The author provides a roadmap for sustainable AI, emphasizing model selection and efficient infrastructure.",
+          "key_arguments": [
+            "Smaller, high-quality models trained on curated data can often perform as well as models three to five times larger while consuming significantly less energy.",
+            "A hybrid cloud approach allows companies to colocate data near processing centers and choose locations with access to renewable hydropower rather than coal.",
+            "Moving processing from standard CPUs/GPUs to specialized AI processors (prototypes) can improve energy efficiency by up to 14 times."
+          ],
+          "key_takeaways_or_insights": [
+            "Utilize open-source tools like the Kepler project to estimate and optimize the energy consumption of code during the development phase.",
+            "Focus sustainability efforts on the inferencing phase, which accounts for 90% of a model’s total carbon footprint."
+          ],
+          "notable_quote": "Focus sustainability efforts on the inferencing phase, which accounts for 90% of a model’s total carbon footprint.",
+          "keywords": [
+            "Sustainable AI",
+            "Energy-efficient infrastructure",
+            "Hybrid cloud"
+          ]
+        },
+        {
+          "chapter_number": 9,
+          "chapter_title": "Make Better Strategic Decisions Around Slow-Developing Technology",
+          "summary": "Transformational innovations like autonomous vehicles are often \"slow-cooking,\" relying on multiple technologies that mature at different speeds. Leaders must map these ecosystems to identify the cost convergence window for commercial viability.",
+          "key_arguments": [
+            "Most major breakthroughs, including the iPhone, utilized components (lithium-ion batteries, GUIs) that had been around for 50 years before the price and size fell enough for mass-market integration.",
+            "The Technology Feasibility Matrix categorizes innovations into four quadrants: Moon shots (high cost/low feasibility), Mission critical, Magic bullets, and Mass market.",
+            "Waiting for full commercialization is a mistake; companies must pursue proactive strategies (shaping trajectories) or intermediate products (like Netflix’s DVDs) to build assets while waiting for infrastructure to mature."
+          ],
+          "key_takeaways_or_insights": [
+            "Establish cross-disciplinary teams that span industry, academia, and government to create a complete picture of the future landscape.",
+            "Track slow-cooking indicators such as university research trends, venture capital shifts, and DARPA calls for proposals."
+          ],
+          "notable_quote": "Waiting for full commercialization is a mistake; companies must pursue proactive strategies to build assets.",
+          "keywords": [
+            "Slow-cooking technology",
+            "Cost convergence window",
+            "Technology Feasibility Matrix"
+          ]
+        },
+        {
+          "chapter_number": 10,
+          "chapter_title": "What 570 Experts Predict the Future of Work Will Look Like",
+          "summary": "A study of 570 experts revealed that predictions about the future are dictated by \"field frames\"—disciplinary biases that lead to radical optimism (entrepreneurs), rational skepticism (economists), or misanthropic pessimism (journalists).",
+          "key_arguments": [
+            "There are no objective facts about the future because it is not yet set in stone; it is an arena for values, ideology, and imagination.",
+            "The \"consensus\" timeline from these experts predicts partial automation by 2026, dramatic inequality by 2035, and a technological singularity by 2074.",
+            "Divergent beliefs often stem from different definitions of what counts as evidence, causing experts to dismiss opposing views as \"doomerism\" or \"hype\"."
+          ],
+          "key_takeaways_or_insights": [
+            "When reading any prediction, ask who is saying it and why, looking specifically for their vested interests and the type of society they wish to build.",
+            "Engage in social and democratic dialogue to ensure the future of work moves toward a desirable \"utopia\" rather than a point of no return."
+          ],
+          "notable_quote": "There are no objective facts about the future because it is not yet set in stone.",
+          "keywords": [
+            "Field frames",
+            "Expert bias",
+            "Future-of-work scenarios"
+          ]
+        }
+      ],
+      "limitations_and_future_directions": {
+        "acknowledged_constraints": [
+          "Incomplete Evidence: The study on the future of work notes that experts often rely on subjective discipline-specific rules rather than universal facts.",
+          "Industry Silos: Current cyber risk management is hindered by a lack of end-to-end perspective, with assessments remaining fragmented and subjective.",
+          "Implementation Gaps: Agentic AI and living intelligence are largely in pilot or experimental stages, with significant organizational and people problems yet to be solved.",
+          "Data Reliability: AI-driven personalized healthcare remains limited by the inconsistency of historical data and the difficulty of maintaining complex pathways.",
+          "Resource Scarcity: The exponential growth of compute power faces a hard constraint in data center energy and water consumption."
+        ],
+        "future_research": [
+          "Development of 'explainable cyber risk' models that map technical events to business outcomes.",
+          "Creation of consistent data standards to enable reliable AI in healthcare.",
+          "Investigation into policy frameworks for the convergence of biological and digital systems.",
+          "Research into energy-efficient algorithmic innovations to mitigate environmental impact."
+        ]
+      },
+      "field_context": {
+        "statement": "This collection locates itself at the pivotal 'messy middle' of the digital age, shifting the academic and professional focus from the novelty of generative AI (2023-2024) to the structural, ethical, and operational realities of 2026. It bridges the gap between theoretical computer science and practical business strategy, emphasizing that the next phase of technology—Agentic AI and Living Intelligence—requires a fundamental rethinking of labor relations, risk management, and infrastructure. The work challenges the notion of inevitable technological determinism, placing the agency back on leaders to design systems that are robust, sustainable, and human-centric."
+      }
+    };
+
+    /**
+     * ------------------------------------------------------------------
+     * CORE LOGIC
+     * ------------------------------------------------------------------
+     */
+    
+    // DOM Elements
+    const navList = document.getElementById('chapter-navigation');
+    const displayArea = document.getElementById('content-display');
+    const headerTitle = document.getElementById('book-title-main');
+    const headerMeta = document.getElementById('book-meta-main');
+    const sectionTitle = document.getElementById('current-section-title');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const hamburger = document.getElementById('hamburger-btn');
+
+    // Initialize Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Set Header Info
+        headerTitle.textContent = jsonData.book_meta.title;
+        headerMeta.textContent = `${jsonData.book_meta.author} | ${jsonData.book_meta.publication_year}`;
+
+        // 2. Build Navigation Links
+        buildNavigation();
+
+        // 3. Load Default Content (Overall Summary)
+        displayContent('summary');
+
+        // 4. Setup Mobile Handlers
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+    });
+
+    function buildNavigation() {
+        // Link: Overall Summary
+        addNavLink('Executive Summary', 'summary');
+
+        // Links: Chapters
+        jsonData.chapters.forEach(chapter => {
+            addNavLink(`${chapter.chapter_number}. ${chapter.chapter_title}`, `chapter-${chapter.chapter_number}`);
+        });
+
+        // Link: Limitations & Future
+        addNavLink('Limitations & Future', 'future');
+    }
+
+    function addNavLink(text, id) {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.textContent = text;
+        btn.setAttribute('data-target', id);
+        
+        btn.addEventListener('click', () => {
+            // Remove active class from all
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            // Add active to clicked
+            btn.classList.add('active');
+            // Load Content
+            displayContent(id);
+            // Close sidebar if mobile
+            if (window.innerWidth <= 992) toggleSidebar();
+        });
+
+        li.appendChild(btn);
+        navList.appendChild(li);
+    }
+
+    function toggleSidebar() {
+        const isOpen = sidebar.classList.contains('open');
+        if (isOpen) {
+            sidebar.classList.remove('open');
+            overlay.style.display = 'none';
+            overlay.style.opacity = '0';
+        } else {
+            sidebar.classList.add('open');
+            overlay.style.display = 'block';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        }
+    }
+
+    /**
+     * ------------------------------------------------------------------
+     * RENDERING ENGINE
+     * ------------------------------------------------------------------
+     */
+    function displayContent(id) {
+        displayArea.innerHTML = ''; // Clear current content
+        
+        // ------------------ CASE 1: OVERALL SUMMARY ------------------
+        if (id === 'summary') {
+            sectionTitle.textContent = "Executive Summary";
+            
+            // Abstract Card
+            const abstractCard = createCard('Abstract', jsonData.overall_summary.abstract);
+            
+            // Keywords
+            const badges = document.createElement('div');
+            badges.className = 'badge-container';
+            jsonData.overall_summary.keywords.forEach(kw => {
+                const b = document.createElement('span');
+                b.className = 'badge';
+                b.textContent = kw;
+                badges.appendChild(b);
+            });
+            abstractCard.appendChild(badges);
+            displayArea.appendChild(abstractCard);
+
+            // Context Card
+            const contextCard = createCard('Field Context', jsonData.field_context.statement);
+            displayArea.appendChild(contextCard);
+        }
+        
+        // ------------------ CASE 2: CHAPTERS ------------------
+        else if (id.startsWith('chapter-')) {
+            const chapNum = parseInt(id.split('-')[1]);
+            const chapter = jsonData.chapters.find(c => c.chapter_number === chapNum);
+            
+            sectionTitle.textContent = chapter.chapter_title;
+
+            // 1. Summary Card
+            const sumCard = createCard('Summary', chapter.summary);
+            
+            // Quote logic inside summary
+            const quoteDiv = document.createElement('div');
+            quoteDiv.className = 'quote-box';
+            quoteDiv.textContent = `"${chapter.notable_quote}"`;
+            sumCard.appendChild(quoteDiv);
+            
+            displayArea.appendChild(sumCard);
+
+            // 2. Arguments & Takeaways (Grid Layout)
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'grid-2-col';
+
+            // Args Column
+            const argsDiv = document.createElement('div');
+            argsDiv.className = 'grid-item';
+            argsDiv.innerHTML = `<h3 style="color:var(--accent-primary); margin-bottom:10px;">Key Arguments</h3>`;
+            const argList = document.createElement('ul');
+            argList.className = 'list-group';
+            chapter.key_arguments.forEach(arg => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.textContent = arg;
+                argList.appendChild(li);
+            });
+            argsDiv.appendChild(argList);
+
+            // Takeaways Column
+            const takeDiv = document.createElement('div');
+            takeDiv.className = 'grid-item';
+            takeDiv.innerHTML = `<h3 style="color:var(--accent-secondary); margin-bottom:10px;">Actionable Insights</h3>`;
+            const takeList = document.createElement('ul');
+            takeList.className = 'list-group';
+            chapter.key_takeaways_or_insights.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.textContent = item;
+                takeList.appendChild(li);
+            });
+            takeDiv.appendChild(takeList);
+
+            gridDiv.appendChild(argsDiv);
+            gridDiv.appendChild(takeDiv);
+            displayArea.appendChild(gridDiv);
+
+            // 3. Custom Visual: Timeline for Intro or Logic Process for Others
+            if (chapNum === 0) {
+                // Introduction gets a specific CSS timeline visual
+                const timelineCard = createCard('Historical Patterns of Disruption', '');
+                timelineCard.innerHTML += `
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-title">Collective Responsibility</div>
+                            <div class="timeline-desc">No lone inventors; requires ecosystem.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-title">Predictably Unpredictable</div>
+                            <div class="timeline-desc">Broad trends are set, specific paths surprise us.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-title">Patient Perseverance</div>
+                            <div class="timeline-desc">"Overnight" success takes decades.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-title">Shadows of Innovation</div>
+                            <div class="timeline-desc">Every tech casts a shadow (e.g., cyber risk).</div>
+                        </div>
+                    </div>
+                `;
+                displayArea.appendChild(timelineCard);
+            }
+        }
+        
+        // ------------------ CASE 3: FUTURE & LIMITATIONS ------------------
+        else if (id === 'future') {
+            sectionTitle.textContent = "Limitations & Future Directions";
+
+            // Grid Layout
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'grid-2-col';
+
+            // Constraints
+            const consCard = document.createElement('div');
+            consCard.className = 'content-card';
+            consCard.innerHTML = `<div class="card-header">Acknowledged Constraints</div>`;
+            const consList = document.createElement('ul');
+            consList.className = 'list-group';
+            jsonData.limitations_and_future_directions.acknowledged_constraints.forEach(c => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.textContent = c;
+                consList.appendChild(li);
+            });
+            consCard.appendChild(consList);
+
+            // Future Research
+            const futCard = document.createElement('div');
+            futCard.className = 'content-card';
+            futCard.innerHTML = `<div class="card-header">Future Research Avenues</div>`;
+            const futList = document.createElement('ul');
+            futList.className = 'list-group';
+            jsonData.limitations_and_future_directions.future_research.forEach(r => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.textContent = r;
+                futList.appendChild(li);
+            });
+            futCard.appendChild(futList);
+
+            gridDiv.appendChild(consCard);
+            gridDiv.appendChild(futCard);
+            displayArea.appendChild(gridDiv);
+        }
+    }
+
+    function createCard(title, text) {
+        const div = document.createElement('div');
+        div.className = 'content-card';
+        
+        const h3 = document.createElement('div');
+        h3.className = 'card-header';
+        h3.textContent = title;
+        
+        const p = document.createElement('div');
+        p.className = 'card-text';
+        p.textContent = text;
+        
+        div.appendChild(h3);
+        div.appendChild(p);
+        return div;
+    }
+
+</script>
+</body>
+</html>

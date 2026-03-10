@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미국 국채 및 금리 분석 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #f0f2f5; /* Professional Blue Background */
+            color: #172b4d; /* Professional Blue Text */
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 40vh;
+            width: 100%;
+            max-width: 800px;
+            max-height: 400px;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #0052cc; /* Professional Blue Primary */
+            color: white;
+        }
+        .content-section {
+            scroll-margin-top: 80px;
+        }
+        .pill-button {
+            transition: all 0.2s ease-in-out;
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .pill-button.active {
+            background-color: #0052cc; /* Professional Blue Primary */
+            color: white;
+        }
+        .source-attribution {
+            background-color: #e6f0ff;
+            border: 1px solid #b3d1ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .source-attribution p {
+            color: #003380;
+            font-weight: 500;
+            margin: 0;
+        }
+        .source-attribution a {
+            background-color: #0052cc;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .source-attribution a:hover {
+            background-color: #0041a3;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen">
+        <div class="md:hidden flex justify-between items-center p-4 bg-white/80 backdrop-blur-sm sticky top-0 z-20 shadow-md">
+            <h1 class="text-xl font-bold" style="color: #0052cc;">미국 금리 분석</h1>
+            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="sidebar" class="bg-white text-gray-800 w-64 space-y-2 py-7 px-2 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out z-30 shadow-lg md:h-screen md:overflow-y-auto">
+            <a href="#" class="block px-4 py-2.5 text-2xl font-bold" style="color: #0052cc;">금리 동향 대시보드</a>
+            <nav id="main-nav">
+                <a href="#overview" class="nav-link block px-4 py-2.5 rounded-lg">개요</a>
+                <a href="#strategy" class="nav-link block px-4 py-2.5 rounded-lg">핵심 전략 분석</a>
+                <a href="#risks" class="nav-link block px-4 py-2.5 rounded-lg">구조적 리스크</a>
+                <a href="#players" class="nav-link block px-4 py-2.5 rounded-lg">주요 플레이어</a>
+                <a href="#scenarios" class="nav-link block px-4 py-2.5 rounded-lg">미래 시나리오</a>
+                <a href="#outlook" class="nav-link block px-4 py-2.5 rounded-lg">결론 및 전망</a>
+            </nav>
+        </div>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-10 md:ml-64">
+            <section id="overview" class="content-section mb-16">
+                <div class="source-attribution">
+                    <p><strong>Source:</strong> 2025. 8. 9. 자 "금리 하락 승부수, 베센트의 도박 성공할까?" (박종훈의 지식한방)</p>
+                    <a href="https://www.youtube.com/watch?v=-wDkpZ_CF3M&t=1s" target="_blank" rel="noopener noreferrer">영상 보기</a>
+                </div>
+                <h2 class="text-4xl font-bold mb-4 text-gray-900">금리 하락 승부수, 베센트의 도박 성공할까?</h2>
+                <p class="text-lg leading-relaxed">
+                    미국 재무부가 사상 최대 규모의 국채 발행이라는 거대한 파도에 맞서고 있습니다. 베센트 재무장관은 장기 국채 금리의 폭등을 막기 위해 '단기채 발행 확대'와 '국채 바이백'이라는 비전통적인 카드를 꺼내 들었습니다. 이 대시보드는 베센트 장관의 전략적 '꼼수'가 과연 미국 경제를 안정시킬 수 있을지, 아니면 더 큰 위험을 초래할지를 심층적으로 분석하고 잠재적 시나리오를 전망합니다.
+                </p>
+            </section>
+
+            <section id="strategy" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">📊 베센트의 핵심 전략</h2>
+                <p class="mb-8 text-md leading-relaxed">베센트 장관의 전략은 장기채 시장에 가해지는 압박을 단기채 시장으로 우회시키는 것이 핵심입니다. 과거 자신이 비판했던 정책까지 동원하며 장기 금리를 인위적으로 억제하려는 시도를 데이터를 통해 분석합니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="kpi-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">국채 발행 규모</h3>
+                        <p class="text-4xl font-bold mt-2" style="color: #0052cc;">사상 최대</p>
+                    </div>
+                    <div class="kpi-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">핵심 수단 ①</h3>
+                        <p class="text-4xl font-bold mt-2" style="color: #0052cc;">단기채 발행</p>
+                    </div>
+                    <div class="kpi-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">핵심 수단 ②</h3>
+                        <p class="text-4xl font-bold mt-2" style="color: #0052cc;">국채 바이백</p>
+                    </div>
+                     <div class="kpi-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">의존 대상</h3>
+                        <p class="text-4xl font-bold mt-2" style="color: #0052cc;">연준(Fed)</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">국채 발행 만기 구성 전략 (가상)</h3>
+                        <div class="chart-container"><canvas id="bondIssuanceChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">장기 국채 금리 억제 목표 (가상)</h3>
+                        <div class="chart-container"><canvas id="yieldCurveChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="risks" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">💣 구조적 리스크</h2>
+                <p class="mb-8 text-md leading-relaxed">베센트의 계획은 정교해 보이지만, 여러 개의 아슬아슬한 가정 위에 서 있습니다. 이 전략이 가진 치명적인 약점들은 다음과 같습니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="kpi-card flex flex-col h-full">
+                        <div class="text-center mb-4">
+                            <div class="text-6xl mb-2">🤝</div>
+                            <h3 class="text-xl font-bold">책임 전가 구조</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">베센트의 전략은 단기 금융시장에 문제가 발생했을 때, 연준(Fed)이 물가 안정 목표와 별개로 금융 시스템 안정을 위해 개입하여 유동성을 공급할 수밖에 없다는 점을 이용합니다. 이는 사실상 재무부가 져야 할 리스크를 연준에 떠넘기는 구조입니다.</p>
+                    </div>
+                    <div class="kpi-card flex flex-col h-full">
+                        <div class="text-center mb-4">
+                            <div class="text-6xl mb-2">🌊</div>
+                            <h3 class="text-xl font-bold">MMF 시장의 한계</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">단기 국채의 주요 매수처는 MMF(머니마켓펀드)입니다. 하지만 MMF가 흡수할 수 있는 자금에는 한계가 있습니다. 국채 발행이 계속되면 MMF가 이를 모두 소화하지 못해 기업 자금 조달에 문제가 생기거나, 단기 금리가 급등하는 '텐트럼' 현상이 발생할 수 있습니다.</p>
+                    </div>
+                    <div class="kpi-card flex flex-col h-full">
+                        <div class="text-center mb-4">
+                            <div class="text-6xl mb-2">🔥</div>
+                            <h3 class="text-xl font-bold">궁극적 리스크: 인플레이션</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">이 전략의 가장 치명적인 약점은 인플레이션입니다. 만약 연준이 시장 안정을 위해 개입하여 막대한 유동성을 공급하게 되면, 이는 시중에 돈이 풀리는 양적완화와 같은 효과를 내어 인플레이션을 걷잡을 수 없이 자극할 수 있습니다. 특히 예상치 못한 외부 변수(예: 관세)가 물가를 자극하면 계획은 실패로 돌아갈 수 있습니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="players" class="content-section mb-16">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">♟️ 주요 플레이어와 입장</h2>
+                <p class="mb-8 text-md leading-relaxed">이 거대한 금융 게임에는 서로 다른 목표를 가진 두 명의 핵심 플레이어가 있습니다. 재무부는 단기적인 시장 안정을, 연준은 장기적인 물가 안정을 목표로 하고 있어 둘 사이의 미묘한 긴장감이 흐릅니다.</p>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">🇺🇸 재무부 (베센트)</h3>
+                        <div class="flex flex-col space-y-4">
+                            <div>
+                                <h4 class="font-bold text-lg" style="color: #0052cc;">목표 (Goals)</h4>
+                                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                                    <li>사상 최대 국채의 안정적 발행 및 소화</li>
+                                    <li>장기 국채 금리 상승 억제</li>
+                                    <li>금리 상승으로 인한 정치적, 경제적 부담 회피</li>
+                                </ul>
+                            </div>
+                             <div class="border-t pt-4">
+                                <h4 class="font-bold text-lg" style="color: #0052cc;">전략 (Strategy)</h4>
+                                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                                    <li>장기채 대신 단기채 발행 비중 확대</li>
+                                    <li>국채 바이백을 통한 시장 직접 개입</li>
+                                    <li>단기 금리 문제 발생 시 연준에 책임 전가</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-4 text-center">🦅 연준 (Fed)</h3>
+                        <div class="flex flex-col space-y-4">
+                           <div>
+                                <h4 class="font-bold text-lg" style="color: #0052cc;">목표 (Goals)</h4>
+                                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                                    <li>물가 안정 (인플레이션 억제)</li>
+                                    <li>완전 고용 달성</li>
+                                    <li>금융 시스템 안정</li>
+                                </ul>
+                            </div>
+                             <div class="border-t pt-4">
+                                <h4 class="font-bold text-lg" style="color: #0052cc;">딜레마 (Dilemma)</h4>
+                                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                                    <li>재무부를 돕기 위해 유동성을 공급하면 인플레이션 유발</li>
+                                    <li>긴축을 유지하면 단기 금융 시장 붕괴 위험</li>
+                                    <li>사실상 재무부 정책을 뒷받침하는 '스텔스 양적완화' 실행 중</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="scenarios" class="content-section mb-16">
+                 <h2 class="text-3xl font-bold mb-6 text-gray-900">⚖️ 미래 시나리오</h2>
+                <p class="mb-8 text-md leading-relaxed">베센트의 도박은 어떤 결과를 낳을까요? 성공과 실패, 두 가지 극단적인 시나리오를 통해 이 전략이 미국 경제와 글로벌 금융 시장에 미칠 영향을 예측해 봅니다.</p>
+                 <div class="flex justify-center mb-6">
+                    <div class="bg-gray-200 p-1 rounded-full flex space-x-1">
+                        <button class="pill-button active px-4 py-2 rounded-full text-sm font-semibold" data-scenario="success">성공 시나리오 (단기)</button>
+                        <button class="pill-button px-4 py-2 rounded-full text-sm font-semibold" data-scenario="failure">실패 시나리오 (장기)</button>
+                    </div>
+                </div>
+                <div id="scenario-content-container">
+                    <div id="scenario-success" class="scenario-content grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">시장 안정</h3>
+                            <p>장기 금리가 안정적으로 유지되고 금융 시장의 불안 심리가 완화됩니다.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">재정 부담 완화</h3>
+                            <p>정부의 이자 부담이 줄어들고, 재정 정책 운용에 숨통이 트입니다.</p>
+                        </div>
+                    </div>
+                    <div id="scenario-failure" class="scenario-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">인플레이션 폭발</h3>
+                            <p>연준의 유동성 공급이 물가 상승을 부추겨 통제 불가능한 인플레이션이 발생합니다.</p>
+                        </div>
+                         <div class="kpi-card">
+                            <h3 class="text-xl font-bold mb-2">금리 급등 (텐트럼)</h3>
+                            <p>MMF 시장이 한계에 도달하거나 인플레이션 우려로 단기 금리가 급등하며 시장 전체에 충격을 줍니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="outlook" class="content-section">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900">🔭 결론 및 최종 전망</h2>
+                <p class="mb-8 text-md leading-relaxed">베센트의 전략은 단기적인 위기를 피하기 위한 고도의 줄타기이지만, 그 줄은 '인플레이션'이라는 칼날 위에 놓여 있습니다. 특히 예상치 못한 변수들이 이 아슬아슬한 균형을 무너뜨릴 수 있습니다.</p>
+                <div class="space-y-4">
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold">핵심 요약 (Key Takeaways) 🔑</h3>
+                        <div class="outlook-content mt-4 text-gray-600">
+                             <p class="text-gray-700 leading-relaxed">베센트 재무장관은 장기 국채 금리의 폭등을 막기 위해 두 가지 핵심 전략, 즉 '꼼수'를 사용하고 있습니다. 첫째, 발행 국채의 절반 이상을 단기물로 채워 장기채 시장의 금리 상승 압력을 회피합니다. 둘째, 국채 바이백(Buyback) 한도를 확대하여 시장에 직접 개입함으로써 장기 금리를 인위적으로 낮추려 합니다. 그러나 이 전략의 성공은 MMF 시장의 단기 국채 소화 능력과 예상치 못한 인플레이션 리스크에 달려 있어 매우 불확실합니다.</p>
+                        </div>
+                    </div>
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold">치명적 변수 (Critical Variable) 💣</h3>
+                         <div class="outlook-content mt-4 text-gray-600">
+                            <ul class="list-disc list-inside space-y-2 text-gray-700 leading-relaxed">
+                                <li><strong>MMF 시장의 한계:</strong> 단기채 발행이 급증하며 MMF 시장의 소화 능력에 한계가 드러날 경우, 기업 자금난이나 단기 금리 급등(텐트럼)을 유발할 수 있습니다.</li>
+                                <li><strong>연준 개입과 인플레이션:</strong> 단기 시장 불안 시 연준의 개입(유동성 공급)은 필연적이며, 이는 시차를 두고 통제 불가능한 인플레이션을 촉발하는 뇌관이 될 수 있습니다.</li>
+                                <li><strong>관세 여파:</strong> 베센트의 '시간차 공격' 계획은 광범위한 상호 관세 부과로 인해 예상보다 빨리 인플레이션이 가속화될 경우, 모든 계획이 수포로 돌아갈 수 있는 중대한 결함을 안고 있습니다.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="outlook-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold">심층 분석 및 전망 📝</h3>
+                        <div class="outlook-content mt-4 text-gray-600 space-y-4 leading-relaxed">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800">1. 베센트의 '꼼수': 단기채 발행과 국채 바이백</h4>
+                                <p>사상 최대 규모의 국채 발행 압박 속에서 베센트 장관은 장기채 시장의 충격을 최소화하기 위해, 과거 자신이 비판했던 옐런의 '단기채 위주 발행' 카드를 꺼내 들었습니다. 전체 발행 물량의 55%를 단기채로 채워 장기 금리 상승을 억제하는 한편, 국채 바이백 한도를 1,500억 달러로 확대하여 "정부가 언제든 시장에서 국채를 비싸게 사줄 것"이라는 강력한 시그널을 보내 시장의 불안 심리를 잠재우고 있습니다. 이 자금 역시 단기채 발행으로 조달하여, 모든 정책이 장기 금리 안정이라는 하나의 목표에 집중되어 있습니다.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800">2. 계획의 약점: MMF 한계와 연준 책임 전가</h4>
+                                <p>이 계획의 아킬레스건은 단기채를 소화해 줄 자금 창구에 있습니다. 과거 옐런 시기에는 2조 달러가 넘는 영레포 시장이 완충 역할을 했지만, 현재는 이 자금이 고갈되어 MMF 시장에 의존하고 있습니다. 이미 MMF 자산의 상당 부분이 단기채에 묶여있어, 향후 1조 달러가 넘는 추가 단기채 물량을 소화할 수 있을지는 미지수입니다. 베센트는 단기 시장에 문제가 생기면 연준이 '스텔스 양적완화'와 같은 방식으로 개입해 금리를 낮출 수밖에 없다는 점을 이용해 사실상 리스크를 연준에 전가하고 있습니다.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800">3. 최종 리스크: 인플레이션과 관세 변수</h4>
+                                <p>궁극적으로 이 모든 전략을 무너뜨릴 수 있는 것은 '인플레이션'입니다. 연준의 개입은 결국 막대한 유동성 공급으로 이어져 12~24개월의 시차를 두고 인플레이션을 유발할 수 있습니다. 베센트는 2026년 중간선거 이후로 문제 발생 시점을 미루는 '시간차 공격'을 계산하고 있지만, 8월부터 본격화된 '상호 관세' 부과가 예상보다 빨리 미국 소비자 물가를 자극할 경우, 인플레이션이 조기에 재점화되면서 장기 금리가 급등하고 모든 계획이 수포로 돌아갈 심각한 위험이 존재합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const chartColors = {
+        primary: 'rgba(0, 82, 204, 0.7)',
+        primaryBorder: 'rgba(0, 82, 204, 1)',
+        secondary: 'rgba(66, 153, 225, 0.7)',
+        secondaryBorder: 'rgba(66, 153, 225, 1)',
+        accent: 'rgba(127, 135, 148, 0.7)',
+        accentBorder: 'rgba(127, 135, 148, 1)',
+    };
+    
+    // Bond Issuance Chart
+    const bondIssuanceCtx = document.getElementById('bondIssuanceChart');
+    if(bondIssuanceCtx) {
+        new Chart(bondIssuanceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['단기채 (1년 이하)', '중기채 (1-10년)', '장기채 (10년 초과)'],
+                datasets: [{
+                    label: '국채 발행 구성',
+                    data: [65, 25, 10], 
+                    backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.accent],
+                    borderColor: '#f0f2f5',
+                    borderWidth: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.label}: ${context.parsed}%`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Yield Curve Chart
+    const yieldCurveCtx = document.getElementById('yieldCurveChart');
+    if(yieldCurveCtx){
+        new Chart(yieldCurveCtx, {
+            type: 'line',
+            data: {
+                labels: ['3개월', '2년', '5년', '10년', '30년'],
+                datasets: [{
+                    label: '자연적 시장 금리 (가상)',
+                    data: [5.2, 4.8, 4.5, 4.7, 5.0],
+                    borderColor: chartColors.accentBorder,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1,
+                }, {
+                    label: '재무부 목표 금리 (가상)',
+                    data: [5.2, 4.7, 4.3, 4.2, 4.3],
+                    borderColor: chartColors.primaryBorder,
+                    backgroundColor: chartColors.primary,
+                    fill: 'start',
+                    tension: 0.1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: { callback: (value) => `${value.toFixed(1)}%` }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Scenarios Section Interactivity
+    const scenarioButtons = document.querySelectorAll('.pill-button');
+    const scenarioContents = document.querySelectorAll('.scenario-content');
+
+    if (scenarioButtons.length > 0 && scenarioContents.length > 0) {
+        scenarioButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                scenarioButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const scenarioToShow = button.dataset.scenario;
+                
+                scenarioContents.forEach(content => {
+                    if (content.id === `scenario-${scenarioToShow}`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+    
+    // Smooth scrolling & active nav link
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.content-section');
+
+    function changeNav() {
+        let index = sections.length;
+        while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+        
+        navLinks.forEach((link) => link.classList.remove('active'));
+        if(index >= 0 && navLinks[index]) {
+            navLinks[index].classList.add('active');
+        }
+    }
+    
+    if (navLinks.length > 0 && sections.length > 0) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if(targetSection){
+                     window.scrollTo({
+                        top: targetSection.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+                 if(window.innerWidth < 768) {
+                    const sidebarEl = document.getElementById('sidebar');
+                    if (sidebarEl) sidebarEl.classList.add('-translate-x-full');
+                }
+            });
+        });
+
+        window.addEventListener('scroll', changeNav);
+        changeNav(); // Initial call
+    }
+    
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const sidebar = document.getElementById('sidebar');
+    if(mobileMenuButton && sidebar){
+        mobileMenuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    }
+
+});
+</script>
+</body>
+</html>

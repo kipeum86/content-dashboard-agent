@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEPA 판결 분석: Gemini vs ChatGPT 심층 보고서</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css"/>
+    <style>
+        :root {
+            --gemini-color: #2563eb; /* Royal Blue */
+            --gemini-light: #eff6ff;
+            --chatgpt-color: #16a34a; /* Emerald Green */
+            --chatgpt-light: #f0fdf4;
+            --bg-color: #f8fafc; /* Slate 50 */
+            --text-main: #334155; /* Slate 700 */
+            --text-heading: #0f172a; /* Slate 900 */
+        }
+        
+        body {
+            font-family: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar for professional look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media (min-width: 768px) { ::-webkit-scrollbar { width: 8px; } }
+
+        /* Navigation Styles */
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 100%);
+        }
+        .nav-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: rgba(255, 255, 255, 0.7);
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 700;
+            border-left-color: #60a5fa;
+            transform: translateX(4px);
+        }
+
+        /* Modern Card Styles */
+        .premium-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 0 3px rgba(15, 23, 42, 0.02);
+            border: 1px solid #f1f5f9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .premium-card:hover {
+            box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08);
+            transform: translateY(-2px);
+        }
+
+        /* Report Content Blocks */
+        .report-block {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 640px) {
+            .report-block { padding: 2.5rem; margin-bottom: 2rem; }
+        }
+        .report-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--gemini-color);
+            border-radius: 1.25rem 0 0 1.25rem;
+        }
+        @media (min-width: 640px) { .report-block::before { width: 6px; } }
+        .report-block.chatgpt::before {
+            background-color: var(--chatgpt-color);
+        }
+
+        /* Typography Refinements */
+        h1, h2, h3, h4, h5, h6 { color: var(--text-heading); letter-spacing: -0.025em; }
+        
+        .report-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+        }
+        @media (min-width: 640px) { .report-title { font-size: 1.35rem; } }
+        
+        .icon-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            flex-shrink: 0;
+        }
+        @media (min-width: 640px) { .icon-circle { width: 3rem; height: 3rem; font-size: 1.5rem; } }
+
+        /* Custom Bullets */
+        .custom-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 1.25rem;
+        }
+        .custom-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        @media (min-width: 640px) { .custom-list li { padding-left: 1.75rem; font-size: 1rem; } }
+        
+        .custom-list.gemini li::before, .custom-list.chatgpt li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6rem;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+        @media (min-width: 640px) { .custom-list.gemini li::before, .custom-list.chatgpt li::before { width: 6px; height: 6px; top: 0.65rem; } }
+        
+        .custom-list.gemini li::before {
+            background-color: var(--gemini-color);
+            box-shadow: 0 0 0 3px var(--gemini-light);
+        }
+        .custom-list.chatgpt li::before {
+            background-color: var(--chatgpt-color);
+            box-shadow: 0 0 0 3px var(--chatgpt-light);
+        }
+
+        /* Tags */
+        .model-tag {
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.025em;
+        }
+        @media (min-width: 640px) { .model-tag { padding: 0.35rem 1.25rem; font-size: 0.875rem; } }
+        
+        .tag-gemini { background-color: var(--gemini-light); color: var(--gemini-color); border: 1px solid #bfdbfe; }
+        .tag-gemini::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--gemini-color); }
+        .tag-chatgpt { background-color: var(--chatgpt-light); color: var(--chatgpt-color); border: 1px solid #bbf7d0; }
+        .tag-chatgpt::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--chatgpt-color); }
+
+        .content-section { scroll-margin-top: 80px; }
+        @media (min-width: 768px) { .content-section { scroll-margin-top: 100px; } }
+
+        /* Dark Section Premium Styling */
+        .dark-section {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-200 selection:text-blue-900">
+
+    <div class="relative min-h-screen flex flex-col md:flex-row">
+        <!-- Mobile Header -->
+        <div class="md:hidden w-full flex justify-between items-center p-4 bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-sm">
+            <h1 class="text-lg font-black text-blue-700 tracking-tight">Strategy Desk</h1>
+            <button id="mobile-menu-button" class="text-slate-700 focus:outline-none bg-slate-100 p-2 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div id="sidebar" class="sidebar-gradient text-white w-72 py-10 px-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-400 ease-in-out z-50 shadow-2xl md:h-screen flex flex-col justify-between">
+            <div>
+                <div class="mb-10 px-2 flex justify-between items-start">
+                    <div>
+                        <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-black tracking-tight leading-tight">Strategy Desk<br><span class="text-blue-200 font-medium text-lg">AI Report DB</span></h2>
+                    </div>
+                    <!-- Mobile Close Button -->
+                    <button id="mobile-close-button" class="md:hidden text-white/70 hover:text-white p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav id="main-nav" class="space-y-2">
+                    <a href="#overview" class="nav-link block px-4 py-3.5 rounded-xl font-medium text-sm">1. 리포트 개요 및 원본</a>
+                    <a href="#gemini-view" class="nav-link block px-4 py-3.5 rounded-xl font-medium text-sm">2. Gemini 3.1 Pro 심층 뷰</a>
+                    <a href="#chatgpt-view" class="nav-link block px-4 py-3.5 rounded-xl font-medium text-sm">3. ChatGPT 5.2 Pro 심층 뷰</a>
+                    <a href="#comparison" class="nav-link block px-4 py-3.5 rounded-xl font-medium text-sm">4. 통합 비교 및 투자 전략</a>
+                </nav>
+            </div>
+            <div class="px-4 text-xs text-blue-300/60 font-medium hidden md:block">
+                © 2026 Kipum Lee. <br>All rights reserved.
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 px-4 py-8 sm:p-8 lg:p-12 md:ml-72 w-full max-w-[1400px] mx-auto flex flex-col min-h-screen">
+            
+            <div class="flex-grow">
+                <!-- 1. 개요 및 원본 -->
+                <section id="overview" class="content-section mb-16 sm:mb-24">
+                    <div class="max-w-4xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-100/50 text-blue-700 font-bold text-[0.7rem] sm:text-xs tracking-widest uppercase mb-4">
+                            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span> Executive Summary
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mt-2 mb-6 md:mb-8 leading-tight text-slate-900 break-keep">대법원 판결과<br>지정학 리스크 연쇄효과</h2>
+                        
+                        <div class="text-base sm:text-lg text-slate-600 leading-relaxed space-y-4 sm:space-y-5">
+                            <p>
+                                미 연방 대법원은 도널드 트럼프 미국 대통령이 한국을 비롯한 세계 각국에 부과한 이른바 <strong class="text-slate-800">'상호관세'가 위법이라고 2026. 2. 20일(현지시간) 판결</strong>했습니다.
+                            </p>
+                            <p>
+                                이날 대법원은 "국제비상경제권한법(IEEPA)이 대통령에 관세 부과 권한을 주지 않는다"고 판단했습니다. 이는 지난 1, 2심의 위법 판결 기조를 유지하여 관세 정책의 근간을 흔든 결정적인 확정 판결입니다.
+                            </p>
+                            
+                            <!-- Highlight Briefing Box -->
+                            <div class="premium-card p-5 sm:p-8 mt-8 md:mt-10 border-l-4 border-l-blue-600">
+                                <h4 class="font-extrabold text-slate-900 text-base sm:text-lg mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                    대시보드 분석 목적
+                                </h4>
+                                <p class="text-slate-700 mb-4 font-medium text-sm sm:text-base">본 대시보드는 이 중대한 판결을 기점으로 촉발될 4가지 핵심 연쇄효과를 종합적으로 분석합니다:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
+                                    <div class="flex gap-2 sm:gap-3">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 sm:mt-2.5 shrink-0"></div>
+                                        <p><strong class="text-slate-900">경제적 파장:</strong> 한국 주요 산업 및 글로벌 공급망(GVC) 득실</p>
+                                    </div>
+                                    <div class="flex gap-2 sm:gap-3">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 sm:mt-2.5 shrink-0"></div>
+                                        <p><strong class="text-slate-900">실무적 리스크:</strong> 천문학적 관세 환급 및 법적/행정적 처리</p>
+                                    </div>
+                                    <div class="flex gap-2 sm:gap-3">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 sm:mt-2.5 shrink-0"></div>
+                                        <p><strong class="text-slate-900">정치 나비효과:</strong> ICE 레이드 등 국내 정치 위기와 중간선거</p>
+                                    </div>
+                                    <div class="flex gap-2 sm:gap-3">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 sm:mt-2.5 shrink-0"></div>
+                                        <p><strong class="text-slate-900">지정학 리스크:</strong> 극단적 '왝 더 독(Wag the Dog)' 시나리오</p>
+                                    </div>
+                                </div>
+                                <p class="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-slate-100 text-[0.85rem] sm:text-sm text-slate-500 break-keep">
+                                    이 복합적인 상황을 두 AI 모델(Gemini 3.1 Pro, ChatGPT 5.2 Pro)이 어떻게 다르게 해석했는지 원본 리포트 논거를 기반으로 상세히 비교합니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 원본 리포트 링크 (Premium Cards) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 mt-10 sm:mt-12 max-w-5xl">
+                        <div class="premium-card p-6 sm:p-8 flex flex-col justify-between hover:border-blue-200">
+                            <div>
+                                <div class="mb-4"><span class="model-tag tag-gemini">Report 01. Gemini</span></div>
+                                <h3 class="font-extrabold text-lg sm:text-xl mb-2 text-slate-900 leading-snug break-keep">대법원 관세 판결과 지정학적 리스크 분석</h3>
+                                <p class="text-[0.85rem] sm:text-sm text-slate-500 mb-6 sm:mb-8 font-medium">작성 모델: Gemini 3.1 Pro (수석 Policy-Econ 전략가 관점)</p>
+                            </div>
+                            <a href="https://docs.google.com/document/d/142_1PfqE5IP2b5vlED3APBWSCU38qkKv7Lemx2m3134/edit?usp=sharing" target="_blank" class="inline-flex items-center justify-center bg-slate-50 text-blue-600 font-bold py-3 px-5 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-colors border border-slate-200 hover:border-blue-200 group w-full sm:w-fit text-sm sm:text-base">
+                                Google Docs 링크 열기
+                                <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                        </div>
+                        
+                        <div class="premium-card p-6 sm:p-8 flex flex-col justify-between hover:border-green-200">
+                            <div>
+                                <div class="mb-4"><span class="model-tag tag-chatgpt">Report 02. ChatGPT</span></div>
+                                <h3 class="font-extrabold text-lg sm:text-xl mb-2 text-slate-900 leading-snug break-keep">IEEPA 무효화 이후 한국 산업·미국 정치 연쇄효과</h3>
+                                <p class="text-[0.85rem] sm:text-sm text-slate-500 mb-6 sm:mb-8 font-medium">작성 모델: ChatGPT 5.2 Pro (구조 및 실무/행정 분석 관점)</p>
+                            </div>
+                            <a href="https://chatgpt.com/s/t_69988666246c81918d9ee63748d97d7d" target="_blank" class="inline-flex items-center justify-center bg-slate-50 text-emerald-600 font-bold py-3 px-5 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 transition-colors border border-slate-200 hover:border-emerald-200 group w-full sm:w-fit text-sm sm:text-base">
+                                ChatGPT 대화창 열기
+                                <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Gemini 3.1 Pro 심층 뷰 -->
+                <section id="gemini-view" class="content-section mb-16 sm:mb-24 max-w-5xl">
+                    <div class="flex flex-col items-start gap-3 sm:gap-4 mb-8 sm:mb-10 border-b border-slate-200 pb-6 sm:pb-8">
+                        <span class="model-tag tag-gemini">Gemini 3.1 Pro View</span>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 break-keep">거시경제 후폭풍과 복합 위기(Polycrisis)의 서사</h2>
+                        <p class="text-base sm:text-lg text-slate-600 leading-relaxed mt-1 sm:mt-2 break-keep">
+                            단순한 무역/법률 이슈가 아닌, 글로벌 자본 흐름과 국가 안보가 얽힌 <strong>'복합 위기(Polycrisis)'</strong> 관점에서 조망합니다. 최고 경영진(C-Level)이 주목해야 할 거시경제적 나비효과를 강력하게 경고합니다.
+                        </p>
+                    </div>
+
+                    <div class="space-y-6 sm:space-y-8">
+                        <!-- Block 1 -->
+                        <div class="report-block">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-blue-600 bg-blue-50/50">🏭</div>
+                                <span class="break-keep">1. 산업 파장: '관세 인하의 역설'과 매몰 비용 딜레마</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                관세 무효화로 인한 수출 단가 하락을 단기적 호재로 인정하지만, 이를 넘어서는 <strong>구조적 딜레마</strong>에 초점을 맞춥니다.
+                            </p>
+                            <ul class="custom-list gemini">
+                                <li><strong class="text-slate-800">현지화 자본의 매몰 비용화:</strong> 고관세를 회피하기 위해 무리하게 투입했던 미국 현지 생산 시설 투자금이 순식간에 '매몰 비용(Sunk Cost)'으로 전락할 수 있습니다.</li>
+                                <li><strong class="text-slate-800">노동력 붕괴의 직격탄:</strong> 무리한 ICE(이민세관집행국) 레이드로 인해 건설/운영 인력이 이탈하며, 관세 장벽이 사라진 상태에서 현지 공장의 가동률마저 떨어지는 최악의 시나리오를 제시합니다.</li>
+                                <li><strong class="text-slate-800">대미 투자 특별법 백지화 위기:</strong> 관세라는 미국의 지렛대가 사라지면서, 한국 국회에 계류 중인 3,500억 달러 규모의 '대미 투자 특별법'이 명분을 잃고 원점 재검토될 수 있습니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2 -->
+                        <div class="report-block">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-blue-600 bg-blue-50/50">📈</div>
+                                <span class="break-keep">2. 재정/정치 리스크: 국채 발작과 이중 수익 비판</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                환급 문제를 법리적 절차가 아닌, <strong>미국 연방 재정과 국채 시장을 흔드는 거시경제 충격</strong>으로 해석합니다.
+                            </p>
+                            <ul class="custom-list gemini">
+                                <li><strong class="text-slate-800">천문학적 환급과 국채 금리 급등:</strong> 1,500억 달러에 달하는 막대한 환급금을 단기간에 마련하기 위해 미국 연방 정부는 국채 발행을 늘릴 수밖에 없으며, 이는 즉각적인 '국채 시장 발작(Treasury Tantrum)'을 촉발합니다.</li>
+                                <li><strong class="text-slate-800">도덕적 해이와 포퓰리즘 타겟:</strong> 이미 비용을 소비자에게 전가했던 글로벌 대기업들이 환급금까지 챙기게 될 경우 '이중 수익(Double-Dipping)' 논란이 거세질 것이며, 행정부가 이를 횡재세 등 포퓰리즘의 먹잇감으로 삼을 수 있습니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 3 -->
+                        <div class="report-block">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-blue-600 bg-blue-50/50">🌍</div>
+                                <span class="break-keep">3. 지정학 전이: '왝 더 독' 시나리오와 한은의 딜레마</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                국내 정치적 위기 탈출을 위한 외부 충격 요법, 즉 <strong>'왝 더 독(Wag the Dog)' 시나리오의 극단성</strong>을 높게 평가합니다.
+                            </p>
+                            <ul class="custom-list gemini">
+                                <li><strong class="text-slate-800">이란 타격과 유가 폭등:</strong> 중간선거 지지율 반전을 위해 행정부가 이란 핵심 시설을 타격할 가능성을 제기하며, 이로 인해 국제 유가가 배럴당 150달러를 돌파할 수 있다고 경고합니다.</li>
+                                <li><strong class="text-slate-800">강달러 고착화와 BOK 진퇴양난:</strong> 극단적인 안전자산 선호(강달러)로 원/달러 환율 1,500원 붕괴를 초래할 것이며, 내수 진작이 필요한 한국은행(BOK)이 환율 방어 때문에 금리를 묶어두는 '통화정책 진퇴양난'에 빠지게 됩니다.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. ChatGPT 5.2 Pro 심층 뷰 -->
+                <section id="chatgpt-view" class="content-section mb-16 sm:mb-24 max-w-5xl">
+                    <div class="flex flex-col items-start gap-3 sm:gap-4 mb-8 sm:mb-10 border-b border-slate-200 pb-6 sm:pb-8">
+                        <span class="model-tag tag-chatgpt">ChatGPT 5.2 Pro View</span>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 break-keep">법률·행정적 메커니즘과 미시적 방어 논리</h2>
+                        <p class="text-base sm:text-lg text-slate-600 leading-relaxed mt-1 sm:mt-2 break-keep">
+                            거대 서사보다는 사안의 <strong>'법률적 테두리와 행정 절차'</strong>를 엄밀히 분해합니다. 현업 부서가 당장 대응해야 할 관세법(CBP 절차)과 공급망의 실제 움직임을 건조하고 현실적인 톤으로 풀어냅니다.
+                        </p>
+                    </div>
+
+                    <div class="space-y-6 sm:space-y-8">
+                        <!-- Block 1 -->
+                        <div class="report-block chatgpt">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-emerald-600 bg-emerald-50/50">⚖️</div>
+                                <span class="break-keep">1. 산업 파장의 현실: 232조 장벽과 프렌드쇼어링</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                IEEPA 무효화가 곧바로 핵심 산업의 대박으로 이어지지 않는다는 <strong>구조적 제약 요건</strong>을 짚어냅니다.
+                            </p>
+                            <ul class="custom-list chatgpt">
+                                <li><strong class="text-slate-800">무역확장법 232조의 중첩 적용:</strong> 자동차 및 철강 산업은 국가 안보를 이유로 한 232조(또는 쿼터제)의 통제를 여전히 받으므로 대법원 판결의 체감 혜택은 매우 제한적입니다.</li>
+                                <li><strong class="text-slate-800">진정한 수혜는 중간재/소비재:</strong> 오히려 배터리 부품, 일반 IT 소비재, 의류 등 232조의 그물망 밖에 있던 산업군이 실질적인 마진 개선 혜택을 볼 것이라 분석합니다.</li>
+                                <li><strong class="text-slate-800">공급망 재편의 비가역성:</strong> 현지화 투자는 안보 동맹(프렌드쇼어링)이라는 구조적 헤징(Hedging)의 결과물이므로, 단기 관세 인하로 기업들의 현지 투자 방향성이 역전되지 않습니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2 -->
+                        <div class="report-block chatgpt">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-emerald-600 bg-emerald-50/50">📝</div>
+                                <span class="break-keep">2. 실무/법리적 환급 리스크: 청산(Liquidation)과 2차 시장</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                환급 지연 가능성을 <strong>CBP(미 관세국경보호청) 행정 규정과 법률 분쟁의 관점</strong>에서 해부합니다.
+                            </p>
+                            <ul class="custom-list chatgpt">
+                                <li><strong class="text-slate-800">청산 여부와 180일 시효:</strong> 수입 신고 건의 '청산(세액 확정)' 완료 여부가 환급의 절대적 기준입니다. 이미 청산된 건은 180일 내 이의제기(Protest)를 거치지 않으면 소송이 기각될 수 있습니다.</li>
+                                <li><strong class="text-slate-800">소송 장기화 (CIT):</strong> 미국 정부가 국제무역법원(CIT)을 통해 개별 품목/원산지별 행정 소송을 유도하여 시간을 끌 것임을 예측합니다.</li>
+                                <li><strong class="text-slate-800">환급권 할인 매각(Factoring):</strong> 불확실성에 지친 기업들이 환급 권리를 사모펀드 등에 할인된 가격에 넘겨 유동성을 확보하려는 '환급권 2차 시장'의 움직임을 포착합니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 3 -->
+                        <div class="report-block chatgpt">
+                            <h3 class="report-title">
+                                <div class="icon-circle text-emerald-600 bg-emerald-50/50">🛡️</div>
+                                <span class="break-keep">3. 외교·안보 파장: 표적 관세로의 전환과 물류 병목</span>
+                            </h3>
+                            <p class="text-slate-600 text-sm sm:text-[1.05rem] font-medium px-1 break-keep">
+                                전쟁 시나리오보다는, 당장 사용할 수 있는 <strong>합법적이고 미시적인 보복 수단</strong>에 초점을 맞춥니다.
+                            </p>
+                            <ul class="custom-list chatgpt">
+                                <li><strong class="text-slate-800">보편관세에서 '표적 핀셋 관세'로 회귀:</strong> 광역 관세(IEEPA)가 불법화됨에 따라, 행정부는 우회로인 301조나 232조, 반덤핑 등을 무기 삼아 특정 산업(예: 변압기)을 정밀 타격하는 정국이 열릴 것입니다.</li>
+                                <li><strong class="text-slate-800">현실적인 중동 타격과 교역:</strong> 이란 전면 침공은 비용이 커서 대리전 수준에 머물 확률이 높으나, 이 경우에도 호르무즈 해협 마찰로 인한 선박 보험료 급등, 리드타임 지연 등 실물 교역(물동량) 인프라에 직접적 타격이 옵니다.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. 쟁점별 심층 비교 및 실무 대응 (Premium Dark Section) -->
+                <section id="comparison" class="content-section mb-10">
+                    <div class="dark-section rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-14 shadow-2xl relative overflow-hidden max-w-[1400px]">
+                        <!-- Abstract Background Elements -->
+                        <div class="absolute top-0 right-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-emerald-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
+
+                        <div class="relative z-10 text-center mb-10 sm:mb-16">
+                            <h2 class="text-2xl sm:text-3xl md:text-5xl font-black mb-4 sm:mb-6 text-white tracking-tight break-keep">💡 쟁점별 심층 비교 및 투자 전략</h2>
+                            <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-light break-keep">두 AI 모델은 동일한 팩트를 바탕으로 '거시적 서사(Gemini)'와 '미시적 실무(ChatGPT)'라는 완벽히 상호 보완적인 통찰을 제공합니다.</p>
+                        </div>
+
+                        <div class="relative z-10 grid xl:grid-cols-12 gap-8 sm:gap-10">
+                            
+                            <!-- Radar Chart Area -->
+                            <div class="xl:col-span-5 flex flex-col">
+                                <div class="glass-card p-5 sm:p-8 h-full flex flex-col justify-center">
+                                    <h3 class="text-center font-bold text-lg sm:text-xl mb-6 sm:mb-8 text-white">분석 렌즈 및 관점 매핑</h3>
+                                    <div class="chart-container w-full h-[300px] sm:h-[400px]">
+                                        <canvas id="analysisRadarChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparison Details Area -->
+                            <div class="xl:col-span-7 space-y-4 sm:space-y-5">
+                                <div class="glass-card p-5 sm:p-6 sm:px-8 flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center">
+                                    <h3 class="w-full md:w-1/4 text-base sm:text-lg font-bold text-white shrink-0">A. 리스크 진앙지</h3>
+                                    <div class="space-y-3 flex-1 border-l-2 md:border-l border-blue-500/30 md:border-white/10 pl-4 sm:pl-6">
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-blue-400">Gemini</span> 1,500억 달러 환급이 미 재정을 압박해 <strong class="text-white font-semibold">글로벌 금리 폭등</strong> 충격으로 번짐.</p>
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-emerald-400">ChatGPT</span> 환급의 본질은 거시가 아닌 <strong class="text-white font-semibold">청산(Liquidation) 및 180일 시효</strong>라는 행정 소송 영역.</p>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card p-5 sm:p-6 sm:px-8 flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center">
+                                    <h3 class="w-full md:w-1/4 text-base sm:text-lg font-bold text-white shrink-0">B. 산업 기회/위협</h3>
+                                    <div class="space-y-3 flex-1 border-l-2 md:border-l border-blue-500/30 md:border-white/10 pl-4 sm:pl-6">
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-blue-400">Gemini</span> 고관세를 피해 쏟아부은 대미 투자가 <strong class="text-white font-semibold">매몰 비용</strong>으로 전락하는 뼈아픈 딜레마 지적.</p>
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-emerald-400">ChatGPT</span> 자동차/철강은 232조에 묶여 체감이 어렵고, <strong class="text-white font-semibold">일반 소비재와 중간재</strong>가 진짜 수혜자임.</p>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card p-5 sm:p-6 sm:px-8 flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center">
+                                    <h3 class="w-full md:w-1/4 text-base sm:text-lg font-bold text-white shrink-0">C. 지정학 강도</h3>
+                                    <div class="space-y-3 flex-1 border-l-2 md:border-l border-blue-500/30 md:border-white/10 pl-4 sm:pl-6">
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-blue-400">Gemini</span> 이란 타격 → 유가 150불 → 강달러 → 금리 진퇴양난이라는 <strong class="text-white font-semibold">파국적 복합 위기</strong> 경고.</p>
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-emerald-400">ChatGPT</span> 전면전 확률은 낮으나 <strong class="text-white font-semibold">해상 운임 폭등과 리드타임 붕괴</strong> 등 실물 교역 타격에 집중.</p>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card p-5 sm:p-6 sm:px-8 flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center">
+                                    <h3 class="w-full md:w-1/4 text-base sm:text-lg font-bold text-white shrink-0">D. 정책 레버리지</h3>
+                                    <div class="space-y-3 flex-1 border-l-2 md:border-l border-blue-500/30 md:border-white/10 pl-4 sm:pl-6">
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-blue-400">Gemini</span> '3,500억 달러 <strong class="text-white font-semibold">대미 투자 특별법' 백지화</strong> 가능성 등 굵직한 거시 국가 외교 파열음 주목.</p>
+                                        <p class="text-sm text-slate-300 leading-relaxed"><span class="inline-block w-14 sm:w-16 font-bold text-emerald-400">ChatGPT</span> 반덤핑 등 개별 산업을 옥죄는 <strong class="text-white font-semibold">'표적 핀셋 압박(Targeted Tariffs)'</strong>으로 불확실성 증가 예측.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 1. 기업 전략 부서 Action Plan -->
+                        <div class="relative z-10 mt-12 sm:mt-16 pt-10 sm:pt-12 border-t border-white/10">
+                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-6 sm:mb-8 justify-center text-center">
+                                <span class="hidden sm:block w-12 h-[1px] bg-yellow-500/50"></span>
+                                <h3 class="text-xl sm:text-2xl font-black text-yellow-400 tracking-wide break-keep">🏢 기업 전략 부서 통합 Action Plan</h3>
+                                <span class="hidden sm:block w-12 h-[1px] bg-yellow-500/50"></span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                                <div class="bg-[#0f172a]/60 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-700/50">
+                                    <div class="flex items-center gap-3 mb-4 sm:mb-5">
+                                        <div class="p-2 bg-blue-500/20 rounded-lg shrink-0"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                                        <h4 class="font-bold text-base sm:text-lg text-white">C-Level 거시 대응 (Gemini 기반)</h4>
+                                    </div>
+                                    <ul class="space-y-3 sm:space-y-4">
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">자금/환율 방어:</strong> 국채 발작 및 강달러에 대비한 자금 조달 및 환율 헤징(Hedging) 전략 전면 재검토</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">매몰 비용 논리 방어:</strong> 미국 현지 생산 시설의 장기적 지정학 분산(프렌드쇼어링) 가치 입증 논리 개발</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">선제적 재고 확보:</strong> 중동 유가 폭등 시나리오에 대비한 핵심 원자재 최소 6개월 치 물량 확보</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-[#0f172a]/60 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-700/50">
+                                    <div class="flex items-center gap-3 mb-4 sm:mb-5">
+                                        <div class="p-2 bg-emerald-500/20 rounded-lg shrink-0"><svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
+                                        <h4 class="font-bold text-base sm:text-lg text-white">현업 부서 실무 방어 (ChatGPT 기반)</h4>
+                                    </div>
+                                    <ul class="space-y-3 sm:space-y-4">
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">법무/통관 전수조사:</strong> 과거 IEEPA 관세 납부 건 중 청산(Liquidation) 미완료 건 및 180일 시효 내 Protest 가능 건 즉시 파악</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">유동성 확보:</strong> 소송 장기화 대비를 위한 환급권 팩토링(헤지펀드 매각) 옵션 타당성 선제적 검토</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">핀셋 관세 대비:</strong> 미 행정부의 우회 제재(232조 등) 타겟이 될 가능성이 높은 품목 모니터링 강화 및 물동량 분산</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. 개미 투자자 Action Plan -->
+                        <div class="relative z-10 mt-12 sm:mt-16 pt-10 sm:pt-12 border-t border-white/10">
+                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-6 sm:mb-8 justify-center text-center">
+                                <span class="hidden sm:block w-12 h-[1px] bg-yellow-500/50"></span>
+                                <h3 class="text-xl sm:text-2xl font-black text-yellow-400 tracking-wide break-keep">🚀 한국 개미 투자자를 위한 포트폴리오 대응</h3>
+                                <span class="hidden sm:block w-12 h-[1px] bg-yellow-500/50"></span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                                <div class="bg-[#0f172a]/60 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-700/50">
+                                    <div class="flex items-center gap-3 mb-4 sm:mb-5">
+                                        <div class="p-2 bg-blue-500/20 rounded-lg shrink-0"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>
+                                        <h4 class="font-bold text-base sm:text-lg text-white">매크로 충격 대비 (Gemini 관점)</h4>
+                                    </div>
+                                    <ul class="space-y-3 sm:space-y-4">
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">강달러 대비 달러 자산 확대:</strong> 원/달러 환율 상승과 미 국채 발작 리스크에 대비해 포트폴리오 내 달러 단기채 ETF나 미국 배당주 비중 확대 고려</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">미국 장기채(TLT) 맹신 주의:</strong> 천문학적 관세 환급을 위해 미 연방 국채 발행이 급증하면 장기채 금리가 발작할 수 있으므로, 단순 '금리 인하' 베팅은 위험</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-blue-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">유가 급등 헷징(Hedging):</strong> 지정학 시나리오 현실화 시 국제 유가가 배럴당 150불을 돌파할 수 있으므로 정유/에너지 테마 일부 편입 검토</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-[#0f172a]/60 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-700/50">
+                                    <div class="flex items-center gap-3 mb-4 sm:mb-5">
+                                        <div class="p-2 bg-emerald-500/20 rounded-lg shrink-0"><svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
+                                        <h4 class="font-bold text-base sm:text-lg text-white">섹터별 옥석 가리기 (ChatGPT 관점)</h4>
+                                    </div>
+                                    <ul class="space-y-3 sm:space-y-4">
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">자동차·철강주 추격 매수 자제:</strong> 관세 철폐 뉴스만 보고 진입하는 것은 위험. 232조 제재가 여전히 살아있어 실제 마진 개선 및 실적 반영은 매우 제한적일 것</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">진짜 수혜주(중소형 소비재) 발굴:</strong> 232조 등 안보 관세망 밖에 있으면서 IEEPA 철폐의 직접적 혜택을 보는 배터리 후방 부품, 화장품, 일반 소비재 섹터 주목</span></li>
+                                        <li class="flex gap-2 sm:gap-3 text-slate-300 text-[0.85rem] sm:text-sm"><span class="text-emerald-400 mt-0.5 shrink-0">▪</span> <span class="break-keep"><strong class="text-white font-medium">해운주 단기 변동성:</strong> 중동 지역 무력 충돌 및 해협 봉쇄 리스크 부각 시, 글로벌 해상 운임(SCFI) 급등에 따른 해운주 테마성 급등락 장세 유의</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="mt-16 pt-8 border-t border-slate-200 text-center pb-4">
+                <p class="text-slate-500 text-sm font-medium tracking-wide">
+                    &copy; 2026 Kipeum Lee. All Rights Reserved.
+                </p>
+            </footer>
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Radar Chart Setup with Responsive handling
+    const radarCtx = document.getElementById('analysisRadarChart');
+    if(radarCtx) {
+        Chart.defaults.font.family = '"Paperlogy", -apple-system, sans-serif';
+        
+        // Adjust font size based on screen width
+        const isMobile = window.innerWidth < 640;
+        
+        const chart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    '거시경제(매크로) 서사', 
+                    '실무 통관 및 법리 해석', 
+                    '극단적 지정학 파급력', 
+                    '도덕적 해이 / 정치 프레임', 
+                    '미시적 산업 공급망 분석'
+                ],
+                datasets: [
+                    {
+                        label: 'Gemini 3.1 Pro',
+                        data: [9.5, 3, 9, 8.5, 4.5],
+                        backgroundColor: 'rgba(59, 130, 246, 0.25)', 
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#ffffff',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#2563eb',
+                        borderWidth: 2,
+                        fill: true
+                    },
+                    {
+                        label: 'ChatGPT 5.2 Pro',
+                        data: [4, 9.5, 5.5, 3, 8.5],
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)', 
+                        borderColor: '#10b981',
+                        pointBackgroundColor: '#059669',
+                        pointBorderColor: '#ffffff',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#059669',
+                        borderWidth: 2,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: isMobile ? 5 : 10
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255,255,255,0.08)' },
+                        grid: { color: 'rgba(255,255,255,0.08)', circular: true },
+                        pointLabels: {
+                            font: { size: isMobile ? 10 : 12, weight: '600' },
+                            color: '#cbd5e1', 
+                            padding: isMobile ? 8 : 15
+                        },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { 
+                            padding: isMobile ? 10 : 20,
+                            font: { size: isMobile ? 11 : 13, weight: '700' },
+                            color: '#ffffff',
+                            usePointStyle: true,
+                            boxWidth: isMobile ? 6 : 8
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                }
+            }
+        });
+    }
+
+    // ScrollSpy & Navigation Logic
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.content-section');
+    const sidebar = document.getElementById('sidebar');
+
+    function changeNav() {
+        let index = sections.length;
+        while(--index && window.scrollY + 150 < sections[index].offsetTop) {}
+        
+        navLinks.forEach((link) => link.classList.remove('active'));
+        if(index >= 0 && navLinks[index]) {
+            navLinks[index].classList.add('active');
+        }
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            if(targetSection){
+                 window.scrollTo({
+                    top: targetSection.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+            // Close mobile menu on click
+            if(window.innerWidth < 768 && sidebar) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+    });
+
+    window.addEventListener('scroll', changeNav, { passive: true });
+    changeNav(); // Init
+    
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileCloseButton = document.getElementById('mobile-close-button');
+    
+    if(mobileMenuButton && sidebar){
+        mobileMenuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    }
+    
+    if(mobileCloseButton && sidebar) {
+        mobileCloseButton.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+        });
+    }
+});
+</script>
+</body>
+</html>
