@@ -29,29 +29,22 @@ Users place source files in the `/input/` folder. The agent scans this folder fo
 
 ## Step 0: Preference Collection Protocol
 
-When the user provides a content source, collect all optional preferences in **a single prompt** before starting the pipeline:
+When the user provides a content source, ask **only one question** — the layout choice:
 
-| Preference | Required? | If not specified |
-|-----------|-----------|-----------------|
-| Layout (Dashboard / Infographic / Summary) | No | Auto-resolved after content extraction (Step 2.5) |
-| Theme | No | Auto-resolved based on content analysis at dashboard generation |
-| Library example ("make it like example-book-01") | No | Auto-resolved after content_type is confirmed (Step 2.5) |
-| Content type override (document/book/paper/article/media) | No | Auto-resolved after content extraction (Step 2.5) |
-| Cover image URL (book only) | Conditional | Always ask the user to provide one when content_type is book |
-
-**Prompt template:**
 ```
-I'll create a dashboard from this content. Before I start, do you have any preferences?
-
-- **Layout**: Interactive Dashboard / Visual Infographic / One-Page Executive Summary (default: auto)
-- **Theme**: Any color theme preference? (default: auto based on content)
-- **Style reference**: Want it similar to a library example? (e.g., "like example-book-01")
-- **Content type**: document / book / paper / article / media (default: auto-detect)
-
-You can skip all of these — I'll auto-determine everything.
+대시보드 레이아웃을 선택해주세요:
+1. Interactive Dashboard (기본값 — 섹션별 네비게이션, 상세 분석)
+2. Visual Infographic (스크롤 기반, 시각적 스토리텔링)
+3. One-Page Executive Summary (핵심 요약, 컴팩트)
 ```
 
-If user skips all, proceed with auto-determination at Step 2.5.
+**Everything else is auto-determined.** Do NOT ask the user about:
+- Theme → auto-resolved from content analysis at Step 4
+- Library example → auto-selected at Step 2.5
+- Content type → auto-detected at Step 1 / Step 2.5
+- Cover image URL → skip; user can add later via revision loop
+
+**The user can override any of these by mentioning them in their initial request** (e.g., "dark theme으로 해줘", "example-book-01처럼 만들어줘"). But never proactively ask.
 
 ---
 
@@ -75,12 +68,7 @@ source_type is pdf/text        → pending — resolved at Step 2.5
 
 ### Validation:
 - Confirm source_type is one of: `pdf`, `text`, `youtube`, `webpage`
-- If ambiguous, ask the user directly
-
-### Conditional: book content_type
-When content_type is determined to be `book` (either user-specified or resolved at Step 2.5):
-- Always ask user for a book cover image URL
-- If user cannot provide one, proceed without it but recommend adding via revision loop
+- If ambiguous, default to `document` and proceed (do not ask the user)
 
 ---
 
@@ -113,7 +101,7 @@ Run `validate_extraction.py` to confirm:
 
 ### Failure handling:
 - Auto-retry once on failure
-- If still fails, ask user to provide source text directly
+- If still fails, report the error to user (do not ask for alternative input — user will decide next steps)
 
 ---
 
