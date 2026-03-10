@@ -1,0 +1,6 @@
+youtube-transcript-api
+yt-dlp
+pdfplumber
+trafilatura
+beautifulsoup4
+requests
