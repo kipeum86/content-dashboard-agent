@@ -5,10 +5,19 @@
 ## Project Overview
 
 This agent orchestrates a pipeline that:
-1. Accepts content input (PDF, text file, YouTube URL, webpage URL)
+1. Accepts content input from `/input/` folder (PDF, text file) or URL (YouTube, webpage)
 2. Extracts text from the source
 3. Analyzes and structures the content into JSON
 4. Generates an interactive HTML dashboard
+
+## Input Folder
+
+Users place source files in the `/input/` folder. The agent scans this folder for content to process.
+
+- **Supported files**: `.pdf`, `.md`, `.txt`
+- **URLs**: YouTube and webpage URLs are provided directly by the user (not placed in `/input/`)
+- When the user says "make a dashboard" without specifying a file, check `/input/` for available files
+- If multiple files exist in `/input/`, ask the user which one to process (v1 processes one file at a time)
 
 ## Workflow Summary
 
@@ -82,9 +91,14 @@ Invoke the **content-ingestion** skill to extract text from the source.
 ### Invocation:
 Run the appropriate extraction script based on source_type:
 ```bash
-python .claude/skills/content-ingestion/scripts/extract_pdf.py <file_path> <output_dir>
-python .claude/skills/content-ingestion/scripts/extract_youtube.py <url> <output_dir>
-python .claude/skills/content-ingestion/scripts/extract_webpage.py <url> <output_dir>
+# For files in /input/ folder:
+python .claude/skills/content-ingestion/scripts/extract_pdf.py input/<filename>.pdf output/<title>
+# For text files, directly copy:
+cp input/<filename>.md output/<title>/raw_text.md
+
+# For URLs (provided directly by user):
+python .claude/skills/content-ingestion/scripts/extract_youtube.py <url> output/<title>
+python .claude/skills/content-ingestion/scripts/extract_webpage.py <url> output/<title>
 ```
 
 ### Output location: `/output/<title>/`
