@@ -1,1 +1,221 @@
-# content-dashboard-agent
+# Content Dashboard Agent
+
+Turn a single content source into a structured analysis JSON and a polished single-file HTML dashboard through a Claude Code workflow.
+
+> This repository is not a standalone SaaS or packaged CLI. It is the working repository for a Claude Code agent system: orchestration instructions, extraction scripts, schema-aware analysis rules, and dashboard generation references.
+
+## Overview
+
+Content Dashboard Agent is designed for a simple but high-value workflow:
+
+1. Accept one source file or URL
+2. Extract usable source text
+3. Convert the source into a content-aware JSON structure
+4. Render an interactive HTML dashboard
+5. Iterate through revision requests in natural language
+
+The project is optimized for operator-driven use inside Claude Code rather than for direct end-user self-service.
+
+## What The Repository Includes
+
+- `CLAUDE.md`: Main orchestrator instructions for the end-to-end workflow
+- `.claude/skills/content-ingestion/`: Source extraction skill plus Python scripts
+- `.claude/agents/content-analyzer/AGENT.md`: Sub-agent spec for structured JSON generation
+- `.claude/skills/web-content-designer/`: Dashboard rendering skill
+- `library/`: Reference dashboards the agent can learn structural patterns from
+- `input/`: Place local source files here
+- `output/`: Generated artifacts for each content item
+
+## Supported Sources
+
+| Source type | Input form | Notes |
+| --- | --- | --- |
+| PDF | Local file in `input/` | Best results when the PDF has an embedded text layer |
+| Text | Local `.md` or `.txt` file in `input/` | Source language is preserved |
+| YouTube | Direct URL | Extracts transcript, timestamps, and video metadata |
+| Webpage | Direct URL | Extracts article/body text and strips boilerplate when possible |
+
+## Output Artifacts
+
+For each processed item, the workflow writes a folder under `output/<title>/`.
+
+| File | Purpose |
+| --- | --- |
+| `raw_text.md` | Extracted source text used for analysis |
+| `timestamps.json` | Subtitle timing data for media sources |
+| `source_metadata.json` | YouTube title, channel, duration, publish date, and source URL |
+| `content_analysis.json` | Structured JSON generated from the source |
+| `<title>-dashboard.html` | Final dashboard output |
+
+## Content Types
+
+The analysis layer maps sources into one of five content-aware schemas:
+
+- `document`
+- `book`
+- `paper`
+- `article`
+- `media`
+
+This matters because the dashboard renderer changes its structure based on the content type. For example, books emphasize chapter navigation, papers highlight methodology and results, and media dashboards use segments and time markers.
+
+## Workflow
+
+### 1. Preference collection
+
+The workflow keeps the first interaction intentionally light. Layout is the only preference the agent should explicitly ask for unless the user already specifies other preferences.
+
+### 2. Source classification
+
+The agent classifies the input as `pdf`, `text`, `youtube`, or `webpage`, then determines or defers the final `content_type`.
+
+### 3. Content extraction
+
+Extraction scripts normalize the source into `raw_text.md`. YouTube sources also produce timestamps and metadata.
+
+### 4. Parameter resolution
+
+If the user did not specify a content type, layout, theme, or reference example, the agent resolves them after seeing the extracted content.
+
+### 5. Structured analysis
+
+The `content-analyzer` sub-agent converts the source into schema-specific JSON while following anti-hallucination rules.
+
+### 6. Dashboard generation
+
+The `web-content-designer` skill turns the JSON into a responsive HTML dashboard, optionally referencing a suitable example from `library/`.
+
+### 7. Revision loop
+
+After generation, the user can request design changes, content corrections, or both. The workflow is designed to support repeated revisions.
+
+## Repository Structure
+
+```text
+.
+|-- CLAUDE.md
+|-- README.md
+|-- requirements.txt
+|-- input/
+|   `-- .gitkeep
+|-- output/
+|   `-- .gitkeep
+|-- library/
+|   |-- README.md
+|   `-- *.html
+`-- .claude/
+    |-- agents/
+    |   `-- content-analyzer/AGENT.md
+    `-- skills/
+        |-- content-ingestion/
+        |   |-- SKILL.md
+        |   |-- references/json_schemas.md
+        |   `-- scripts/
+        |       |-- extract_pdf.py
+        |       |-- extract_webpage.py
+        |       |-- extract_youtube.py
+        |       `-- validate_extraction.py
+        `-- web-content-designer/SKILL.md
+```
+
+## Setup
+
+### Requirements
+
+- A recent Python 3 environment
+- Access to Claude Code
+- Network access for YouTube and webpage extraction
+
+### Install dependencies
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+If you prefer a global environment, install the same packages from `requirements.txt` directly.
+
+## How To Use
+
+### Recommended: run through Claude Code
+
+1. Put a source file in `input/`, or prepare a YouTube/webpage URL.
+2. Open the repository in Claude Code.
+3. Ask the agent to make a dashboard from your source.
+4. Review the generated files in `output/<title>/`.
+5. Request revisions in natural language until the dashboard is where you want it.
+
+Example prompts:
+
+```text
+Make a dashboard from input/my-report.pdf
+```
+
+```text
+Create a dashboard from this YouTube video: https://www.youtube.com/watch?v=...
+```
+
+```text
+Use a summary layout and make the dashboard feel more editorial
+```
+
+### Manual extraction commands
+
+If you want to validate only the ingestion layer, the extraction scripts can be run directly.
+
+PDF:
+
+```bash
+python .claude/skills/content-ingestion/scripts/extract_pdf.py "input/my-report.pdf" "output/my-report"
+```
+
+Webpage:
+
+```bash
+python .claude/skills/content-ingestion/scripts/extract_webpage.py "https://example.com/article" "output/article"
+```
+
+YouTube:
+
+```bash
+python .claude/skills/content-ingestion/scripts/extract_youtube.py "https://www.youtube.com/watch?v=VIDEO_ID" "output/video-title"
+```
+
+Validation:
+
+```bash
+python .claude/skills/content-ingestion/scripts/validate_extraction.py "output/video-title/raw_text.md"
+```
+
+## Library Reference System
+
+The `library/` folder is a quality multiplier. It stores approved HTML dashboards that future runs can reference for layout and interaction patterns.
+
+Important constraints:
+
+- The agent should absorb structure and styling patterns, not copy content
+- Library registration is user-initiated, not automatic
+- Media dashboards should reference a media-type example when one exists
+
+See `library/README.md` for the registration format.
+
+## Current Limitations
+
+- The workflow is agent-driven; there is no standalone command that runs the full pipeline end to end
+- The project is currently optimized for one source at a time
+- Output quality depends on source quality, especially for scanned PDFs and weak webpage extraction targets
+- YouTube processing depends on transcript availability
+- The dashboard renderer relies on external CDNs for some frontend assets
+- `input/` and `output/` contents are intentionally gitignored
+
+## Why This Project Exists
+
+Many useful dashboards start from the same repetitive sequence: extract text, summarize it, re-structure it, and then rebuild it into a readable interface. This repository compresses that workflow into a reusable Claude Code system so the operator can spend less time hand-translating content across tools.
+
+## Related Docs
+
+- `CLAUDE.md`
+- `library/README.md`
+- `docs/github-about.md`
+- `docs/github-release-note.md`
