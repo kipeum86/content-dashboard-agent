@@ -8,8 +8,11 @@ build/
 venv/
 .venv/
 
-# Output files (keep structure, ignore generated content)
+# Output files (user-generated content, not tracked)
 output/*/
+
+# Design documents
+content-dashboard-agent-design*.md
 
 # OS files
 .DS_Store
