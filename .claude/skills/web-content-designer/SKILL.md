@@ -65,9 +65,10 @@ Each content type should be rendered with appropriate differentiation:
 - Fewer decorative elements, focus on readability
 
 ### media
+- **REQUIRED: "Watch Original Video" button** — prominent CTA button at the top of the dashboard (hero area), linking to `media_meta.source_url`. Style: large, high-contrast, with a play icon (▶). Must be immediately visible without scrolling.
+- **REQUIRED: Reference a media-type library example** — always scan `/library/` for a YouTube-sourced dashboard and absorb its structural/stylistic patterns before generating
 - Timeline visualization (horizontal or vertical timeline with time markers)
 - Segment-based navigation with start_time/end_time displayed
-- Source URL linked for easy access to original video
 - Total duration displayed in header
 
 ## Theme System

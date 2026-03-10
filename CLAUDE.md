@@ -176,7 +176,7 @@ Invoke the **content-analyzer** sub-agent to generate structured JSON.
 - User-specified theme (if any)
 - Content type-specific instructions:
   - `book`: Place cover image at top of sidebar if available
-  - `media`: Include timeline visualization with time markers
+  - `media`: **Must** reference a media-type library example for styling (scan `/library/` for YouTube-sourced dashboards). Include timeline visualization with time markers. **Must** include a prominent "Watch Original Video" button at the top of the dashboard linking to `media_meta.source_url`
 - Language: always preserve source language
 
 ### Output:

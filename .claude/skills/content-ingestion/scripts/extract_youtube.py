@@ -39,7 +39,24 @@ def extract_transcript(video_id: str):
 
     ytt_api = YouTubeTranscriptApi()
 
-    # Try fetching transcript - the library auto-selects available languages
+    # Try fetching transcript with multiple language fallbacks
+    language_priorities = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de']
+    for lang in language_priorities:
+        try:
+            transcript = ytt_api.fetch(video_id, languages=[lang])
+            entries = []
+            for snippet in transcript:
+                entries.append({
+                    "text": snippet.text,
+                    "start": snippet.start,
+                    "duration": snippet.duration,
+                })
+            print(f"Transcript found in language: {lang}")
+            return entries
+        except Exception:
+            continue
+
+    # Final fallback: let the library auto-select
     try:
         transcript = ytt_api.fetch(video_id)
         entries = []
