@@ -148,9 +148,12 @@ Required only if you plan to use NotebookLM notebooks as a source. Run once to s
 
 ```bash
 pip install "notebooklm-py[browser]"
-playwright install chromium
+python -m playwright install chromium
 notebooklm login
 ```
+
+> On Windows, if `notebooklm` is not recognized, use the full path or add the Python Scripts directory to your PATH:
+> `C:\Users\<you>\AppData\Local\Python\pythoncore-3.14-64\Scripts\notebooklm.exe login`
 
 Credentials are stored in `~/.notebooklm/storage_state.json` and reused automatically on subsequent runs.
 
