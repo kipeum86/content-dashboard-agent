@@ -52,10 +52,11 @@ When the user provides a content source, ask **only one question** — the layou
 
 ### Source type rules (definitive at Step 1):
 ```
-*.pdf                          → pdf
-*.md, *.txt                    → text
-youtube.com/*, youtu.be/*      → youtube
-Other URLs (http/https)        → webpage
+*.pdf                              → pdf
+*.md, *.txt                        → text
+youtube.com/*, youtu.be/*          → youtube
+notebooklm.google.com/notebook/*   → notebooklm
+Other URLs (http/https)            → webpage
 ```
 
 ### Content type rules (may be deferred):
@@ -63,18 +64,19 @@ Other URLs (http/https)        → webpage
 User explicitly specified      → use specified value (definitive)
 source_type is youtube         → media (definitive)
 source_type is webpage         → article (definitive)
+source_type is notebooklm      → pending — resolved at Step 2.5
 source_type is pdf/text        → pending — resolved at Step 2.5
 ```
 
 ### Validation:
-- Confirm source_type is one of: `pdf`, `text`, `youtube`, `webpage`
+- Confirm source_type is one of: `pdf`, `text`, `youtube`, `webpage`, `notebooklm`
 - If ambiguous, default to `document` and proceed (do not ask the user)
 
 ---
 
-## Step 2: Content Extraction (Invoke content-ingestion skill)
+## Step 2: Content Extraction
 
-Invoke the **content-ingestion** skill to extract text from the source.
+Invoke the appropriate skill based on source_type.
 
 ### Invocation:
 Run the appropriate extraction script based on source_type:
@@ -87,12 +89,16 @@ cp input/<filename>.md output/<title>/raw_text.md
 # For URLs (provided directly by user):
 python .claude/skills/content-ingestion/scripts/extract_youtube.py <url> output/<title>
 python .claude/skills/content-ingestion/scripts/extract_webpage.py <url> output/<title>
+
+# For NotebookLM notebooks (invoke notebooklm-ingestion skill):
+python .claude/skills/notebooklm-ingestion/scripts/extract_notebooklm.py <notebook_url_or_id> output/<title>
 ```
 
 ### Output location: `/output/<title>/`
 - `raw_text.md` — extracted text (all source types)
 - `timestamps.json` — subtitle timestamps (YouTube only)
-- `source_metadata.json` — video metadata (YouTube only)
+- `source_metadata.json` — video/notebook metadata (YouTube and NotebookLM)
+- `notebooklm_report.md` — Study Guide Markdown (NotebookLM only, best-effort)
 
 ### Validation:
 Run `validate_extraction.py` to confirm:
@@ -116,6 +122,7 @@ After content extraction, resolve any unspecified preferences using the actual e
 - Chapter-based, 10+ chapters → `book`
 - Short single-topic → `article`
 - YouTube source → `media`
+- NotebookLM source with ≥10 processed sources → `book`
 - Default → `document`
 
 **Layout** (if not user-specified):
@@ -141,6 +148,8 @@ Invoke the **content-analyzer** sub-agent to generate structured JSON.
 - Resolved `content_type`
 - (YouTube) `/output/<title>/timestamps.json`
 - (YouTube) `/output/<title>/source_metadata.json`
+- (NotebookLM) `/output/<title>/notebooklm_report.md` — if file exists, pass as structural hint with instruction: "이 파일은 NotebookLM이 생성한 Study Guide입니다. 구조 참고용으로만 사용하고, 분석은 raw_text.md 기준으로 수행하세요."
+- (NotebookLM) `/output/<title>/source_metadata.json`
 - (Book) Cover image URL if available
 
 ### Expected output:
@@ -257,6 +266,7 @@ example-<content_type>-<sequence>.html
 
 | Component | When | What to pass |
 |-----------|------|-------------|
-| **content-ingestion** skill | Step 2 | source file/URL + source_type |
-| **content-analyzer** sub-agent | Step 3, Step 5 (content revisions) | raw_text.md + content_type + timestamps/metadata (if YouTube) + cover URL (if book) |
+| **content-ingestion** skill | Step 2 (pdf, text, youtube, webpage) | source file/URL + source_type |
+| **notebooklm-ingestion** skill | Step 2 (notebooklm) | notebook URL or ID |
+| **content-analyzer** sub-agent | Step 3, Step 5 (content revisions) | raw_text.md + content_type + timestamps/metadata (if YouTube) + notebooklm_report.md hint (if NotebookLM) + cover URL (if book) |
 | **web-content-designer** skill | Step 4 | content_analysis.json + raw_text.md + layout + theme + library example |

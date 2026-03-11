@@ -4,3 +4,4 @@ pdfplumber
 trafilatura
 beautifulsoup4
 requests
+notebooklm-py
