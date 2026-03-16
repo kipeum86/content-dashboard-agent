@@ -140,12 +140,38 @@ Apply the user's stated theme preference (e.g., "dark mode", "blue and white", "
 
 ## Library Example Reference
 
-When a library example is provided:
-1. Scan the example HTML for structural patterns (layout, component arrangement)
-2. Note CSS styling approach (custom properties, color scheme structure)
-3. Identify interaction patterns (navigation, expand/collapse, scroll behavior)
-4. Apply these patterns to the new dashboard with fresh content and theme
-5. **Never copy text content, data, or quotes from the example**
+The library example is the **structural template**, not just a reference. The generated dashboard should look and feel like a sibling of the example — same visual DNA, different content.
+
+### When a library example is provided, follow this process:
+
+**Step 1 — Extract the template structure:**
+Read the example HTML thoroughly and extract:
+- Overall page layout (sidebar width, header height, main content grid)
+- Component hierarchy (how sections, cards, quotes, stats are nested)
+- CSS custom properties and design tokens (--primary, --bg, --card-bg, --text, spacing scale, border-radius)
+- CSS class architecture (naming patterns, component classes, utility usage)
+- Typography system (font sizes, weights, line-heights, heading hierarchy)
+- Interactive behaviors (sidebar navigation, scroll-spy, expand/collapse, search/filter, hover effects)
+- Visual components (stat cards, quote blocks, keyword tags, progress indicators, charts, timeline)
+- Responsive breakpoints and mobile behavior
+
+**Step 2 — Build using the template:**
+- Use the **same HTML skeleton** (same nesting structure for sidebar, header, main, sections, cards)
+- Use the **same CSS class names and component styles** (replicate the stylesheet structure)
+- Use the **same interaction patterns** (same JS behavior for navigation, scroll, expand/collapse)
+- Use the **same visual rhythm** (same spacing, same card layout, same section flow)
+
+**Step 3 — Replace content only:**
+- Swap in new text content, data values, quotes, keywords from `content_analysis.json`
+- Apply auto-determined or user-specified color theme to the CSS custom properties
+- Adjust section count and content volume to match the new source material
+
+### What this means in practice:
+If the library example has a fixed sidebar with chapter list + scrollable main area with cards containing summary/arguments/quote/keywords → the new dashboard MUST have the same layout with the same card components. Do NOT invent a completely different layout, card structure, or interaction model.
+
+### Never copy:
+- Text content, data values, quotes, or keywords from the example
+- The example's specific color theme (determine from new content instead)
 
 ## Design Overrides (Revision Support)
 

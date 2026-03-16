@@ -171,16 +171,21 @@ Invoke the **content-analyzer** sub-agent to generate structured JSON.
 ### Library example selection (before generation):
 1. If user specified a library example → use it directly
 2. If not, read `/library/README.md` → select 1 example matching content_type + layout (prefer most recent)
-3. Scan the selected example HTML for structural/stylistic patterns only
-4. If library is empty, use web-content-designer built-in patterns
+3. **Read the selected example HTML thoroughly** — this is the structural template, not just a reference
+4. If library is empty, fall back to web-content-designer built-in patterns
 
-### Reference principles:
-- **Absorb from examples**: HTML structure, CSS styling patterns, interaction patterns, component layout, visualization types
-- **Do NOT absorb**: text content, data values, quotes, keywords, color theme
+### Reference principles — the example IS the template:
+
+The library example is the **structural template** for the new dashboard. The generated output should look and feel like a sibling of the example — same visual DNA, different content.
+
+- **REPLICATE from examples**: HTML skeleton (sidebar, header, main area, card structure), CSS architecture (custom properties, class naming, component styles), interaction patterns (navigation, expand/collapse, scroll-spy, hover effects), component types (stat cards, quote blocks, keyword tags, progress bars, charts), visual rhythm (spacing, typography scale, section flow)
+- **REPLACE with new content**: text content, data values, quotes, keywords
+- **AUTO-DETERMINE from content**: color theme (unless user specified)
 
 ### Information to pass to web-content-designer:
 - Full analysis JSON content (`content_analysis.json`)
 - Source text (`raw_text.md`) — for theme analysis unless user specified a theme
+- **Library example HTML** — the full HTML file content (not just the filename)
 - Layout selection
 - User-specified theme (if any)
 - Content type-specific instructions:
