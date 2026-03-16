@@ -1,150 +1,170 @@
+<div align="center">
+
 # Content Dashboard Agent
 
-Turn a single content source into a structured analysis JSON and a polished single-file HTML dashboard through a Claude Code workflow.
+**Turn any content source into a polished, interactive HTML dashboard.**
 
-> This repository is not a standalone SaaS or packaged CLI. It is the working repository for a Claude Code agent system: orchestration instructions, extraction scripts, schema-aware analysis rules, and dashboard generation references.
+PDFs · Text files · YouTube videos · Webpages · NotebookLM notebooks
 
-## Overview
+[한국어 README](README.ko.md)
 
-Content Dashboard Agent is designed for a simple but high-value workflow:
+<br>
 
-1. Accept one source file or URL
-2. Extract usable source text
-3. Convert the source into a content-aware JSON structure
-4. Render an interactive HTML dashboard
-5. Iterate through revision requests in natural language
+<img src="https://img.shields.io/badge/powered_by-Claude_Code-blueviolet?style=for-the-badge" alt="Powered by Claude Code">
+<img src="https://img.shields.io/badge/output-Single_File_HTML-orange?style=for-the-badge" alt="Single File HTML">
+<img src="https://img.shields.io/badge/sources-5_types-green?style=for-the-badge" alt="5 Source Types">
 
-The project is optimized for operator-driven use inside Claude Code rather than for direct end-user self-service.
+</div>
 
-## What The Repository Includes
+<br>
 
-- `CLAUDE.md`: Main orchestrator instructions for the end-to-end workflow
-- `.claude/skills/content-ingestion/`: Source extraction skill plus Python scripts
-- `.claude/agents/content-analyzer/AGENT.md`: Sub-agent spec for structured JSON generation
-- `.claude/skills/web-content-designer/`: Dashboard rendering skill
-- `library/`: Reference dashboards the agent can learn structural patterns from
-- `input/`: Place local source files here
-- `output/`: Generated artifacts for each content item
+> **Note:** This is not a standalone app or CLI. It is the working repository for a **Claude Code agent system** — orchestration instructions, extraction scripts, analysis rules, and dashboard generation references.
+
+---
+
+## Live Examples
+
+See what Content Dashboard Agent produces. Each link opens a fully generated, single-file HTML dashboard.
+
+<table>
+<tr>
+<th width="150">Content Type</th>
+<th width="300">English</th>
+<th width="300">한국어</th>
+</tr>
+<tr>
+<td><strong>📖 Book Summary</strong></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/JoKJEYX">View Dashboard →</a></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/azvzbxE">대시보드 보기 →</a></td>
+</tr>
+<tr>
+<td><strong>🎬 YouTube Video</strong></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/jEbErrj">View Dashboard →</a></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/ZYpEKRX">대시보드 보기 →</a></td>
+</tr>
+<tr>
+<td><strong>📄 Research Paper</strong></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/MYwNmMb">View Dashboard →</a></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/emNqWwv">대시보드 보기 →</a></td>
+</tr>
+<tr>
+<td><strong>📊 Comprehensive</strong></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/JodqRME">View Dashboard →</a></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/Eajzgoy">대시보드 보기 →</a></td>
+</tr>
+<tr>
+<td><strong>⚖️ Case Law</strong></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/qEdgWgO">View Dashboard →</a></td>
+<td><a href="https://codepen.io/Kipeum-Lee/full/xbGMKMb">대시보드 보기 →</a></td>
+</tr>
+</table>
+
+---
+
+## How It Works
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Content    │     │   Extract   │     │   Analyze   │     │  Generate   │
+│   Source     │────▶│   Text      │────▶│   to JSON   │────▶│  Dashboard  │
+│             │     │             │     │             │     │             │
+│ PDF/YouTube │     │ raw_text.md │     │ Structured  │     │ Single-file │
+│ Web/Text/NLM│     │ + metadata  │     │ analysis    │     │ HTML output │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+                                                                   │
+                                                                   ▼
+                                                            ┌─────────────┐
+                                                            │  Revision   │
+                                                            │    Loop     │
+                                                            │ "Make it    │
+                                                            │  darker..." │
+                                                            └─────────────┘
+```
+
+### The Pipeline
+
+| Step | What happens | Who does it |
+|:----:|--------------|-------------|
+| **1** | You provide a source (file or URL) and pick a layout | You |
+| **2** | Text is extracted and normalized | `content-ingestion` scripts |
+| **3** | Content type, theme, and layout are auto-resolved | Orchestrator (`CLAUDE.md`) |
+| **4** | Source is analyzed into structured JSON | `content-analyzer` sub-agent |
+| **5** | JSON is rendered into an interactive dashboard | `web-content-designer` skill |
+| **6** | You request changes in plain language | Revision loop (unlimited) |
+
+---
 
 ## Supported Sources
 
-| Source type | Input form | Notes |
-| --- | --- | --- |
-| PDF | Local file in `input/` | Best results when the PDF has an embedded text layer |
-| Text | Local `.md` or `.txt` file in `input/` | Source language is preserved |
-| YouTube | Direct URL | Extracts transcript, timestamps, and video metadata |
-| Webpage | Direct URL | Extracts article/body text and strips boilerplate when possible |
-| NotebookLM | Direct notebook URL | Pulls source fulltexts and generates a Study Guide via notebooklm-py; requires one-time `notebooklm login` |
+| Source | Input | What gets extracted |
+|--------|-------|---------------------|
+| **PDF** | Local file in `input/` | Full text (best with embedded text layer) |
+| **Text** | `.md` or `.txt` in `input/` | Direct content, language preserved |
+| **YouTube** | URL | Transcript + timestamps + video metadata |
+| **Webpage** | URL | Article body, boilerplate stripped |
+| **NotebookLM** | Notebook URL | Source fulltexts + Study Guide via notebooklm-py |
 
-## Output Artifacts
+---
 
-For each processed item, the workflow writes a folder under `output/<title>/`.
+## Content-Aware Output
 
-| File | Purpose |
-| --- | --- |
-| `raw_text.md` | Extracted source text used for analysis |
-| `timestamps.json` | Subtitle timing data for media sources |
-| `source_metadata.json` | YouTube title, channel, duration, publish date, and source URL; or NotebookLM notebook title and source list |
-| `notebooklm_report.md` | Study Guide generated by NotebookLM (NotebookLM sources only) |
-| `content_analysis.json` | Structured JSON generated from the source |
-| `<title>-dashboard.html` | Final dashboard output |
+The dashboard adapts its structure based on what you feed it:
 
-## Content Types
+| Content Type | Optimized For |
+|:------------:|---------------|
+| `book` | Chapter navigation, cover imagery, section-by-section analysis |
+| `paper` | Abstract, methodology, results, discussion structure |
+| `media` | Timestamped segments, video metadata, "Watch Original" button |
+| `article` | Editorial flow, lighter structure |
+| `document` | Flexible general-purpose layout |
 
-The analysis layer maps sources into one of five content-aware schemas:
+Three layout options: **Interactive Dashboard** (sectioned navigation) · **Visual Infographic** (scroll-based storytelling) · **One-Page Executive Summary** (compact key points)
 
-- `document`
-- `book`
-- `paper`
-- `article`
-- `media`
+---
 
-This matters because the dashboard renderer changes its structure based on the content type. For example, books emphasize chapter navigation, papers highlight methodology and results, and media dashboards use segments and time markers.
+## Quick Start
 
-## Workflow
+### Prerequisites
 
-### 1. Preference collection
+- Python 3.10+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) access
 
-The workflow keeps the first interaction intentionally light. Layout is the only preference the agent should explicitly ask for unless the user already specifies other preferences.
-
-### 2. Source classification
-
-The agent classifies the input as `pdf`, `text`, `youtube`, `webpage`, or `notebooklm`, then determines or defers the final `content_type`.
-
-### 3. Content extraction
-
-Extraction scripts normalize the source into `raw_text.md`. YouTube sources also produce timestamps and metadata.
-
-### 4. Parameter resolution
-
-If the user did not specify a content type, layout, theme, or reference example, the agent resolves them after seeing the extracted content.
-
-### 5. Structured analysis
-
-The `content-analyzer` sub-agent converts the source into schema-specific JSON while following anti-hallucination rules.
-
-### 6. Dashboard generation
-
-The `web-content-designer` skill turns the JSON into a responsive HTML dashboard, optionally referencing a suitable example from `library/`.
-
-### 7. Revision loop
-
-After generation, the user can request design changes, content corrections, or both. The workflow is designed to support repeated revisions.
-
-## Repository Structure
-
-```text
-.
-|-- CLAUDE.md
-|-- README.md
-|-- requirements.txt
-|-- input/
-|   `-- .gitkeep
-|-- output/
-|   `-- .gitkeep
-|-- library/
-|   |-- README.md
-|   `-- *.html
-`-- .claude/
-    |-- agents/
-    |   `-- content-analyzer/AGENT.md
-    `-- skills/
-        |-- content-ingestion/
-        |   |-- SKILL.md
-        |   |-- references/json_schemas.md
-        |   `-- scripts/
-        |       |-- extract_pdf.py
-        |       |-- extract_webpage.py
-        |       |-- extract_youtube.py
-        |       `-- validate_extraction.py
-        |-- notebooklm-ingestion/
-        |   |-- SKILL.md
-        |   `-- scripts/
-        |       `-- extract_notebooklm.py
-        `-- web-content-designer/SKILL.md
-```
-
-## Setup
-
-### Requirements
-
-- A recent Python 3 environment
-- Access to Claude Code
-- Network access for YouTube and webpage extraction
-
-### Install dependencies
+### Install
 
 ```bash
+git clone https://github.com/your-username/content-dashboard-agent.git
+cd content-dashboard-agent
+
 python -m venv .venv
-.venv\Scripts\activate
+source .venv/bin/activate        # macOS/Linux
+# .venv\Scripts\activate         # Windows
+
 pip install -r requirements.txt
 ```
 
-If you prefer a global environment, install the same packages from `requirements.txt` directly.
+### Run
 
-### NotebookLM authentication (optional)
+1. Place a source file in `input/`, or have a URL ready
+2. Open the project in Claude Code
+3. Ask the agent:
 
-Required only if you plan to use NotebookLM notebooks as a source. Run once to save credentials:
+```
+Make a dashboard from input/my-report.pdf
+```
+```
+Create a dashboard from this YouTube video: https://www.youtube.com/watch?v=...
+```
+```
+Make a dashboard from my NotebookLM notebook: https://notebooklm.google.com/notebook/...
+```
+
+4. Pick a layout when prompted
+5. Review the output in `output/<title>/`
+6. Request revisions in natural language — no limit
+
+### NotebookLM Setup (optional)
+
+Only needed if you use NotebookLM notebooks as a source:
 
 ```bash
 pip install "notebooklm-py[browser]"
@@ -152,101 +172,87 @@ python -m playwright install chromium
 notebooklm login
 ```
 
-> On Windows, if `notebooklm` is not recognized, use the full path or add the Python Scripts directory to your PATH:
+> **Windows:** If `notebooklm` is not recognized, use the full path:
 > `C:\Users\<you>\AppData\Local\Python\pythoncore-3.14-64\Scripts\notebooklm.exe login`
 
-Credentials are stored in `~/.notebooklm/storage_state.json` and reused automatically on subsequent runs.
+---
 
-## How To Use
+## Output Structure
 
-### Recommended: run through Claude Code
+Each processed source generates a folder under `output/`:
 
-1. Put a source file in `input/`, or prepare a YouTube/webpage URL.
-2. Open the repository in Claude Code.
-3. Ask the agent to make a dashboard from your source.
-4. Review the generated files in `output/<title>/`.
-5. Request revisions in natural language until the dashboard is where you want it.
-
-Example prompts:
-
-```text
-Make a dashboard from input/my-report.pdf
+```
+output/<title>/
+├── raw_text.md               # Extracted source text
+├── timestamps.json           # YouTube only
+├── source_metadata.json      # YouTube / NotebookLM
+├── notebooklm_report.md      # NotebookLM only
+├── content_analysis.json     # Structured analysis
+└── <title>-dashboard.html    # Final dashboard
 ```
 
-```text
-Create a dashboard from this YouTube video: https://www.youtube.com/watch?v=...
+---
+
+## Repository Structure
+
+```
+.
+├── CLAUDE.md                           # Orchestrator instructions
+├── README.md
+├── requirements.txt
+├── input/                              # Drop source files here
+├── output/                             # Generated artifacts
+├── library/                            # Reference dashboard examples
+│   ├── README.md
+│   └── *.html
+└── .claude/
+    ├── agents/
+    │   └── content-analyzer/AGENT.md   # Analysis sub-agent spec
+    └── skills/
+        ├── content-ingestion/          # Extraction scripts
+        │   ├── SKILL.md
+        │   ├── references/json_schemas.md
+        │   └── scripts/
+        ├── notebooklm-ingestion/       # NotebookLM extraction
+        │   ├── SKILL.md
+        │   └── scripts/
+        └── web-content-designer/       # Dashboard rendering
+            └── SKILL.md
 ```
 
-```text
-Make a dashboard from my NotebookLM notebook: https://notebooklm.google.com/notebook/...
-```
+---
 
-```text
-Use a summary layout and make the dashboard feel more editorial
-```
+## Library System
 
-### Manual extraction commands
+The `library/` folder stores approved dashboard examples. Future runs reference these for layout and styling patterns — not content.
 
-If you want to validate only the ingestion layer, the extraction scripts can be run directly.
+- Registration is **user-initiated** only ("add to library")
+- The agent absorbs structure and interaction patterns, never content
+- Media dashboards prefer media-type references when available
 
-NotebookLM (requires `notebooklm login` first):
+See [library/README.md](library/README.md) for the full catalog and naming convention.
 
-```bash
-python .claude/skills/notebooklm-ingestion/scripts/extract_notebooklm.py "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID" "output/my-notebook"
-```
+---
 
-PDF:
+## Limitations
 
-```bash
-python .claude/skills/content-ingestion/scripts/extract_pdf.py "input/my-report.pdf" "output/my-report"
-```
+- Agent-driven workflow — no standalone CLI for the full pipeline
+- One source at a time (v1)
+- PDF quality depends on embedded text layers
+- YouTube requires available transcripts
+- Dashboards may load frontend assets from external CDNs
+- `input/` and `output/` are gitignored
 
-Webpage:
+---
 
-```bash
-python .claude/skills/content-ingestion/scripts/extract_webpage.py "https://example.com/article" "output/article"
-```
+## Why This Exists
 
-YouTube:
+Content-heavy work often breaks down because source material, analysis, and presentation live in different tools. Content Dashboard Agent collapses that into one repeatable workflow — extract, analyze, render, revise — all inside Claude Code.
 
-```bash
-python .claude/skills/content-ingestion/scripts/extract_youtube.py "https://www.youtube.com/watch?v=VIDEO_ID" "output/video-title"
-```
+---
 
-Validation:
+<div align="center">
 
-```bash
-python .claude/skills/content-ingestion/scripts/validate_extraction.py "output/video-title/raw_text.md"
-```
+**[See Live Examples](#live-examples)** · **[한국어 README](README.ko.md)**
 
-## Library Reference System
-
-The `library/` folder is a quality multiplier. It stores approved HTML dashboards that future runs can reference for layout and interaction patterns.
-
-Important constraints:
-
-- The agent should absorb structure and styling patterns, not copy content
-- Library registration is user-initiated, not automatic
-- Media dashboards should reference a media-type example when one exists
-
-See `library/README.md` for the registration format.
-
-## Current Limitations
-
-- The workflow is agent-driven; there is no standalone command that runs the full pipeline end to end
-- The project is currently optimized for one source at a time
-- Output quality depends on source quality, especially for scanned PDFs and weak webpage extraction targets
-- YouTube processing depends on transcript availability
-- The dashboard renderer relies on external CDNs for some frontend assets
-- `input/` and `output/` contents are intentionally gitignored
-
-## Why This Project Exists
-
-Many useful dashboards start from the same repetitive sequence: extract text, summarize it, re-structure it, and then rebuild it into a readable interface. This repository compresses that workflow into a reusable Claude Code system so the operator can spend less time hand-translating content across tools.
-
-## Related Docs
-
-- `CLAUDE.md`
-- `library/README.md`
-- `docs/github-about.md`
-- `docs/github-release-note.md`
+</div>
