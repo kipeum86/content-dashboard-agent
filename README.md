@@ -63,22 +63,12 @@ See what Content Dashboard Agent produces. Each link opens a fully generated, si
 
 ## How It Works
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Content    │     │   Extract   │     │   Analyze   │     │  Generate   │
-│   Source     │────▶│   Text      │────▶│   to JSON   │────▶│  Dashboard  │
-│             │     │             │     │             │     │             │
-│ PDF/YouTube │     │ raw_text.md │     │ Structured  │     │ Single-file │
-│ Web/Text/NLM│     │ + metadata  │     │ analysis    │     │ HTML output │
-└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
-                                                                   │
-                                                                   ▼
-                                                            ┌─────────────┐
-                                                            │  Revision   │
-                                                            │    Loop     │
-                                                            │ "Make it    │
-                                                            │  darker..." │
-                                                            └─────────────┘
+```mermaid
+flowchart LR
+    A["📥 Content Source<br>PDF · YouTube<br>Web · Text · NLM"] -->|Extract| B["📝 Text Extraction<br>raw_text.md<br>+ metadata"]
+    B -->|Analyze| C["🔍 JSON Analysis<br>Structured<br>analysis"]
+    C -->|Generate| D["🎨 Dashboard<br>Single-file<br>HTML output"]
+    D -->|Revise| E["🔄 Revision Loop<br>Make it<br>darker..."]
 ```
 
 ### The Pipeline
